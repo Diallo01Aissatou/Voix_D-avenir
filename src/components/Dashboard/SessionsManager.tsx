@@ -5,7 +5,7 @@ import { Calendar, Clock, User, Video, MessageSquare, CheckCircle, XCircle, Aler
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `http://localhost:5001${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface SessionsManagerProps {
@@ -62,7 +62,7 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
     console.log('Confirmation présence pour session:', sessionId);
     setConfirmingPresence(sessionId);
     try {
-      const response = await fetch(`http://localhost:5001/api/mentorship/sessions/${sessionId}/confirm`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/sessions/${sessionId}/confirm`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -90,7 +90,7 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
     
     console.log('Annulation séance:', sessionId);
     try {
-      const response = await fetch(`http://localhost:5001/api/mentorship/sessions/${sessionId}/cancel`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/sessions/${sessionId}/cancel`, {
         method: 'PUT',
         credentials: 'include'
       });

@@ -43,7 +43,7 @@ const DynamicChat: React.FC<DynamicChatProps> = ({ otherUserId, otherUserName, o
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/messages/${otherUserId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${otherUserId}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -71,7 +71,7 @@ const DynamicChat: React.FC<DynamicChatProps> = ({ otherUserId, otherUserName, o
         formData.append('file', fileInputRef.current.files[0]);
       }
 
-      const response = await fetch('http://localhost:5001/api/messages', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
         method: 'POST',
         credentials: 'include',
         body: formData
@@ -149,13 +149,13 @@ const DynamicChat: React.FC<DynamicChatProps> = ({ otherUserId, otherUserName, o
                     <div className="mt-2">
                       {message.fileName?.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                         <img 
-                          src={`http://localhost:5001${message.fileUrl}`} 
+                          src={`https://voix-avenir-backend.onrender.com${message.fileUrl}`} 
                           alt={message.fileName}
                           className="max-w-full h-auto rounded"
                         />
                       ) : (
                         <a 
-                          href={`http://localhost:5001${message.fileUrl}`}
+                          href={`https://voix-avenir-backend.onrender.com${message.fileUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center space-x-2 text-sm underline"

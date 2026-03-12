@@ -79,7 +79,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 <div className="h-96 lg:h-auto">
                   <img
-                    src={featuredExpert.user?.photo ? `http://localhost:5001${featuredExpert.user.photo}` : 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg'}
+                    src={featuredExpert.user?.photo ? `https://voix-avenir-backend.onrender.com${featuredExpert.user.photo}` : 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg'}
                     alt={featuredExpert.user?.name}
                     className="w-full h-full object-cover"
                   />
@@ -146,7 +146,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
               <div key={expert._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 overflow-hidden group">
                 <div className="h-64 overflow-hidden">
                   <img
-                    src={expert.user?.photo ? `http://localhost:5001${expert.user.photo}` : 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg'}
+                    src={expert.user?.photo ? `https://voix-avenir-backend.onrender.com${expert.user.photo}` : 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg'}
                     alt={expert.user?.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />

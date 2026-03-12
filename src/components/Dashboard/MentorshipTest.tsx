@@ -23,7 +23,7 @@ const MentorshipTest: React.FC = () => {
   const loadData = async () => {
     try {
       // Utiliser les vraies routes qui existent
-      const requestsRes = await fetch(`http://localhost:5001/api/mentorship/${currentUser?.role === 'mentore' ? 'received' : 'sent'}`, {
+      const requestsRes = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${currentUser?.role === 'mentore' ? 'received' : 'sent'}`, {
         credentials: 'include'
       });
       
@@ -46,7 +46,7 @@ const MentorshipTest: React.FC = () => {
 
   const handleRequestAction = async (requestId: string, action: 'accepted' | 'rejected') => {
     try {
-      const response = await fetch(`http://localhost:5001/api/mentorship/respond/${requestId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

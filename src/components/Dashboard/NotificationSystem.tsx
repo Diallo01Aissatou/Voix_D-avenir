@@ -42,7 +42,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
       const localReadDb = JSON.parse(localStorage.getItem(`read_notifs_${userId}`) || '{}');
 
       // Charger les notifications de séances
-      const sessionsResponse = await fetch('http://localhost:5001/api/sessions/notifications', {
+      const sessionsResponse = await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications', {
         credentials: 'include'
       });
 
@@ -64,7 +64,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
 
       // Charger les notifications de mentorat (demandes)
       try {
-        const mentorshipResponse = await fetch('http://localhost:5001/api/mentorship/notifications', {
+        const mentorshipResponse = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/notifications', {
           credentials: 'include'
         });
 
@@ -136,7 +136,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
   const markAsRead = async (notificationId: string) => {
     try {
       // Marquer comme lu côté serveur
-      await fetch(`http://localhost:5001/api/sessions/notifications/${notificationId}/read`, {
+      await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/notifications/${notificationId}/read`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -169,7 +169,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
   const clearAllNotifications = async () => {
     try {
       // Marquer toutes les notifications comme lues côté serveur
-      await fetch('http://localhost:5001/api/sessions/notifications/read-all', {
+      await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications/read-all', {
         method: 'PUT',
         credentials: 'include'
       });

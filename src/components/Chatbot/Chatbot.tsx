@@ -36,9 +36,9 @@ const Chatbot: React.FC = () => {
 
                 // Fetch with catch to prevent Promise.all from failing entirely
                 const [mentorsRes, resourcesRes, sessionsRes] = await Promise.all([
-                    fetch('http://localhost:5001/api/users/mentores').catch(() => null),
-                    fetch('http://localhost:5001/api/resources').catch(() => null),
-                    currentUser ? fetch('http://localhost:5001/api/sessions', { headers }).catch(() => null) : Promise.resolve(null)
+                    fetch('https://voix-avenir-backend.onrender.com/api/users/mentores').catch(() => null),
+                    fetch('https://voix-avenir-backend.onrender.com/api/resources').catch(() => null),
+                    currentUser ? fetch('https://voix-avenir-backend.onrender.com/api/sessions', { headers }).catch(() => null) : Promise.resolve(null)
                 ]);
 
                 // Fallback Mock Data

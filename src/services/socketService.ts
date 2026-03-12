@@ -9,7 +9,7 @@ class SocketService {
       return;
     }
 
-    this.socket = io('http://localhost:5001', {
+    this.socket = io('https://voix-avenir-backend.onrender.com', {
       transports: ['websocket', 'polling']
     });
 

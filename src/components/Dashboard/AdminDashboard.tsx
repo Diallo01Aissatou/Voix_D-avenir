@@ -376,7 +376,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         role: 'mentoree',
         message: newTestimonial.message,
         rating: newTestimonial.rating,
-        avatar: selectedMentee?.photo ? `http://localhost:5001${selectedMentee.photo}` : 'https://via.placeholder.com/50'
+        avatar: selectedMentee?.photo ? `https://voix-avenir-backend.onrender.com${selectedMentee.photo}` : 'https://via.placeholder.com/50'
       });
       setNewTestimonial({ menteeId: '', message: '', rating: 5 });
       loadTestimonials();
@@ -879,7 +879,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                 <div className="flex items-center">
                                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
                                     {user.photo ? (
-                                      <img src={`http://localhost:5001${user.photo}`} alt={user.name} className="w-10 h-10 object-cover" />
+                                      <img src={`https://voix-avenir-backend.onrender.com${user.photo}`} alt={user.name} className="w-10 h-10 object-cover" />
                                     ) : (
                                       <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
                                         {user.name?.charAt(0)?.toUpperCase()}
@@ -1034,7 +1034,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           <div className="flex items-center flex-1 min-w-0">
                             {partner.logo && (
                               <img
-                                src={`http://localhost:5001${partner.logo}`}
+                                src={`https://voix-avenir-backend.onrender.com${partner.logo}`}
                                 alt={partner.name}
                                 className="w-16 h-16 object-contain mr-4 flex-shrink-0"
                               />
@@ -1106,7 +1106,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                       <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                                         {mentee.photo ? (
                                           <img
-                                            src={`http://localhost:5001${mentee.photo}`}
+                                            src={`https://voix-avenir-backend.onrender.com${mentee.photo}`}
                                             alt={mentee.name}
                                             className="w-8 h-8 object-cover"
                                           />
@@ -1174,7 +1174,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
                               {(testimonial.adminCreated?.avatar || testimonial.mentee?.photo) ? (
                                 <img
-                                  src={testimonial.adminCreated?.avatar || `http://localhost:5001${testimonial.mentee?.photo}`}
+                                  src={testimonial.adminCreated?.avatar || `https://voix-avenir-backend.onrender.com${testimonial.mentee?.photo}`}
                                   alt={testimonial.adminCreated?.name || testimonial.mentee?.name}
                                   className="w-10 h-10 object-cover"
                                   onError={(e) => {
@@ -1244,7 +1244,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                     <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                                       {mentore.photo ? (
                                         <img
-                                          src={`http://localhost:5001${mentore.photo}`}
+                                          src={`https://voix-avenir-backend.onrender.com${mentore.photo}`}
                                           alt={mentore.name}
                                           className="w-8 h-8 object-cover"
                                         />
@@ -1347,7 +1347,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                             <div className="flex items-center mb-4">
                               {expert.user?.photo && (
                                 <img
-                                  src={`http://localhost:5001${expert.user.photo}`}
+                                  src={`https://voix-avenir-backend.onrender.com${expert.user.photo}`}
                                   alt={expert.user.name}
                                   className="w-16 h-16 rounded-full object-cover mr-4"
                                 />
@@ -1543,12 +1543,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                 {resource.type === 'video' ? (
                                   <div className="text-sm text-gray-600">
                                     <span className="inline-block bg-blue-100 px-2 py-1 rounded text-xs mr-2">Vidéo uploadée</span>
-                                    <a href={`http://localhost:5001${resource.fileUrl}`} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                                    <a href={`https://voix-avenir-backend.onrender.com${resource.fileUrl}`} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
                                       Voir la vidéo
                                     </a>
                                   </div>
                                 ) : (
-                                  <a href={`http://localhost:5001${resource.fileUrl}`} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline text-sm">
+                                  <a href={`https://voix-avenir-backend.onrender.com${resource.fileUrl}`} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline text-sm">
                                     Lien vers la ressource
                                   </a>
                                 )}
@@ -1558,7 +1558,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           {resource.image && (
                             <div className="ml-4">
                               <img
-                                src={`http://localhost:5001${resource.image}`}
+                                src={`https://voix-avenir-backend.onrender.com${resource.image}`}
                                 alt={resource.title}
                                 className="w-24 h-24 object-cover rounded-lg"
                               />
@@ -1648,12 +1648,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           {item.image && (
                             <div className="ml-4">
                               <img
-                                src={`http://localhost:5001${item.image}`}
+                                src={`https://voix-avenir-backend.onrender.com${item.image}`}
                                 alt={item.title}
                                 className="w-24 h-24 object-cover rounded-lg mb-2"
                               />
                               <a
-                                href={`http://localhost:5001${item.image}`}
+                                href={`https://voix-avenir-backend.onrender.com${item.image}`}
                                 download
                                 className="text-xs text-purple-600 hover:text-purple-800 flex items-center"
                               >

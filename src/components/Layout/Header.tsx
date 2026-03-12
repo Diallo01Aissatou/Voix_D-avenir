@@ -7,7 +7,7 @@ import NotificationSystem from '../Dashboard/NotificationSystem';
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `http://localhost:5001${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface HeaderProps {
@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
   const loadUserProfile = async () => {
     if (!currentUser) return;
     try {
-      const response = await fetch('http://localhost:5001/api/users/profile', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/users/profile', {
         credentials: 'include'
       });
       if (response.ok) {

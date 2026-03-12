@@ -38,7 +38,7 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

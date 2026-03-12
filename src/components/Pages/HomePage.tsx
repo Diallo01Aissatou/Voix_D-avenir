@@ -270,7 +270,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4 flex-shrink-0">
                     {testimonial.author?.photo ? (
                       <img
-                        src={testimonial.author.photo.startsWith('http') ? testimonial.author.photo : `http://localhost:5001/uploads/${testimonial.author.photo.split('/').pop()}`}
+                        src={testimonial.author.photo.startsWith('http') ? testimonial.author.photo : `https://voix-avenir-backend.onrender.com/uploads/${testimonial.author.photo.split('/').pop()}`}
                         alt={testimonial.author.name}
                         className="w-12 h-12 object-cover"
                         onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -435,7 +435,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     <div className="w-24 h-24 mb-4 flex items-center justify-center bg-gray-50 rounded-xl p-3 shadow-sm group-hover:shadow-md transition-shadow">
                       {isImageLogo ? (
                         <img
-                          src={partner.logo.startsWith('/uploads') ? `http://localhost:5001${partner.logo}` : partner.logo}
+                          src={partner.logo.startsWith('/uploads') ? `https://voix-avenir-backend.onrender.com${partner.logo}` : partner.logo}
                           alt={partner.name}
                           className="w-20 h-20 object-contain group-hover:scale-110 transition-transform"
                           onError={(e: React.SyntheticEvent<HTMLImageElement>) => {

@@ -121,7 +121,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('faq')}
+                  onClick={() => onNavigate('help-center')}
                   className="text-gray-300 hover:text-white transition-colors text-sm"
                 >
                   Centre d'aide

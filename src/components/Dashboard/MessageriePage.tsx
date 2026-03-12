@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `http://localhost:5001${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface Conversation {
@@ -94,7 +94,7 @@ const MessageriePage: React.FC = () => {
 
   const loadConversations = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/messages/conversations', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages/conversations', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -115,7 +115,7 @@ const MessageriePage: React.FC = () => {
 
   const loadAvailableUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/messages/users/available', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages/users/available', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -136,7 +136,7 @@ const MessageriePage: React.FC = () => {
 
   const loadUserProfile = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/users/profile', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/users/profile', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -161,7 +161,7 @@ const MessageriePage: React.FC = () => {
   const loadMessages = async (userId: string) => {
     try {
       console.log('Chargement messages pour userId:', userId);
-      const response = await fetch(`http://localhost:5001/api/messages/${userId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${userId}`, {
         credentials: 'include'
       });
       console.log('Réponse API messages:', response.status);
@@ -189,7 +189,7 @@ const MessageriePage: React.FC = () => {
 
     try {
       // Envoyer via HTTP d'abord
-      const response = await fetch('http://localhost:5001/api/messages', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -63,9 +63,9 @@ const IntelligentChatbot: React.FC = () => {
                 };
 
                 const [mentorsRes, resourcesRes, sessionsRes] = await Promise.all([
-                    fetch('http://localhost:5001/api/users/mentores').catch(() => null),
-                    fetch('http://localhost:5001/api/resources').catch(() => null),
-                    currentUser ? fetch('http://localhost:5001/api/sessions', { headers }).catch(() => null) : Promise.resolve(null)
+                    fetch('https://voix-avenir-backend.onrender.com/api/users/mentores').catch(() => null),
+                    fetch('https://voix-avenir-backend.onrender.com/api/resources').catch(() => null),
+                    currentUser ? fetch('https://voix-avenir-backend.onrender.com/api/sessions', { headers }).catch(() => null) : Promise.resolve(null)
                 ]);
 
                 // Données de fallback
@@ -163,7 +163,7 @@ const IntelligentChatbot: React.FC = () => {
             apiMessages.push({ role: 'user', content: textToSend });
 
             // Appel à notre API backend
-            const response = await fetch('http://localhost:5001/api/ai/chat', {
+            const response = await fetch('https://voix-avenir-backend.onrender.com/api/ai/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

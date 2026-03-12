@@ -56,7 +56,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
     
     try {
       console.log('Envoi de la requête fetch...');
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}/confirm`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/confirm`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -88,7 +88,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}/cancel`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/cancel`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -111,7 +111,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -224,7 +224,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                       window.open = () => null;
                       
                       try {
-                        const response = await fetch(`http://localhost:5001/api/sessions/${session._id}/confirm`, {
+                        const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${session._id}/confirm`, {
                           method: 'PUT',
                           credentials: 'include'
                         });

@@ -199,10 +199,10 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
                         <div className="mt-2">
                           {message.fileName?.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                             <img 
-                              src={`http://localhost:5001${message.fileUrl}`} 
+                              src={`https://voix-avenir-backend.onrender.com${message.fileUrl}`} 
                               alt={message.fileName}
                               className="max-w-full h-auto rounded-lg cursor-pointer"
-                              onClick={() => window.open(`http://localhost:5001${message.fileUrl}`, '_blank')}
+                              onClick={() => window.open(`https://voix-avenir-backend.onrender.com${message.fileUrl}`, '_blank')}
                             />
                           ) : (
                             <div className={`flex items-center space-x-2 p-2 rounded-lg ${
@@ -211,7 +211,7 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
                               <Paperclip className="w-4 h-4" />
                               <span className="text-sm flex-1 truncate">{message.fileName}</span>
                               <button
-                                onClick={() => window.open(`http://localhost:5001${message.fileUrl}`, '_blank')}
+                                onClick={() => window.open(`https://voix-avenir-backend.onrender.com${message.fileUrl}`, '_blank')}
                                 className={`p-1 rounded transition-colors ${
                                   isCurrentUser ? 'hover:bg-white hover:bg-opacity-20' : 'hover:bg-gray-200'
                                 }`}

@@ -1,7 +1,7 @@
 import axios from "axios";
 
- const Api=axios.create({
-    baseURL:'http://localhost:5001/api',
+const Api = axios.create({
+    baseURL: 'https://voix-avenir-backend.onrender.com/api',
     withCredentials: true,
 })
 export default Api 

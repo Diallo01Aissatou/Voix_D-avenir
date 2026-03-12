@@ -54,7 +54,7 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   const loadRequests = async () => {
     try {
       const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`http://localhost:5001/api/mentorship/${endpoint}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -69,7 +69,7 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   const loadMentorships = async () => {
     try {
       const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`http://localhost:5001/api/mentorship/${endpoint}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -86,7 +86,7 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
     try {
       const otherUserId = getOtherUserId(selectedMentorship);
       if (otherUserId) {
-        const response = await fetch(`http://localhost:5001/api/messages/${otherUserId}`, {
+        const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${otherUserId}`, {
           credentials: 'include'
         });
         if (response.ok) {
@@ -125,7 +125,7 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
     if (!otherUserId) return;
 
     try {
-      const response = await fetch('http://localhost:5001/api/messages', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -169,7 +169,7 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   const handleRequestAction = async (requestId: string, action: 'accepted' | 'rejected', responseMessage?: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/mentorship/respond/${requestId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

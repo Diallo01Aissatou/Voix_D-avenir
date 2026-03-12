@@ -334,7 +334,7 @@ const MentoreeDashboard: React.FC<MentoreeDashboardProps> = ({ onNavigate }) => 
   const loadRequests = async () => {
     try {
       console.log('Chargement des demandes...');
-      const response = await fetch('http://localhost:5001/api/mentorship/sent', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/sent', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -398,9 +398,9 @@ const MentoreeDashboard: React.FC<MentoreeDashboardProps> = ({ onNavigate }) => 
   const loadStats = async () => {
     try {
       const [sentResponse, receivedResponse, sessionsResponse] = await Promise.all([
-        fetch('http://localhost:5001/api/mentorship/sent', { credentials: 'include' }),
-        fetch('http://localhost:5001/api/mentorship/received', { credentials: 'include' }),
-        fetch('http://localhost:5001/api/mentorship/sessions', { credentials: 'include' })
+        fetch('https://voix-avenir-backend.onrender.com/api/mentorship/sent', { credentials: 'include' }),
+        fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', { credentials: 'include' }),
+        fetch('https://voix-avenir-backend.onrender.com/api/mentorship/sessions', { credentials: 'include' })
       ]);
       
       let sentRequests = [];
@@ -445,7 +445,7 @@ const MentoreeDashboard: React.FC<MentoreeDashboardProps> = ({ onNavigate }) => 
 
   const loadMySessions = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/sessions', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/sessions', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -462,7 +462,7 @@ const MentoreeDashboard: React.FC<MentoreeDashboardProps> = ({ onNavigate }) => 
 
   const loadChatMessages = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/messages/${userId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${userId}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -483,7 +483,7 @@ const MentoreeDashboard: React.FC<MentoreeDashboardProps> = ({ onNavigate }) => 
     if (!newMessage.trim() || !chatUserComplete) return;
     
     try {
-      const response = await fetch('http://localhost:5001/api/messages', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -1201,7 +1201,7 @@ const MentoreeDashboard: React.FC<MentoreeDashboardProps> = ({ onNavigate }) => 
                 <button 
                   onClick={async () => {
                     try {
-                      const response = await fetch(`http://localhost:5001/api/messages/${chatUserComplete._id}`);
+                      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${chatUserComplete._id}`);
                       const msgs = await response.json();
                       console.log('Messages rechargés:', msgs);
                       setMessages(msgs);

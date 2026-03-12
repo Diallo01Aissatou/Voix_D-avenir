@@ -21,6 +21,7 @@ import Rencontres from './components/Pages/Rencontres';
 import NotificationDemoPage from './components/Pages/NotificationDemoPage';
 import VoixAvenirNotificationsDemo from './components/Pages/VoixAvenirNotificationsDemo';
 import ContactPage from './components/Pages/ContactPage';
+import HelpCenterPage from './components/Pages/HelpCenterPage';
 import IntelligentChatbot from './components/Chatbot/IntelligentChatbot';
 
 
@@ -112,6 +113,8 @@ function AppContent() {
         return <FAQPage onNavigate={handleNavigate} />;
       case 'contact':
         return <ContactPage onNavigate={handleNavigate} />;
+      case 'help-center':
+        return <HelpCenterPage onNavigate={handleNavigate} />;
       case 'notification-demo':
         return <NotificationDemoPage onNavigate={handleNavigate} />;
       case 'voix-avenir-notifications':

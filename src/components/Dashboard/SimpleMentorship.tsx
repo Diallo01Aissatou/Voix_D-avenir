@@ -23,7 +23,7 @@ const SimpleMentorship = () => {
     try {
       // Charger les demandes
       const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const reqResponse = await fetch(`http://localhost:5001/api/mentorship/${endpoint}`, {
+      const reqResponse = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
         credentials: 'include'
       });
       if (reqResponse.ok) {
@@ -33,7 +33,7 @@ const SimpleMentorship = () => {
 
       // Charger les mentores si mentorée
       if (currentUser?.role === 'mentoree') {
-        const mentResponse = await fetch('http://localhost:5001/api/users?role=mentore', {
+        const mentResponse = await fetch('https://voix-avenir-backend.onrender.com/api/users?role=mentore', {
           credentials: 'include'
         });
         if (mentResponse.ok) {
@@ -49,7 +49,7 @@ const SimpleMentorship = () => {
   const sendRequest = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/mentorship/request', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -75,7 +75,7 @@ const SimpleMentorship = () => {
     if (!newMessage.trim() || !chatUser) return;
     
     try {
-      const response = await fetch('http://localhost:5001/api/messages', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -97,7 +97,7 @@ const SimpleMentorship = () => {
 
   const respond = async (requestId, status) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/mentorship/respond/${requestId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -351,7 +351,7 @@ const SimpleMentorship = () => {
                   <button 
                     onClick={async () => {
                       try {
-                        const response = await fetch(`http://localhost:5001/api/messages/${chatUser._id}`);
+                        const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${chatUser._id}`);
                         const msgs = await response.json();
                         console.log('Messages chargés:', msgs);
                         setMessages(msgs);

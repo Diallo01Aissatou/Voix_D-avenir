@@ -121,7 +121,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
     }
 
     try {
-      const fileUrl = resource.fileUrl.startsWith('http') ? resource.fileUrl : `http://localhost:5001${resource.fileUrl}`;
+      const fileUrl = resource.fileUrl.startsWith('http') ? resource.fileUrl : `https://voix-avenir-backend.onrender.com${resource.fileUrl}`;
       
       // Pour les vidéos, essayer d'abord un téléchargement direct
       if (resource.type === 'video') {
@@ -172,7 +172,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
     } catch (error) {
       console.error('Erreur téléchargement:', error);
       // Fallback: ouvrir le fichier dans un nouvel onglet
-      const fileUrl = resource.fileUrl.startsWith('http') ? resource.fileUrl : `http://localhost:5001${resource.fileUrl}`;
+      const fileUrl = resource.fileUrl.startsWith('http') ? resource.fileUrl : `https://voix-avenir-backend.onrender.com${resource.fileUrl}`;
       window.open(fileUrl, '_blank');
     }
   };
@@ -342,7 +342,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                 <div key={resource._id} className="bg-white rounded-md shadow-sm overflow-hidden hover:shadow-md transition-all group">
                   <div className="relative h-20 overflow-hidden">
                     <img
-                      src={resource.image ? `http://localhost:5001${resource.image}` : 'https://images.pexels.com/photos/7688460/pexels-photo-7688460.jpeg'}
+                      src={resource.image ? `https://voix-avenir-backend.onrender.com${resource.image}` : 'https://images.pexels.com/photos/7688460/pexels-photo-7688460.jpeg'}
                       alt={resource.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
@@ -440,7 +440,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                   <div className="relative w-full h-full bg-gray-900">
                     {resource.image ? (
                       <img 
-                        src={`http://localhost:5001${resource.image}`}
+                        src={`https://voix-avenir-backend.onrender.com${resource.image}`}
                         alt={resource.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -451,7 +451,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                     ) : null}
                     <video 
                       className={`w-full h-full object-cover ${resource.image ? 'hidden' : ''}`}
-                      src={`http://localhost:5001${resource.fileUrl}`}
+                      src={`https://voix-avenir-backend.onrender.com${resource.fileUrl}`}
                       preload="metadata"
                       muted
                       onLoadedMetadata={(e) => {
@@ -620,9 +620,9 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                           <video 
                             controls 
                             className="w-full h-full rounded-lg bg-black"
-                            src={`http://localhost:5001${selectedResource.fileUrl}`}
+                            src={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`}
                             preload="metadata"
-                            poster={selectedResource.image ? `http://localhost:5001${selectedResource.image}` : undefined}
+                            poster={selectedResource.image ? `https://voix-avenir-backend.onrender.com${selectedResource.image}` : undefined}
                             onLoadedMetadata={(e) => {
                               e.target.currentTime = 1;
                             }}
@@ -632,9 +632,9 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                               e.target.nextSibling.style.display = 'block';
                             }}
                           >
-                            <source src={`http://localhost:5001${selectedResource.fileUrl}`} type="video/mp4" />
-                            <source src={`http://localhost:5001${selectedResource.fileUrl}`} type="video/webm" />
-                            <source src={`http://localhost:5001${selectedResource.fileUrl}`} type="video/ogg" />
+                            <source src={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`} type="video/mp4" />
+                            <source src={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`} type="video/webm" />
+                            <source src={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`} type="video/ogg" />
                             Votre navigateur ne supporte pas la lecture vidéo.
                           </video>
                           <div className="hidden w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
@@ -642,7 +642,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                               <Play className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                               <p className="text-gray-600 mb-4">Impossible de lire cette vidéo</p>
                               <a 
-                                href={`http://localhost:5001${selectedResource.fileUrl}`} 
+                                href={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors inline-flex items-center"
@@ -668,7 +668,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                 ) : selectedResource.type === 'pdf' || selectedResource.type === 'article' ? (
                   <div className="h-96">
                     <iframe
-                      src={`http://localhost:5001${selectedResource.fileUrl}`}
+                      src={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`}
                       className="w-full h-full rounded-lg border"
                       title={selectedResource.title}
                     />
@@ -699,7 +699,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                           Télécharger le Guide
                         </button>
                         <a
-                          href={`http://localhost:5001${selectedResource.fileUrl}`}
+                          href={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-6 py-3 bg-white text-green-600 border-2 border-green-600 rounded-lg hover:bg-green-50 transition-colors inline-flex items-center"
@@ -715,7 +715,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                     <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-600 mb-4">Prévisualisation non disponible pour ce type de fichier</p>
                     <a 
-                      href={`http://localhost:5001${selectedResource.fileUrl}`} 
+                      href={`https://voix-avenir-backend.onrender.com${selectedResource.fileUrl}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors inline-flex items-center"

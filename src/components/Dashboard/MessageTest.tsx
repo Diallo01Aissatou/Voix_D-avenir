@@ -15,7 +15,7 @@ const MessageTest: React.FC = () => {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/messages/users/available', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages/users/available', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -29,7 +29,7 @@ const MessageTest: React.FC = () => {
 
   const loadConversations = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/messages/conversations', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages/conversations', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -45,7 +45,7 @@ const MessageTest: React.FC = () => {
     if (!testMessage.trim() || !selectedUser) return;
 
     try {
-      const response = await fetch('http://localhost:5001/api/messages', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

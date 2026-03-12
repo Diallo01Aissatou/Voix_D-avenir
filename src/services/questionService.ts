@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5001/api/questions';
+const API_URL = 'https://voix-avenir-backend.onrender.com/api/questions';
 
 export interface UserQuestionData {
     question: string;

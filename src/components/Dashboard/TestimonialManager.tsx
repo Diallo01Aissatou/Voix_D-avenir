@@ -45,7 +45,7 @@ const TestimonialManager: React.FC = () => {
 
   const loadMyTestimonials = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/testimonials/my', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/testimonials/my', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -67,8 +67,8 @@ const TestimonialManager: React.FC = () => {
     setLoading(true);
     try {
       const url = editingTestimonial 
-        ? `http://localhost:5001/api/testimonials/${editingTestimonial._id}`
-        : 'http://localhost:5001/api/testimonials';
+        ? `https://voix-avenir-backend.onrender.com/api/testimonials/${editingTestimonial._id}`
+        : 'https://voix-avenir-backend.onrender.com/api/testimonials';
       
       const method = editingTestimonial ? 'PUT' : 'POST';
 
@@ -109,7 +109,7 @@ const TestimonialManager: React.FC = () => {
     if (!confirm('Supprimer ce témoignage ?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5001/api/testimonials/${testimonialId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/testimonials/${testimonialId}`, {
         method: 'DELETE',
         credentials: 'include'
       });

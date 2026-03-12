@@ -9,7 +9,7 @@ import DynamicMentorshipManager from './DynamicMentorshipManager';
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `http://localhost:5001${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface MentoreDashboardProps {
@@ -62,7 +62,7 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
   const loadRequests = async () => {
     try {
       console.log('Chargement des demandes reçues...');
-      const response = await fetch('http://localhost:5001/api/mentorship/received', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', {
         credentials: 'include'
       });
       
@@ -87,7 +87,7 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
   const loadSessions = async () => {
     try {
       console.log('Chargement des séances...');
-      const response = await fetch('http://localhost:5001/api/sessions', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/sessions', {
         credentials: 'include'
       });
       if (response.ok) {
@@ -107,8 +107,8 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
   const loadStats = async () => {
     try {
       const [requestsResponse, sessionsResponse] = await Promise.all([
-        fetch('http://localhost:5001/api/mentorship/received', { credentials: 'include' }),
-        fetch('http://localhost:5001/api/sessions', { credentials: 'include' })
+        fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', { credentials: 'include' }),
+        fetch('https://voix-avenir-backend.onrender.com/api/sessions', { credentials: 'include' })
       ]);
       
       let requests = [];
@@ -157,7 +157,7 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
     try {
       console.log('Réponse à la demande:', requestId, status);
       
-      const response = await fetch(`http://localhost:5001/api/mentorship/respond/${requestId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -531,7 +531,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}/update`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/update`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -579,7 +579,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}/update`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/update`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -611,7 +611,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}/complete`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/complete`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -637,7 +637,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}/cancel`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/cancel`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -663,7 +663,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/sessions/${sessionId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -987,7 +987,7 @@ const ProfileManager = ({ currentUser, onUpdate }) => {
         endTime: profileData.endTime
       });
       
-      const response = await fetch('http://localhost:5001/api/users/profile', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/users/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

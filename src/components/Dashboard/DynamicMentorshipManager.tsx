@@ -5,7 +5,7 @@ import CreateSessionModal from './CreateSessionModal';
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `http://localhost:5001${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface DynamicMentorshipManagerProps {
@@ -37,7 +37,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
   const loadRequests = async () => {
     try {
       const endpoint = userRole === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`http://localhost:5001/api/mentorship/${endpoint}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
         credentials: 'include'
       });
       
@@ -56,7 +56,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
     setProcessingRequest(requestId);
     
     try {
-      const response = await fetch(`http://localhost:5001/api/mentorship/respond/${requestId}`, {
+      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

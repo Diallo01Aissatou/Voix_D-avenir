@@ -52,7 +52,7 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
 
   const loadNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/sessions/notifications', {
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications', {
         credentials: 'include'
       });
       
@@ -85,7 +85,7 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await fetch(`http://localhost:5001/api/sessions/notifications/${notificationId}/read`, {
+      await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/notifications/${notificationId}/read`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -188,7 +188,7 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
               <button
                 onClick={async () => {
                   try {
-                    await fetch('http://localhost:5001/api/sessions/notifications/read-all', {
+                    await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications/read-all', {
                       method: 'PUT',
                       credentials: 'include'
                     });

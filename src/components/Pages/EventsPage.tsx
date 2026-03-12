@@ -328,7 +328,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ onNavigate }) => {
                               {event.documents.map((doc, index) => (
                                 <a
                                   key={index}
-                                  href={`http://localhost:5001${doc.fileUrl || doc.url}`}
+                                  href={`https://voix-avenir-backend.onrender.com${doc.fileUrl || doc.url}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-xs text-purple-600 hover:text-purple-800 underline block"
@@ -346,7 +346,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ onNavigate }) => {
                               {event.videos.map((video, index) => (
                                 <a
                                   key={index}
-                                  href={`http://localhost:5001${video.fileUrl || video.url}`}
+                                  href={`https://voix-avenir-backend.onrender.com${video.fileUrl || video.url}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-xs text-red-600 hover:text-red-800 underline block"
@@ -437,7 +437,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ onNavigate }) => {
                               {event.documents.map((doc, index) => (
                                 <a
                                   key={index}
-                                  href={`http://localhost:5001${doc.fileUrl || doc.url}`}
+                                  href={`https://voix-avenir-backend.onrender.com${doc.fileUrl || doc.url}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-purple-600 hover:text-purple-800 underline block ml-2"
@@ -453,7 +453,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ onNavigate }) => {
                               {event.videos.map((video, index) => (
                                 <a
                                   key={index}
-                                  href={`http://localhost:5001${video.fileUrl || video.url}`}
+                                  href={`https://voix-avenir-backend.onrender.com${video.fileUrl || video.url}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-red-600 hover:text-red-800 underline block ml-2"
