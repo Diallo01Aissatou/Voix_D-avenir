@@ -16,6 +16,8 @@ interface MentorRequestModalProps {
   onSuccess: () => void;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
 const MentorRequestModal: React.FC<MentorRequestModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [mentores, setMentores] = useState<Mentore[]>([]);
   const [selectedMentore, setSelectedMentore] = useState('');
@@ -30,7 +32,7 @@ const MentorRequestModal: React.FC<MentorRequestModalProps> = ({ isOpen, onClose
 
   const fetchMentores = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users?role=mentore', {
+      const response = await fetch(`${BASE_API_URL}/api/users?role=mentore`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -48,7 +50,7 @@ const MentorRequestModal: React.FC<MentorRequestModalProps> = ({ isOpen, onClose
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/mentor-requests/create', {
+      const response = await fetch(`${BASE_API_URL}/api/mentor-requests/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

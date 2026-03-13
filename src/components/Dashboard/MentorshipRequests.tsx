@@ -17,6 +17,8 @@ interface MentorshipRequest {
   respondedAt?: string;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
 const MentorshipRequests: React.FC = () => {
   const [requests, setRequests] = useState<MentorshipRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ const MentorshipRequests: React.FC = () => {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/mentorship/received', {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/received`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -45,7 +47,7 @@ const MentorshipRequests: React.FC = () => {
 
   const handleResponse = async (requestId: string, status: 'accepted' | 'rejected') => {
     try {
-      const response = await fetch(`http://localhost:5000/api/mentorship/respond/${requestId}`, {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/respond/${requestId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -58,8 +60,8 @@ const MentorshipRequests: React.FC = () => {
       });
 
       if (response.ok) {
-        setRequests(prev => prev.map(req => 
-          req._id === requestId 
+        setRequests(prev => prev.map(req =>
+          req._id === requestId
             ? { ...req, status, responseMessage: responseMessage.trim(), respondedAt: new Date().toISOString() }
             : req
         ));
@@ -102,7 +104,7 @@ const MentorshipRequests: React.FC = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">Demandes de mentorat reçues</h2>
-      
+
       {requests.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />

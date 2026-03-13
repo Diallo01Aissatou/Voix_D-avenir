@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://voix-avenir-backend.onrender.com/api';
 
 class MentorshipApi {
   private async request(endpoint: string, options: RequestInit = {}) {
@@ -13,7 +13,7 @@ class MentorshipApi {
     };
 
     const response = await fetch(url, config);
-    
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Erreur réseau' }));
       throw new Error(error.message || `Erreur ${response.status}`);
@@ -63,7 +63,7 @@ class MentorshipApi {
     const formData = new FormData();
     formData.append('recipient', recipientId);
     formData.append('content', content);
-    
+
     if (file) {
       formData.append('file', file);
     }

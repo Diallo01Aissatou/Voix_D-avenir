@@ -14,6 +14,7 @@ interface Message {
   content: string;
   fileUrl?: string;
   fileName?: string;
+  read?: boolean;
   timestamp: string;
 }
 
@@ -23,6 +24,8 @@ interface MentorshipChatProps {
   currentUserId: string;
   onBack: () => void;
 }
+
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
 
 const MentorshipChat: React.FC<MentorshipChatProps> = ({
   otherUserId,
@@ -51,7 +54,7 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/messages/${otherUserId}`, {
+      const response = await fetch(`${BASE_API_URL}/api/messages/${otherUserId}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -74,12 +77,12 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
       const formData = new FormData();
       formData.append('recipient', otherUserId);
       formData.append('content', newMessage.trim());
-      
+
       if (fileInputRef.current?.files?.[0]) {
         formData.append('file', fileInputRef.current.files[0]);
       }
 
-      const response = await fetch('http://localhost:5000/api/messages', {
+      const response = await fetch(`${BASE_API_URL}/api/messages`, {
         method: 'POST',
         credentials: 'include',
         body: formData
@@ -158,7 +161,7 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
           messages.map((message, index) => {
             const senderId = typeof message.sender === 'object' ? message.sender._id : message.sender;
             const isCurrentUser = senderId === currentUserId;
-            const showDate = index === 0 || 
+            const showDate = index === 0 ||
               formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp);
 
             return (
@@ -169,17 +172,15 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
                   </div>
                 )}
                 <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-                  <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${
-                    isCurrentUser ? 'flex-row-reverse space-x-reverse' : 'flex-row'
-                  }`}>
-                    {/* Avatar */}
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      isCurrentUser 
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white' 
-                        : 'bg-gray-300 text-gray-600'
+                  <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isCurrentUser ? 'flex-row-reverse space-x-reverse' : 'flex-row'
                     }`}>
+                    {/* Avatar */}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isCurrentUser
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                      : 'bg-gray-300 text-gray-600'
+                      }`}>
                       <span className="text-xs font-medium">
-                        {isCurrentUser 
+                        {isCurrentUser
                           ? 'M'
                           : otherUserName.charAt(0).toUpperCase()
                         }
@@ -187,34 +188,31 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
                     </div>
 
                     {/* Message Bubble */}
-                    <div className={`px-4 py-3 rounded-2xl shadow-md relative ${
-                      isCurrentUser
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-md'
-                        : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md'
-                    }`}>
+                    <div className={`px-4 py-3 rounded-2xl shadow-md relative ${isCurrentUser
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-md'
+                      : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md'
+                      }`}>
                       {message.content && (
                         <p className="text-sm leading-relaxed">{message.content}</p>
                       )}
                       {message.fileUrl && (
                         <div className="mt-2">
                           {message.fileName?.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                            <img 
-                              src={`https://voix-avenir-backend.onrender.com${message.fileUrl}`} 
+                            <img
+                              src={`${BASE_API_URL}${message.fileUrl}`}
                               alt={message.fileName}
                               className="max-w-full h-auto rounded-lg cursor-pointer"
                               onClick={() => window.open(`https://voix-avenir-backend.onrender.com${message.fileUrl}`, '_blank')}
                             />
                           ) : (
-                            <div className={`flex items-center space-x-2 p-2 rounded-lg ${
-                              isCurrentUser ? 'bg-white bg-opacity-20' : 'bg-gray-100'
-                            }`}>
+                            <div className={`flex items-center space-x-2 p-2 rounded-lg ${isCurrentUser ? 'bg-white bg-opacity-20' : 'bg-gray-100'
+                              }`}>
                               <Paperclip className="w-4 h-4" />
                               <span className="text-sm flex-1 truncate">{message.fileName}</span>
                               <button
-                                onClick={() => window.open(`https://voix-avenir-backend.onrender.com${message.fileUrl}`, '_blank')}
-                                className={`p-1 rounded transition-colors ${
-                                  isCurrentUser ? 'hover:bg-white hover:bg-opacity-20' : 'hover:bg-gray-200'
-                                }`}
+                                onClick={() => window.open(`${BASE_API_URL}${message.fileUrl}`, '_blank')}
+                                className={`p-1 rounded transition-colors ${isCurrentUser ? 'hover:bg-white hover:bg-opacity-20' : 'hover:bg-gray-200'
+                                  }`}
                               >
                                 <Download className="w-4 h-4" />
                               </button>
@@ -222,12 +220,10 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
                           )}
                         </div>
                       )}
-                      <div className={`flex items-center mt-2 ${
-                        isCurrentUser ? 'justify-end' : 'justify-start'
-                      }`}>
-                        <span className={`text-xs ${
-                          isCurrentUser ? 'text-purple-200' : 'text-gray-500'
+                      <div className={`flex items-center mt-2 ${isCurrentUser ? 'justify-end' : 'justify-start'
                         }`}>
+                        <span className={`text-xs ${isCurrentUser ? 'text-purple-200' : 'text-gray-500'
+                          }`}>
                           {formatTime(message.timestamp)}
                         </span>
                         {isCurrentUser && (

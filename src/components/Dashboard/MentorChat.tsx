@@ -18,6 +18,8 @@ interface MentorChatProps {
   onBack: () => void;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
 const MentorChat: React.FC<MentorChatProps> = ({ otherUserId, otherUserName, currentUserId, onBack }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -40,7 +42,7 @@ const MentorChat: React.FC<MentorChatProps> = ({ otherUserId, otherUserName, cur
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/messages/${otherUserId}`, {
+      const response = await fetch(`${BASE_API_URL}/api/messages/${otherUserId}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -63,12 +65,12 @@ const MentorChat: React.FC<MentorChatProps> = ({ otherUserId, otherUserName, cur
       const formData = new FormData();
       formData.append('recipient', otherUserId);
       formData.append('content', newMessage.trim());
-      
+
       if (fileInputRef.current?.files?.[0]) {
         formData.append('file', fileInputRef.current.files[0]);
       }
 
-      const response = await fetch('http://localhost:5000/api/messages', {
+      const response = await fetch(`${BASE_API_URL}/api/messages`, {
         method: 'POST',
         credentials: 'include',
         body: formData
@@ -127,23 +129,22 @@ const MentorChat: React.FC<MentorChatProps> = ({ otherUserId, otherUserName, cur
             const isCurrentUser = message.sender._id === currentUserId;
             return (
               <div key={message._id} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  isCurrentUser 
-                    ? 'bg-purple-600 text-white' 
+                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${isCurrentUser
+                    ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-800'
-                }`}>
+                  }`}>
                   {message.content && <p className="text-sm">{message.content}</p>}
                   {message.fileUrl && (
                     <div className="mt-2">
                       {message.fileName?.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                        <img 
-                          src={`http://localhost:5000${message.fileUrl}`} 
+                        <img
+                          src={`${BASE_API_URL}${message.fileUrl}`}
                           alt={message.fileName}
                           className="max-w-full h-auto rounded"
                         />
                       ) : (
-                        <a 
-                          href={`http://localhost:5000${message.fileUrl}`}
+                        <a
+                          href={`${BASE_API_URL}${message.fileUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center space-x-2 text-sm underline"

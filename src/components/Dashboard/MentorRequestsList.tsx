@@ -22,6 +22,8 @@ interface MentorRequestsListProps {
   refreshTrigger: number;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
 const MentorRequestsList: React.FC<MentorRequestsListProps> = ({ onStartChat, refreshTrigger }) => {
   const [requests, setRequests] = useState<MentorRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ const MentorRequestsList: React.FC<MentorRequestsListProps> = ({ onStartChat, re
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/mentor-requests/sent', {
+      const response = await fetch(`${BASE_API_URL}/api/mentor-requests/sent`, {
         credentials: 'include'
       });
       if (response.ok) {

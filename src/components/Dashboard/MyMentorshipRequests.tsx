@@ -22,6 +22,8 @@ interface MyMentorshipRequestsProps {
   onStartChat?: (mentoreId: string, mentoreName: string) => void;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
 const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat }) => {
   const [requests, setRequests] = useState<MentorshipRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/mentorship/sent', {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/sent`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -84,7 +86,7 @@ const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">Mes demandes de mentorat</h2>
-      
+
       {requests.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />

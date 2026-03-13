@@ -7,8 +7,16 @@ interface SimpleModalProps {
   onSuccess: () => void;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
+interface Mentore {
+  _id: string;
+  name: string;
+  profession: string;
+}
+
 const SimpleModal: React.FC<SimpleModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const [mentores, setMentores] = useState([]);
+  const [mentores, setMentores] = useState<Mentore[]>([]);
   const [selectedMentore, setSelectedMentore] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +29,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({ isOpen, onClose, onSuccess })
 
   const loadMentores = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users?role=mentore', {
+      const response = await fetch(`${BASE_API_URL}/api/users?role=mentore`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -35,10 +43,10 @@ const SimpleModal: React.FC<SimpleModalProps> = ({ isOpen, onClose, onSuccess })
 
   const sendRequest = async () => {
     if (!selectedMentore || !message) return;
-    
+
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/mentorship/request', {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -71,7 +79,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({ isOpen, onClose, onSuccess })
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Mentore</label>

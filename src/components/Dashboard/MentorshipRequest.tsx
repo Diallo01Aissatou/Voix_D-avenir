@@ -16,6 +16,8 @@ interface MentorshipRequestProps {
   onClose: () => void;
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
 const MentorshipRequest: React.FC<MentorshipRequestProps> = ({ onClose }) => {
   const [mentores, setMentores] = useState<Mentore[]>([]);
   const [selectedMentore, setSelectedMentore] = useState<string>('');
@@ -28,7 +30,7 @@ const MentorshipRequest: React.FC<MentorshipRequestProps> = ({ onClose }) => {
 
   const fetchMentores = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users?role=mentore', {
+      const response = await fetch(`${BASE_API_URL}/api/users?role=mentore`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -46,7 +48,7 @@ const MentorshipRequest: React.FC<MentorshipRequestProps> = ({ onClose }) => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/mentorship/request', {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +79,7 @@ const MentorshipRequest: React.FC<MentorshipRequestProps> = ({ onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Demander un mentorat</h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -103,7 +105,7 @@ const MentorshipRequest: React.FC<MentorshipRequestProps> = ({ onClose }) => {
               {(() => {
                 const mentore = mentores.find(m => m._id === selectedMentore);
                 if (!mentore) return null;
-                
+
                 return (
                   <div className="flex items-start space-x-4">
                     <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">

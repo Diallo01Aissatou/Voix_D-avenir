@@ -32,7 +32,7 @@ const App: React.FC<RencontresProps> = () => {
   const [status, setStatus] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<User>({ _id: '66d03d42f5347f3b610c4a4a', role: 'mentee' }); // Exemple utilisateur
-  const API_URL = 'http://localhost:5000'; // Change selon ton backend
+  const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
 
   useEffect(() => {
     const fetchAppointments = async () => {

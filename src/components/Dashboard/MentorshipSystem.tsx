@@ -21,6 +21,8 @@ interface Mentore {
   expertise: string[];
 }
 
+const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+
 const MentorshipSystem: React.FC = () => {
   const { currentUser } = useAuth();
   const [requests, setRequests] = useState<MentorshipRequest[]>([]);
@@ -32,7 +34,7 @@ const MentorshipSystem: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [chatUser, setChatUser] = useState<{id: string, name: string} | null>(null);
+  const [chatUser, setChatUser] = useState<{ id: string, name: string } | null>(null);
 
   useEffect(() => {
     loadRequests();
@@ -44,7 +46,7 @@ const MentorshipSystem: React.FC = () => {
   const loadRequests = async () => {
     try {
       const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`http://localhost:5000/api/mentorship/${endpoint}`, {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/${endpoint}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -59,7 +61,7 @@ const MentorshipSystem: React.FC = () => {
   const loadMentores = async () => {
     try {
       console.log('Chargement des mentores...');
-      const response = await fetch('http://localhost:5000/api/users?role=mentore', {
+      const response = await fetch(`${BASE_API_URL}/api/users?role=mentore`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -77,7 +79,7 @@ const MentorshipSystem: React.FC = () => {
   const createRequest = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/mentorship/request', {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -102,7 +104,7 @@ const MentorshipSystem: React.FC = () => {
 
   const respondToRequest = async (requestId: string, status: 'accepted' | 'rejected') => {
     try {
-      const response = await fetch(`http://localhost:5000/api/mentorship/respond/${requestId}`, {
+      const response = await fetch(`${BASE_API_URL}/api/mentorship/respond/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -178,10 +180,10 @@ const MentorshipSystem: React.FC = () => {
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
                     {(request.mentore?.photo || request.mentoree?.photo) ? (
-                      <img 
-                        src={request.mentore?.photo || request.mentoree?.photo} 
-                        alt="Photo" 
-                        className="w-12 h-12 rounded-full object-cover" 
+                      <img
+                        src={request.mentore?.photo || request.mentoree?.photo}
+                        alt="Photo"
+                        className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
                       <User className="w-6 h-6 text-white" />
@@ -274,7 +276,7 @@ const MentorshipSystem: React.FC = () => {
                   <button
                     onClick={() => {
                       const otherUser = currentUser?.role === 'mentore' ? request.mentoree : request.mentore;
-                      setChatUser({id: otherUser?._id || '', name: otherUser?.name || ''});
+                      setChatUser({ id: otherUser?._id || '', name: otherUser?.name || '' });
                     }}
                     className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
                   >
@@ -293,7 +295,7 @@ const MentorshipSystem: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-xl font-bold mb-4">Nouvelle demande de mentorat</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Rechercher une mentore</label>
