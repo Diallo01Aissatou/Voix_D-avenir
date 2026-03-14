@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
             onClick={() => onNavigate('home')}
           >
             <img
-              src="/logo.png"
+              src={`${import.meta.env.BASE_URL}logo.png`}
               alt="Voix D'avenir Logo"
               className="h-10 w-auto"
             />

@@ -157,7 +157,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             <div className="relative">
               <div className="relative z-10">
                 <img
-                  src="src/public/image2.png"
+                  src={`${import.meta.env.BASE_URL}image2.png`}
                   alt="Femme leader inspirante"
                   className="rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
                 />

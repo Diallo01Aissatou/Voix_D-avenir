@@ -86,7 +86,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <img src="/logo.png" alt="Voix D'avenir Logo" className="h-16 w-auto" />
+              <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Voix D'avenir Logo" className="h-16 w-auto" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Connexion</h1>
             <p className="text-gray-600">Accédez à votre espace personnel</p>
