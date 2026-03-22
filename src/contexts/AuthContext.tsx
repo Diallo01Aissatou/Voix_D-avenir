@@ -1,14 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import Api from '../data/Api';
-import { mockUsers } from '../data/mockData';
 import { UserServices } from '../data/User';
 
 interface AuthContextType {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
-  login: (email: string, password: string, role: string) => boolean;
-  register: (userData: Partial<User>) => boolean;
+  login: (email: string, password: string, role: string) => Promise<boolean>;
+  register: (userData: Partial<User> | FormData) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -54,49 +52,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const login = (email: string, password: string, role: string): boolean => {
-    // Simulation de l'authentification
-    if (password === 'password') {
-      let user: User | undefined;
+  const login = async (email: string, password: string, role: string): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      const data = await UserServices.login({ email, password, role });
 
-      if (role === 'admin' && email === 'admin@mentora.gn') {
-        user = {
-          id: 'admin',
-          name: 'Administrateur',
-          email: 'admin@mentora.gn',
-          role: 'admin'
-        };
-      } else {
-        user = mockUsers.find(u => u.email === email && u.role === role);
-      }
-
-      if (user) {
-        setCurrentUser(user);
-        localStorage.setItem('mentora_user', JSON.stringify(user));
+      if (data && data.user) {
+        setCurrentUser(data.user);
+        localStorage.setItem('mentora_user', JSON.stringify(data.user));
         return true;
       }
+      return false;
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    return false;
   };
 
-  const register = async (userData: Partial<User>): Promise<boolean> => {
+  const register = async (userData: Partial<User> | FormData): Promise<boolean> => {
     try {
-      const response = await UserServices.aregistre(userData); // appel backend
-      const newUser = response; // à adapter selon ton backend (un seul user ou tableau)
+      setIsLoading(true);
+      const newUser = await UserServices.aregistre(userData);
 
-      setCurrentUser(newUser);
-      localStorage.setItem("mentora_user", JSON.stringify(newUser));
-      return true;
+      if (newUser && newUser.id) {
+        setCurrentUser(newUser);
+        localStorage.setItem("mentora_user", JSON.stringify(newUser));
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error("Erreur d'inscription :", error);
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-
   const logout = async () => {
     try {
-      await Api.post('/auth/logout');
+      await UserServices.logout();
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
     } finally {

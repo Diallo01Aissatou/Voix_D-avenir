@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Send, Check, X, MessageCircle, User } from 'lucide-react';
+import { Send, Check, X, MessageCircle, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Api from '../../data/Api';
 
 const SimpleMentorship = () => {
   const { currentUser } = useAuth();
@@ -17,28 +18,23 @@ const SimpleMentorship = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentUser]);
 
   const loadData = async () => {
+    if (!currentUser) return;
     try {
       // Charger les demandes
-      const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const reqResponse = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
-        credentials: 'include'
-      });
-      if (reqResponse.ok) {
-        const reqData = await reqResponse.json();
-        setRequests(reqData);
+      const endpoint = currentUser.role === 'mentore' ? 'received' : 'sent';
+      const reqResponse = await Api.get(`/mentorship/${endpoint}`);
+      if (reqResponse.data) {
+        setRequests(reqResponse.data);
       }
 
       // Charger les mentores si mentorée
-      if (currentUser?.role === 'mentoree') {
-        const mentResponse = await fetch('https://voix-avenir-backend.onrender.com/api/users?role=mentore', {
-          credentials: 'include'
-        });
-        if (mentResponse.ok) {
-          const mentData = await mentResponse.json();
-          setMentores(mentData);
+      if (currentUser.role === 'mentoree') {
+        const mentResponse = await Api.get('/users?role=mentore');
+        if (mentResponse.data) {
+          setMentores(mentResponse.data);
         }
       }
     } catch (error) {
@@ -49,45 +45,36 @@ const SimpleMentorship = () => {
   const sendRequest = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ mentoreId: selectedMentore, message })
+      const response = await Api.post('/mentorship/request', {
+        mentoreId: selectedMentore,
+        message
       });
 
-      if (response.ok) {
+      if (response.data) {
         alert('Demande envoyée!');
         setShowModal(false);
         setSelectedMentore('');
         setMessage('');
         loadData();
-      } else {
-        alert('Erreur');
       }
     } catch (error) {
-      alert('Erreur réseau');
+      console.error('Erreur envoi demande:', error);
+      alert('Erreur lors de l\'envoi');
     }
     setLoading(false);
   };
 
   const sendChatMessage = async () => {
     if (!newMessage.trim() || !chatUser) return;
-    
+
     try {
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          recipient: chatUser._id,
-          content: newMessage
-        })
+      const response = await Api.post('/messages', {
+        recipient: chatUser._id,
+        content: newMessage
       });
 
-      if (response.ok) {
-        const sentMessage = await response.json();
-        setMessages(prev => [...prev, sentMessage]);
+      if (response.data) {
+        setMessages(prev => [...prev, response.data]);
         setNewMessage('');
       }
     } catch (error) {
@@ -97,18 +84,12 @@ const SimpleMentorship = () => {
 
   const respond = async (requestId, status) => {
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status })
-      });
-
-      if (response.ok) {
+      const response = await Api.put(`/mentorship/respond/${requestId}`, { status });
+      if (response.data) {
         loadData();
       }
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Erreur réponse demande:', error);
     }
   };
 
@@ -118,7 +99,6 @@ const SimpleMentorship = () => {
         <h2 className="text-2xl font-bold">
           {currentUser?.role === 'mentore' ? 'Demandes reçues' : 'Mes demandes'}
         </h2>
-
       </div>
 
       <div className="space-y-4">
@@ -128,10 +108,10 @@ const SimpleMentorship = () => {
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center overflow-hidden">
                   {(currentUser?.role === 'mentore' ? request.mentoree?.photo : request.mentore?.photo) ? (
-                    <img 
-                      src={currentUser?.role === 'mentore' ? request.mentoree?.photo : request.mentore?.photo} 
+                    <img
+                      src={currentUser?.role === 'mentore' ? request.mentoree?.photo : request.mentore?.photo}
                       alt={currentUser?.role === 'mentore' ? request.mentoree?.name : request.mentore?.name}
-                      className="w-12 h-12 rounded-full object-cover" 
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                   ) : (
                     <User className="w-6 h-6 text-white" />
@@ -146,13 +126,12 @@ const SimpleMentorship = () => {
                   </p>
                 </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-sm ${
-                request.status === 'accepted' ? 'bg-green-100 text-green-700' :
-                request.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                'bg-yellow-100 text-yellow-700'
-              }`}>
+              <span className={`px-3 py-1 rounded-full text-sm ${request.status === 'accepted' ? 'bg-green-100 text-green-700' :
+                  request.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                    'bg-yellow-100 text-yellow-700'
+                }`}>
                 {request.status === 'accepted' ? 'Acceptée' :
-                 request.status === 'rejected' ? 'Rejetée' : 'En attente'}
+                  request.status === 'rejected' ? 'Rejetée' : 'En attente'}
               </span>
             </div>
 
@@ -180,11 +159,10 @@ const SimpleMentorship = () => {
             )}
 
             {request.status === 'accepted' && (
-              <button 
+              <button
                 onClick={() => {
                   const otherUser = currentUser?.role === 'mentore' ? request.mentoree : request.mentore;
                   if (otherUser) {
-                    // Déclencher l'événement pour basculer vers la messagerie
                     const messageEvent = new CustomEvent('switchToMessaging', {
                       detail: { userId: otherUser._id }
                     });
@@ -199,13 +177,15 @@ const SimpleMentorship = () => {
             )}
           </div>
         ))}
+        {requests.length === 0 && (
+          <p className="text-center text-gray-500 py-8">Aucune demande pour le moment.</p>
+        )}
       </div>
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-xl font-bold mb-4">Nouvelle demande</h3>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Mentore</label>
@@ -222,7 +202,6 @@ const SimpleMentorship = () => {
                   ))}
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium mb-2">Message</label>
                 <textarea
@@ -232,7 +211,6 @@ const SimpleMentorship = () => {
                   rows={4}
                 />
               </div>
-
               <div className="flex space-x-3">
                 <button
                   onClick={() => setShowModal(false)}
@@ -253,13 +231,12 @@ const SimpleMentorship = () => {
         </div>
       )}
 
-      {/* Modal de Chat */}
       {showChat && chatUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl h-[80vh] flex flex-col">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">Chat avec {chatUser.name}</h3>
-              <button 
+              <button
                 onClick={() => {
                   setShowChat(false);
                   setChatUser(null);
@@ -270,7 +247,6 @@ const SimpleMentorship = () => {
               </button>
             </div>
             <div className="flex-1 flex flex-col">
-              {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                 {messages.length === 0 ? (
                   <div className="text-center text-gray-500 py-8">
@@ -281,21 +257,16 @@ const SimpleMentorship = () => {
                     {messages.map((msg, index) => {
                       const senderId = typeof msg.sender === 'object' ? msg.sender._id : msg.sender;
                       const currentUserId = currentUser?._id || currentUser?.id;
-                      
-                      // Messages envoyés par moi = à droite, reçus = à gauche
                       const isCurrentUser = String(senderId) === String(currentUserId);
-                      
+
                       return (
                         <div key={index} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-                          <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${
-                            isCurrentUser ? 'flex-row-reverse space-x-reverse' : 'flex-row'
-                          }`}>
-                            {/* Avatar */}
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${
-                              isCurrentUser 
-                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white' 
-                                : 'bg-gray-300 text-gray-600'
+                          <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isCurrentUser ? 'flex-row-reverse space-x-reverse' : 'flex-row'
                             }`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${isCurrentUser
+                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                                : 'bg-gray-300 text-gray-600'
+                              }`}>
                               {isCurrentUser ? (
                                 currentUser?.photo ? (
                                   <img src={currentUser.photo} alt={currentUser.name} className="w-8 h-8 rounded-full object-cover" />
@@ -310,31 +281,20 @@ const SimpleMentorship = () => {
                                 )
                               )}
                             </div>
-                            
-                            {/* Message Bubble */}
-                            <div className={`px-4 py-3 rounded-2xl shadow-md ${
-                              isCurrentUser
+                            <div className={`px-4 py-3 rounded-2xl shadow-md ${isCurrentUser
                                 ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-md'
                                 : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md'
-                            }`}>
-                              <p className="text-sm leading-relaxed">{msg.content}</p>
-                              <div className={`flex items-center mt-2 ${
-                                isCurrentUser ? 'justify-end' : 'justify-start'
                               }`}>
-                                <span className={`text-xs ${
-                                  isCurrentUser ? 'text-purple-200' : 'text-gray-500'
+                              <p className="text-sm leading-relaxed">{msg.content}</p>
+                              <div className={`flex items-center mt-2 ${isCurrentUser ? 'justify-end' : 'justify-start'
                                 }`}>
+                                <span className={`text-xs ${isCurrentUser ? 'text-purple-200' : 'text-gray-500'
+                                  }`}>
                                   {new Date(msg.timestamp).toLocaleTimeString('fr-FR', {
                                     hour: '2-digit',
                                     minute: '2-digit'
                                   })}
                                 </span>
-                                {isCurrentUser && (
-                                  <div className="flex space-x-1 ml-2">
-                                    <div className="w-2 h-2 bg-purple-200 rounded-full"></div>
-                                    {msg.read && <div className="w-2 h-2 bg-green-400 rounded-full"></div>}
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </div>
@@ -344,41 +304,7 @@ const SimpleMentorship = () => {
                   </div>
                 )}
               </div>
-              
-              {/* Zone de saisie */}
               <div className="p-4 border-t bg-white">
-                <div className="flex space-x-2 mb-2">
-                  <button 
-                    onClick={async () => {
-                      try {
-                        const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${chatUser._id}`);
-                        const msgs = await response.json();
-                        console.log('Messages chargés:', msgs);
-                        setMessages(msgs);
-                      } catch (error) {
-                        console.error('Erreur:', error);
-                      }
-                    }}
-                    className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
-                  >
-                    Recharger
-                  </button>
-                  <button 
-                    onClick={() => {
-                      const fakeMessage = {
-                        _id: Date.now(),
-                        sender: chatUser._id,
-                        content: 'Message de test reçu',
-                        timestamp: new Date().toISOString()
-                      };
-                      setMessages(prev => [...prev, fakeMessage]);
-                    }}
-                    className="px-3 py-1 bg-green-500 text-white rounded text-sm"
-                  >
-                    Test Reçu
-                  </button>
-                  <span className="text-sm text-gray-500">{messages.length} messages</span>
-                </div>
                 <div className="flex space-x-2">
                   <input
                     type="text"
@@ -388,7 +314,7 @@ const SimpleMentorship = () => {
                     placeholder="Tapez votre message..."
                     className="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
                   />
-                  <button 
+                  <button
                     onClick={sendChatMessage}
                     disabled={!newMessage.trim()}
                     className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"

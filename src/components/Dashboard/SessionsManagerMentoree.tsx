@@ -1,6 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Video, MapPin, Link, MessageSquare, CheckCircle, XCircle, Edit, Eye, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Clock, User, Video, MapPin, Link, CheckCircle, XCircle, Edit, Eye, RefreshCw } from 'lucide-react';
 import { Session } from '../../types';
+import Api, { BASE_URL } from '../../data/Api';
+
+// Fonction utilitaire pour corriger les URLs des photos
+const getPhotoUrl = (photo: string | undefined) => {
+  if (!photo) return null;
+  if (photo.startsWith('http')) return photo;
+  return `${BASE_URL}${photo.startsWith('/') ? photo : '/' + photo}`;
+};
 
 interface SessionsManagerMentoreeProps {
   sessions: Session[];
@@ -8,10 +16,10 @@ interface SessionsManagerMentoreeProps {
   onOpenChat: (userId: string) => void;
 }
 
-const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({ 
-  sessions, 
-  onRefresh, 
-  onOpenChat 
+const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
+  sessions,
+  onRefresh,
+  onOpenChat
 }) => {
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState<string | null>(null);
@@ -19,18 +27,18 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
   const [confirmedSessions, setConfirmedSessions] = useState<Set<string>>(new Set());
 
   const getStatusBadge = (status: string, sessionId: string) => {
-    // Si la séance a été confirmée localement, afficher "Confirmée"
     const actualStatus = confirmedSessions.has(sessionId) ? 'confirmed' : status;
-    
-    const badges = {
+
+    const badges: Record<string, { color: string, text: string, icon: any }> = {
       scheduled: { color: 'bg-blue-100 text-blue-700', text: 'À venir', icon: Clock },
       confirmed: { color: 'bg-green-100 text-green-700', text: 'Confirmée', icon: CheckCircle },
       completed: { color: 'bg-gray-100 text-gray-700', text: 'Terminée', icon: CheckCircle },
-      canceled: { color: 'bg-red-100 text-red-700', text: 'Annulée', icon: XCircle }
+      canceled: { color: 'bg-red-100 text-red-700', text: 'Annulée', icon: XCircle },
+      cancelled: { color: 'bg-red-100 text-red-700', text: 'Annulée', icon: XCircle }
     };
     const badge = badges[actualStatus] || badges.scheduled;
     const Icon = badge.icon;
-    
+
     return (
       <span className={`px-3 py-1 rounded-full text-sm flex items-center ${badge.color}`}>
         <Icon className="w-4 h-4 mr-1" />
@@ -48,59 +56,36 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
   };
 
   const handleConfirmPresence = async (sessionId: string) => {
-    console.log('=== DEBUT handleConfirmPresence ===');
-    console.log('SessionId:', sessionId);
-    
     setLoading(true);
-    console.log('Loading set to true');
-    
     try {
-      console.log('Envoi de la requête fetch...');
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/confirm`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      
-      console.log('Réponse reçue:', response.status, response.ok);
-
-      if (response.ok) {
-        console.log('Réponse OK - Affichage alerte');
+      // Utilisation du endpoint /api/sessions/... comme dans l'original
+      const response = await Api.put(`/sessions/${sessionId}/confirm`);
+      if (response.data) {
         alert('Présence confirmée avec succès !');
-        console.log('Alerte affichée - Appel onRefresh');
         onRefresh();
-        console.log('onRefresh appelé');
-      } else {
-        console.log('Réponse pas OK - Affichage erreur');
-        alert('Erreur lors de la confirmation');
+        setShowConfirmModal(null);
       }
-    } catch (error) {
-      console.log('Erreur catch:', error);
-      alert('Erreur de connexion');
+    } catch (error: any) {
+      console.error('Erreur confirmation presence:', error);
+      alert(`Erreur: ${error.response?.data?.message || 'Une erreur est survenue.'}`);
     } finally {
-      console.log('Finally - Loading set to false');
       setLoading(false);
-      console.log('=== FIN handleConfirmPresence ===');
     }
   };
 
   const handleCancelSession = async (sessionId: string) => {
     if (!confirm('Êtes-vous sûre de vouloir annuler cette séance ?')) return;
-    
+
     setLoading(true);
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}/cancel`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-
-      if (response.ok) {
+      const response = await Api.put(`/sessions/${sessionId}/cancel`);
+      if (response.data) {
         alert('Séance annulée');
         onRefresh();
-      } else {
-        alert('Erreur lors de l\'annulation');
       }
-    } catch (error) {
-      alert('Erreur de connexion');
+    } catch (error: any) {
+      console.error('Erreur annulation séance:', error);
+      alert(`Erreur: ${error.response?.data?.message || 'Une erreur est survenue.'}`);
     } finally {
       setLoading(false);
     }
@@ -108,22 +93,17 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
 
   const handleDeleteSession = async (sessionId: string) => {
     if (!confirm('Êtes-vous sûre de vouloir supprimer cette séance de l\'historique ?')) return;
-    
+
     setLoading(true);
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${sessionId}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      });
-
-      if (response.ok) {
+      const response = await Api.delete(`/sessions/${sessionId}`);
+      if (response.data) {
         alert('Séance supprimée de l\'historique');
         onRefresh();
-      } else {
-        alert('Erreur lors de la suppression');
       }
-    } catch (error) {
-      alert('Erreur de connexion');
+    } catch (error: any) {
+      console.error('Erreur suppression séance:', error);
+      alert(`Erreur: ${error.response?.data?.message || 'Une erreur est survenue.'}`);
     } finally {
       setLoading(false);
     }
@@ -154,9 +134,9 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
             <div key={`${session._id}-${index}`} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-                    {session.mentore?.photo ? (
-                      <img src={session.mentore.photo} alt={session.mentore.name} className="w-12 h-12 rounded-full object-cover" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+                    {getPhotoUrl(session.mentore?.photo) ? (
+                      <img src={getPhotoUrl(session.mentore.photo)!} alt={session.mentore.name} className="w-12 h-12 rounded-full object-cover" />
                     ) : (
                       <User className="w-6 h-6 text-white" />
                     )}
@@ -181,8 +161,8 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                 <div className="flex items-center">
                   {getModeIcon(session.mode)}
                   <span className="ml-2">
-                    {session.mode === 'online' ? 'En ligne' : 
-                     session.mode === 'video' ? 'Appel vidéo' : 'Présentiel'}
+                    {session.mode === 'online' ? 'En ligne' :
+                      session.mode === 'video' ? 'Appel vidéo' : 'Présentiel'}
                   </span>
                 </div>
               </div>
@@ -201,7 +181,6 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                     onClick={() => {
                       const message = `Bonjour, je souhaiterais reprogrammer notre séance "${session.topic}" prévue le ${new Date(session.scheduledDate).toLocaleDateString('fr-FR')}. Pouvez-vous me proposer d'autres créneaux ?`;
                       onOpenChat(session.mentore._id);
-                      // Optionnel: pré-remplir le message
                       setTimeout(() => {
                         const event = new CustomEvent('prefillMessage', {
                           detail: { message }
@@ -218,30 +197,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
 
                 {(session.status === 'scheduled' || !session.status) && !confirmedSessions.has(session._id) && (
                   <button
-                    onClick={async () => {
-                      // Bloquer l'ouverture de nouvelles fenêtres
-                      const originalOpen = window.open;
-                      window.open = () => null;
-                      
-                      try {
-                        const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/${session._id}/confirm`, {
-                          method: 'PUT',
-                          credentials: 'include'
-                        });
-                        if (response.ok) {
-                          setConfirmedSessions(prev => new Set([...prev, session._id]));
-                          alert('Présence confirmée avec succès !');
-                          onRefresh();
-                        } else {
-                          alert('Erreur lors de la confirmation');
-                        }
-                      } catch (error) {
-                        alert('Erreur de connexion');
-                      } finally {
-                        // Restaurer window.open
-                        window.open = originalOpen;
-                      }
-                    }}
+                    onClick={() => setShowConfirmModal(session._id)}
                     className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm flex items-center"
                   >
                     <CheckCircle className="w-4 h-4 mr-1" />
@@ -257,11 +213,9 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                     className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center"
                   >
                     <Video className="w-4 h-4 mr-1" />
-                    Rejoindre Google Meet
+                    Rejoindre
                   </a>
                 )}
-
-
 
                 {(session.status === 'scheduled' || session.status === 'confirmed') && (
                   <button
@@ -304,9 +258,9 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
 
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-                  {selectedSession.mentore?.photo ? (
-                    <img src={selectedSession.mentore.photo} alt={selectedSession.mentore.name} className="w-16 h-16 rounded-full object-cover" />
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+                  {getPhotoUrl(selectedSession.mentore?.photo) ? (
+                    <img src={getPhotoUrl(selectedSession.mentore.photo)!} alt={selectedSession.mentore.name} className="w-16 h-16 rounded-full object-cover" />
                   ) : (
                     <User className="w-8 h-8 text-white" />
                   )}
@@ -324,7 +278,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                  {getStatusBadge(selectedSession.status)}
+                  {getStatusBadge(selectedSession.status, selectedSession._id)}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -341,8 +295,8 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Mode</label>
                   <p className="text-gray-900">
-                    {selectedSession.mode === 'online' ? 'En ligne' : 
-                     selectedSession.mode === 'video' ? 'Appel vidéo' : 'Présentiel'}
+                    {selectedSession.mode === 'online' ? 'En ligne' :
+                      selectedSession.mode === 'video' ? 'Appel vidéo' : 'Présentiel'}
                   </p>
                 </div>
               </div>
@@ -356,56 +310,18 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
 
               {selectedSession.meetingLink && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Lien Google Meet</label>
-                  <div className="flex items-center space-x-2">
-                    <a
-                      href={selectedSession.meetingLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline flex items-center"
-                    >
-                      <Video className="w-4 h-4 mr-1" />
-                      Rejoindre la réunion
-                    </a>
-                    <button
-                      onClick={() => navigator.clipboard.writeText(selectedSession.meetingLink)}
-                      className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200"
-                    >
-                      Copier
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">{selectedSession.meetingLink}</p>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Lien de réunion</label>
+                  <a
+                    href={selectedSession.meetingLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline flex items-center"
+                  >
+                    <Video className="w-4 h-4 mr-1" />
+                    Rejoindre la réunion
+                  </a>
                 </div>
               )}
-              
-              {!selectedSession.meetingLink && selectedSession.status === 'scheduled' && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-sm text-yellow-700">
-                    📹 Le lien Google Meet sera automatiquement généré lorsque vous confirmerez votre présence.
-                  </p>
-                </div>
-              )}
-
-              {selectedSession.notes && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                  <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{selectedSession.notes}</p>
-                </div>
-              )}
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Messagerie de la séance</label>
-                <button
-                  onClick={() => {
-                    setSelectedSession(null);
-                    onOpenChat(selectedSession.mentore._id);
-                  }}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
-                >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Ouvrir la conversation avec {selectedSession.mentore?.name}
-                </button>
-              </div>
             </div>
 
             <div className="flex justify-end space-x-3 mt-6">
@@ -415,17 +331,6 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
               >
                 Fermer
               </button>
-              {selectedSession.status === 'scheduled' && (
-                <button
-                  onClick={() => {
-                    setShowConfirmModal(selectedSession._id);
-                    setSelectedSession(null);
-                  }}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  Confirmer ma présence
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -436,24 +341,9 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Confirmer votre présence</h3>
-            <div className="mb-6">
-              <p className="text-gray-600 mb-3">
-                Confirmez-vous votre présence à cette séance de mentorat ?
-              </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-center">
-                  <Video className="w-5 h-5 text-blue-600 mr-2" />
-                  <div>
-                    <p className="text-sm font-medium text-blue-800">
-                      Lien Google Meet automatique
-                    </p>
-                    <p className="text-xs text-blue-600">
-                      Un lien de réunion sera généré automatiquement après confirmation
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <p className="text-gray-600 mb-6">
+              Confirmez-vous votre présence à cette séance de mentorat ?
+            </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowConfirmModal(null)}
@@ -465,16 +355,9 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
               <button
                 onClick={() => handleConfirmPresence(showConfirmModal)}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center"
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
-                {loading ? (
-                  'Génération du lien...'
-                ) : (
-                  <>
-                    <Video className="w-4 h-4 mr-2" />
-                    Confirmer & Générer Meet
-                  </>
-                )}
+                {loading ? 'Confirmation...' : 'Confirmer'}
               </button>
             </div>
           </div>

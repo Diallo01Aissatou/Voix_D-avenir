@@ -1,5 +1,6 @@
 export interface User {
   id: string;
+  _id?: string;
   name: string;
   email: string;
   password: string; // 🔑 ajouté
@@ -80,7 +81,7 @@ export interface Event {
   description: string;
   date: string;
   time: string;
- type: 'webinaire' | 'atelier' | 'conférence';
+  type: 'webinaire' | 'atelier' | 'conférence';
 
   speaker: string;
   registrationUrl: string;
@@ -91,7 +92,7 @@ export interface Opportunity {
   id: string;
   title: string;
   description: string;
-type: 'stage' | 'bourse' | 'concours';
+  type: 'stage' | 'bourse' | 'concours';
   deadline: string;
   organization: string;
   applyUrl: string;
@@ -115,7 +116,7 @@ export interface Session {
   updatedAt: string;
 }
 
-export interface Appointement{
+export interface Appointement {
   id: string;
   mentoreeId: string;
   mentoreId: string;

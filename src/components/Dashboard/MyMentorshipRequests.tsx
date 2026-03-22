@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Clock, MessageCircle, CheckCircle, XCircle } from 'lucide-react';
+import Api, { BASE_URL } from '../../data/Api';
 
 interface MentorshipRequest {
   _id: string;
@@ -22,7 +23,12 @@ interface MyMentorshipRequestsProps {
   onStartChat?: (mentoreId: string, mentoreName: string) => void;
 }
 
-const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+// Fonction utilitaire pour corriger les URLs des photos
+const getPhotoUrl = (photo: string | undefined) => {
+  if (!photo) return null;
+  if (photo.startsWith('http')) return photo;
+  return `${BASE_URL}${photo.startsWith('/') ? photo : '/' + photo}`;
+};
 
 const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat }) => {
   const [requests, setRequests] = useState<MentorshipRequest[]>([]);
@@ -34,12 +40,9 @@ const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(`${BASE_API_URL}/api/mentorship/sent`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setRequests(data);
+      const response = await Api.get('/mentorship/sent');
+      if (response.data) {
+        setRequests(response.data);
       }
     } catch (error) {
       console.error('Erreur lors du chargement des demandes:', error);
@@ -98,9 +101,9 @@ const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat
             <div key={request._id} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-                    {request.mentore.photo ? (
-                      <img src={request.mentore.photo} alt={request.mentore.name} className="w-12 h-12 rounded-full object-cover" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+                    {getPhotoUrl(request.mentore.photo) ? (
+                      <img src={getPhotoUrl(request.mentore.photo)!} alt={request.mentore.name} className="w-12 h-12 rounded-full object-cover" />
                     ) : (
                       <User className="w-6 h-6 text-white" />
                     )}

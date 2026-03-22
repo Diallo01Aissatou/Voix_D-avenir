@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, Video, MessageSquare, CheckCircle, XCircle, AlertCircle, ExternalLink, FileText, Edit, Trash2, Plus } from 'lucide-react';
+import { Calendar, Clock, User, Video, MessageSquare, CheckCircle, XCircle, AlertCircle, FileText, Plus } from 'lucide-react';
+import Api, { BASE_URL } from '../../data/Api';
 
 // Fonction utilitaire pour corriger les URLs des photos
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `${BASE_URL}${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface SessionsManagerProps {
@@ -15,15 +16,15 @@ interface SessionsManagerProps {
   onRequestMentorship: () => void;
 }
 
-const SessionsManager: React.FC<SessionsManagerProps> = ({ 
-  sessions, 
-  onRefresh, 
-  onOpenChat, 
-  onRequestMentorship 
+const SessionsManager: React.FC<SessionsManagerProps> = ({
+  sessions,
+  onRefresh,
+  onOpenChat,
+  onRequestMentorship
 }) => {
-  const [selectedSession, setSelectedSession] = useState(null);
+  const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [confirmingPresence, setConfirmingPresence] = useState(null);
+  const [confirmingPresence, setConfirmingPresence] = useState<string | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -59,27 +60,16 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
   };
 
   const confirmPresence = async (sessionId: string) => {
-    console.log('Confirmation présence pour session:', sessionId);
     setConfirmingPresence(sessionId);
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/sessions/${sessionId}/confirm`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      console.log('Réponse confirmation:', response.status);
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Confirmation réussie:', result);
+      const response = await Api.put(`/mentorship/sessions/${sessionId}/confirm`);
+      if (response.data) {
         alert('Présence confirmée avec succès !');
         onRefresh();
-      } else {
-        const error = await response.json().catch(() => ({ message: 'Erreur serveur' }));
-        console.error('Erreur API:', error);
-        alert(`Erreur: ${error.message}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur confirmation présence:', error);
-      alert('Erreur de connexion');
+      alert(`Erreur: ${error.response?.data?.message || 'Une erreur est survenue.'}`);
     } finally {
       setConfirmingPresence(null);
     }
@@ -87,50 +77,34 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
 
   const cancelSession = async (sessionId: string) => {
     if (!confirm('Êtes-vous sûre de vouloir annuler cette séance ?')) return;
-    
-    console.log('Annulation séance:', sessionId);
+
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/sessions/${sessionId}/cancel`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      console.log('Réponse annulation:', response.status);
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Annulation réussie:', result);
+      const response = await Api.put(`/mentorship/sessions/${sessionId}/cancel`);
+      if (response.data) {
         alert('Séance annulée avec succès !');
         onRefresh();
-      } else {
-        const error = await response.json().catch(() => ({ message: 'Erreur serveur' }));
-        console.error('Erreur API:', error);
-        alert(`Erreur: ${error.message}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur annulation séance:', error);
-      alert('Erreur de connexion');
+      alert(`Erreur: ${error.response?.data?.message || 'Une erreur est survenue.'}`);
     }
   };
 
-  const SessionCard = ({ session }) => (
+  const SessionCard = ({ session }: { session: any }) => (
     <div className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
       <div className="flex items-start space-x-4">
         <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
           {getPhotoUrl(session.mentore?.photo) ? (
-            <img 
-              src={getPhotoUrl(session.mentore.photo)} 
-              alt={session.mentore.name} 
-              className="w-16 h-16 rounded-full object-cover" 
-              onError={(e) => {
-                console.log('Erreur photo mentore:', getPhotoUrl(session.mentore.photo));
-                e.currentTarget.src = '';
-                e.currentTarget.style.display = 'none';
-              }}
+            <img
+              src={getPhotoUrl(session.mentore.photo)!}
+              alt={session.mentore.name}
+              className="w-16 h-16 rounded-full object-cover"
             />
           ) : (
             <User className="w-8 h-8 text-white" />
           )}
         </div>
-        
+
         <div className="flex-1">
           <div className="flex items-start justify-between mb-3">
             <div>
@@ -148,11 +122,11 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
           <div className="space-y-2 mb-4">
             <div className="flex items-center text-sm text-gray-600">
               <Calendar className="w-4 h-4 mr-2" />
-              {new Date(session.scheduledDate).toLocaleDateString('fr-FR', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+              {new Date(session.scheduledDate).toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
               })}
             </div>
             <div className="flex items-center text-sm text-gray-600">
@@ -163,12 +137,6 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
               <FileText className="w-4 h-4 mr-2" />
               {session.topic || 'Séance de mentorat personnalisée'}
             </div>
-            {session.mode && (
-              <div className="flex items-center text-sm text-gray-600">
-                <Video className="w-4 h-4 mr-2" />
-                {session.mode === 'online' ? 'En ligne' : session.mode === 'video' ? 'Appel vidéo' : 'Présentiel'}
-              </div>
-            )}
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -181,7 +149,7 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
             >
               Voir détails
             </button>
-            
+
             {session.status === 'scheduled' && (
               <>
                 <button
@@ -199,12 +167,11 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
                 </button>
               </>
             )}
-            
+
             {session.meetingLink && (session.status === 'scheduled' || session.status === 'confirmed') && (
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  console.log('Ouverture lien réunion:', session.meetingLink);
                   window.open(session.meetingLink, '_blank', 'noopener,noreferrer');
                 }}
                 className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center"
@@ -213,9 +180,9 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
                 Rejoindre
               </button>
             )}
-            
+
             <button
-              onClick={() => onOpenChat(session.mentore._id)}
+              onClick={() => onOpenChat(session.mentore?._id)}
               className="px-3 py-1 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm flex items-center"
             >
               <MessageSquare className="w-4 h-4 mr-1" />
@@ -227,7 +194,7 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
     </div>
   );
 
-  const SessionDetails = ({ session, onClose }) => (
+  const SessionDetails = ({ session, onClose }: { session: any, onClose: () => void }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
@@ -245,15 +212,10 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
             <div className="flex items-center space-x-4">
               <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
                 {getPhotoUrl(session.mentore?.photo) ? (
-                  <img 
-                    src={getPhotoUrl(session.mentore.photo)} 
-                    alt={session.mentore.name} 
-                    className="w-20 h-20 rounded-full object-cover" 
-                    onError={(e) => {
-                      console.log('Erreur photo mentore modal:', getPhotoUrl(session.mentore.photo));
-                      e.currentTarget.src = '';
-                      e.currentTarget.style.display = 'none';
-                    }}
+                  <img
+                    src={getPhotoUrl(session.mentore.photo)!}
+                    alt={session.mentore.name}
+                    className="w-20 h-20 rounded-full object-cover"
                   />
                 ) : (
                   <User className="w-10 h-10 text-white" />
@@ -287,57 +249,15 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
                     {session.duration || 60} minutes
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mode</label>
-                  <div className="flex items-center text-gray-600">
-                    <Video className="w-4 h-4 mr-2" />
-                    {session.mode === 'online' ? 'En ligne' : session.mode === 'video' ? 'Appel vidéo' : 'Présentiel'}
-                  </div>
-                </div>
               </div>
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Sujet</label>
                   <p className="text-gray-600">{session.topic || 'Séance de mentorat personnalisée'}</p>
                 </div>
-                {session.description && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <p className="text-gray-600">{session.description}</p>
-                  </div>
-                )}
               </div>
             </div>
-
-            {session.resources && session.resources.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Ressources associées</label>
-                <div className="space-y-2">
-                  {session.resources.map((resource, index) => (
-                    <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                      <FileText className="w-4 h-4 mr-2 text-gray-500" />
-                      <span className="flex-1 text-sm text-gray-700">{resource.name}</span>
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {session.notes && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-lg">{session.notes}</p>
-              </div>
-            )}
 
             <div className="flex flex-wrap gap-3 pt-4 border-t">
               {session.status === 'scheduled' && (
@@ -364,12 +284,11 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
                   </button>
                 </>
               )}
-              
+
               {session.meetingLink && (session.status === 'scheduled' || session.status === 'confirmed') && (
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    console.log('Ouverture lien réunion depuis modal:', session.meetingLink);
                     window.open(session.meetingLink, '_blank', 'noopener,noreferrer');
                   }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
@@ -378,10 +297,10 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
                   Rejoindre la séance
                 </button>
               )}
-              
+
               <button
                 onClick={() => {
-                  onOpenChat(session.mentore._id);
+                  onOpenChat(session.mentore?._id);
                   onClose();
                 }}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center"

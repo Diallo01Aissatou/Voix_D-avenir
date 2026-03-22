@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
-import Api from '../../data/Api';
+import { Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
@@ -16,36 +16,34 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const { login } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      const response = await Api.post('/auth/login', {
-        email: formData.email,
-        password: formData.password
-      });
+      const success = await login(formData.email, formData.password, formData.role);
 
-      if (response.data.user) {
-        localStorage.setItem('mentora_user', JSON.stringify(response.data.user));
+      if (success) {
+        const savedUser = localStorage.getItem('mentora_user');
+        const user = savedUser ? JSON.parse(savedUser) : null;
 
-        // Déclencher un événement pour mettre à jour le contexte
-        window.dispatchEvent(new Event('storage'));
-
-        // Redirection basée sur le rôle de l'utilisateur
-        const userRole = response.data.user.role;
-        if (userRole === 'admin') {
-          onNavigate('admin-dashboard');
-        } else if (userRole === 'mentore') {
-          onNavigate('mentore-dashboard');
-        } else {
-          onNavigate('mentoree-dashboard');
+        if (user) {
+          if (user.role === 'admin') {
+            onNavigate('admin-dashboard');
+          } else if (user.role === 'mentore') {
+            onNavigate('mentore-dashboard');
+          } else {
+            onNavigate('mentoree-dashboard');
+          }
         }
+      } else {
+        setError('Email ou mot de passe incorrect');
       }
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || 'Email ou mot de passe incorrect';
-      setError(errorMessage);
+      setError('Une erreur est survenue lors de la connexion');
     } finally {
       setIsLoading(false);
     }
@@ -59,27 +57,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
     setError('');
   };
 
-  const createAdmin = async () => {
-    try {
-      const timestamp = Date.now();
-      await Api.post('/auth/create-admin', {
-        name: 'Administrateur',
-        email: `admin${timestamp}@voixdavenir.gn`,
-        password: 'admin123'
-      });
-      alert(`Admin créé avec succès !\nEmail: admin${timestamp}@voixdavenir.gn\nMot de passe: admin123`);
-    } catch (error) {
-      alert('Erreur: ' + (error?.response?.data?.message || 'Erreur de création'));
-    }
-  };
-
-  // Comptes de démonstration
-  // const demoAccounts = [
-  //   { email: 'aminata@email.com', role: 'mentoree', name: 'Aminata (Mentorée)' },
-  //   { email: 'fatoumata@email.com', role: 'mentore', name: 'Dr. Fatoumata (Mentore)' },
-  //   { email: 'admin@mentora.gn', role: 'admin', name: 'Administrateur' }
-  // ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-12">
       <div className="container mx-auto px-4">
@@ -91,32 +68,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Connexion</h1>
             <p className="text-gray-600">Accédez à votre espace personnel</p>
           </div>
-
-          {/* Comptes de démonstration */}
-          {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-blue-800 mb-3">Comptes de démonstration</h3>
-            <div className="space-y-2">
-              {demoAccounts.map((account, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setFormData({
-                      email: account.email,
-                      password: 'password',
-                      role: account.role
-                    });
-                  }}
-                  className="w-full text-left p-2 rounded bg-white hover:bg-blue-50 transition-colors text-sm"
-                >
-                  <div className="font-medium text-blue-800">{account.name}</div>
-                  <div className="text-blue-600">{account.email}</div>
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-blue-600 mt-2">
-              Mot de passe pour tous les comptes : <code className="bg-white px-1 rounded">password</code>
-            </p>
-          </div> */}
 
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, CheckCircle, XCircle, Clock, Calendar } from 'lucide-react';
+import Api from '../../data/Api';
 
 interface Notification {
   id: string;
@@ -15,9 +16,9 @@ interface SessionNotificationsProps {
   onNotificationClick?: (notification: Notification) => void;
 }
 
-const SessionNotifications: React.FC<SessionNotificationsProps> = ({ 
-  userId, 
-  onNotificationClick 
+const SessionNotifications: React.FC<SessionNotificationsProps> = ({
+  userId,
+  onNotificationClick
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -25,7 +26,7 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
 
   useEffect(() => {
     loadNotifications();
-    
+
     // Écouter les événements de mise à jour de séance
     const handleSessionUpdate = (event: CustomEvent) => {
       const { type, sessionId, message } = event.detail;
@@ -40,7 +41,7 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
     };
 
     window.addEventListener('sessionUpdate', handleSessionUpdate as EventListener);
-    
+
     // Vérifier les notifications toutes les 30 secondes
     const interval = setInterval(loadNotifications, 30000);
 
@@ -52,13 +53,10 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
 
   const loadNotifications = async () => {
     try {
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications', {
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const formattedNotifications = data.map(notif => ({
+      const response = await Api.get('/sessions/notifications');
+
+      if (response.data) {
+        const formattedNotifications = response.data.map((notif: any) => ({
           id: notif._id,
           type: notif.type,
           message: notif.title || notif.message,
@@ -66,9 +64,9 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
           timestamp: notif.createdAt,
           read: notif.read
         }));
-        
+
         setNotifications(formattedNotifications);
-        setUnreadCount(formattedNotifications.filter(n => !n.read).length);
+        setUnreadCount(formattedNotifications.filter((n: any) => !n.read).length);
       }
     } catch (error) {
       console.error('Erreur chargement notifications:', error);
@@ -85,13 +83,10 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/notifications/${notificationId}/read`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      
-      setNotifications(prev => 
-        prev.map(n => 
+      await Api.put(`/sessions/notifications/${notificationId}/read`);
+
+      setNotifications(prev =>
+        prev.map(n =>
           n.id === notificationId ? { ...n, read: true } : n
         )
       );
@@ -118,7 +113,7 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
     const now = new Date();
     const time = new Date(timestamp);
     const diffMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
-    
+
     if (diffMinutes < 1) return 'À l\'instant';
     if (diffMinutes < 60) return `${diffMinutes} min`;
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}h`;
@@ -144,7 +139,7 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
           <div className="p-4 border-b">
             <h3 className="font-semibold text-gray-800">Notifications</h3>
           </div>
-          
+
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
@@ -160,9 +155,8 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
                     onNotificationClick?.(notification);
                     setShowDropdown(false);
                   }}
-                  className={`p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors ${
-                    !notification.read ? 'bg-purple-50' : ''
-                  }`}
+                  className={`p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors ${!notification.read ? 'bg-purple-50' : ''
+                    }`}
                 >
                   <div className="flex items-start space-x-3">
                     {getNotificationIcon(notification.type)}
@@ -182,16 +176,13 @@ const SessionNotifications: React.FC<SessionNotificationsProps> = ({
               ))
             )}
           </div>
-          
+
           {notifications.length > 0 && (
             <div className="p-3 border-t">
               <button
                 onClick={async () => {
                   try {
-                    await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications/read-all', {
-                      method: 'PUT',
-                      credentials: 'include'
-                    });
+                    await Api.put('/sessions/notifications/read-all');
                     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
                     setUnreadCount(0);
                   } catch (error) {

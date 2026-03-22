@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAuth } from '../../contexts/AuthContext';
+import Api from '../../data/Api';
 import { ConversationContext, BotResponse } from '../../services/chatbotService';
 
 interface Message {
@@ -57,57 +58,40 @@ const IntelligentChatbot: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const headers = {
-                    'Content-Type': 'application/json',
-                    ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
-                };
-
                 const [mentorsRes, resourcesRes, sessionsRes] = await Promise.all([
-                    fetch('https://voix-avenir-backend.onrender.com/api/users/mentores').catch(() => null),
-                    fetch('https://voix-avenir-backend.onrender.com/api/resources').catch(() => null),
-                    currentUser ? fetch('https://voix-avenir-backend.onrender.com/api/sessions', { headers }).catch(() => null) : Promise.resolve(null)
+                    Api.get('/users/mentores').catch(() => null),
+                    Api.get('/resources').catch(() => null),
+                    currentUser ? Api.get('/sessions').catch(() => null) : Promise.resolve(null)
                 ]);
 
                 // Données de fallback
                 const mockMentors = [
                     { name: "Aissatou Diallo", profession: "Leadership & Business", expertise: "Business", bio: "Experte en leadership féminin et entrepreneuriat." },
-                    { name: "Fatou Camara", profession: "Développement personnel", expertise: "Coaching", bio: "Coach certifiée en développement personnel et confiance en soi." },
-                    { name: "Mariama Sow", profession: "Études à l'étranger", expertise: "Education", bio: "Conseillère d'orientation et experte en études internationales." },
-                    { name: "Hawa Mansaré", profession: "Technologie", expertise: "Tech", bio: "Ingénieure en informatique, experte en développement web." },
-                    { name: "Hadja Safiatou Diallo", profession: "Santé", expertise: "Médecine", bio: "Médecin spécialisée, experte en santé publique." }
+                    { name: "Fatou Camara", profession: "Développement personnel", expertise: "Coaching", bio: "Coach certifiée en développement personnel et confiance en soi." }
                 ];
 
                 const mockResources = [
                     { title: "Guide de l'entrepreneuriat féminin" },
-                    { title: "Comment obtenir une bourse ?" },
-                    { title: "Vidéo : Confiance en soi" },
-                    { title: "Modèle de CV professionnel" }
+                    { title: "Comment obtenir une bourse ?" }
                 ];
 
-                if (mentorsRes && mentorsRes.ok) {
-                    const data = await mentorsRes.json();
-                    setMentors(data.length > 0 ? data : mockMentors);
+                if (mentorsRes && mentorsRes.data) {
+                    setMentors(mentorsRes.data.length > 0 ? mentorsRes.data : mockMentors);
                 } else {
                     setMentors(mockMentors);
                 }
 
-                if (resourcesRes && resourcesRes.ok) {
-                    const data = await resourcesRes.json();
-                    setResources(data.length > 0 ? data : mockResources);
+                if (resourcesRes && resourcesRes.data) {
+                    setResources(resourcesRes.data.length > 0 ? resourcesRes.data : mockResources);
                 } else {
                     setResources(mockResources);
                 }
 
-                if (sessionsRes && sessionsRes.ok) {
-                    setSessions(await sessionsRes.json());
+                if (sessionsRes && sessionsRes.data) {
+                    setSessions(sessionsRes.data);
                 }
             } catch (error) {
                 console.error("Erreur chargement données chatbot:", error);
-                // Fallback critique
-                setMentors([
-                    { name: "Aissatou Diallo", profession: "Leadership & Business", expertise: "Business", bio: "Experte en leadership féminin." },
-                    { name: "Fatou Camara", profession: "Développement personnel", expertise: "Coaching", bio: "Coach certifiée." }
-                ]);
             }
         };
         fetchData();
@@ -123,7 +107,6 @@ const IntelligentChatbot: React.FC = () => {
         scrollToBottom();
     }, [messages, isOpen, isLoading]);
 
-    // Focus sur l'input quand le chat s'ouvre
     useEffect(() => {
         if (isOpen && inputRef.current) {
             setTimeout(() => inputRef.current?.focus(), 100);
@@ -135,7 +118,6 @@ const IntelligentChatbot: React.FC = () => {
         const textToSend = suggestionText || inputText.trim();
         if (!textToSend || isLoading) return;
 
-        // Message utilisateur
         const userMessage: Message = {
             id: Date.now().toString(),
             text: textToSend,
@@ -147,7 +129,6 @@ const IntelligentChatbot: React.FC = () => {
         setInputText('');
         setIsLoading(true);
 
-        // Mettre à jour le contexte (historique local)
         const updatedHistory = [...conversationContext.conversationHistory, textToSend];
         setConversationContext(prev => ({
             ...prev,
@@ -155,39 +136,27 @@ const IntelligentChatbot: React.FC = () => {
         }));
 
         try {
-            // Préparer les messages pour l'API
             const apiMessages = messages.map(m => ({
                 role: m.sender === 'user' ? 'user' : 'assistant',
                 content: m.text
             }));
             apiMessages.push({ role: 'user', content: textToSend });
 
-            // Appel à notre API backend
-            const response = await fetch('https://voix-avenir-backend.onrender.com/api/ai/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ messages: apiMessages })
-            });
+            const response = await Api.post('/ai/chat', { messages: apiMessages });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.details || 'Erreur API');
+            if (response.data) {
+                const aiContent = response.data.message.content;
+
+                const botMessage: Message = {
+                    id: (Date.now() + 1).toString(),
+                    text: aiContent,
+                    sender: 'bot',
+                    timestamp: new Date()
+                };
+
+                setMessages(prev => [...prev, botMessage]);
             }
-
-            const data = await response.json();
-            const aiContent = data.message.content;
-
-            const botMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                text: aiContent,
-                sender: 'bot',
-                timestamp: new Date()
-            };
-
-            setMessages(prev => [...prev, botMessage]);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Erreur AI Chatbot:", error);
 
             const botMessage: Message = {
@@ -209,14 +178,11 @@ const IntelligentChatbot: React.FC = () => {
 
     const handleActionClick = (action: BotResponse['action']) => {
         if (!action) return;
-
-        // Navigation selon le type d'action
         if (action.type === 'navigate' && action.value) {
             window.location.href = action.value;
         } else if (action.type === 'link' && action.value) {
             window.open(action.value, '_blank');
         }
-        // Pour 'suggest', on peut ajouter une logique spécifique si nécessaire
     };
 
     const formatMessage = (text: string) => {
@@ -241,7 +207,6 @@ const IntelligentChatbot: React.FC = () => {
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             {isOpen && (
                 <div className="mb-4 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-purple-100 overflow-hidden flex flex-col h-[600px] transition-all duration-300 ease-in-out transform origin-bottom-right">
-                    {/* En-tête */}
                     <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 flex items-center justify-between text-white">
                         <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -264,7 +229,6 @@ const IntelligentChatbot: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Messages */}
                     <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-br from-purple-50/50 to-pink-50/50 space-y-4">
                         {messages.map((msg) => (
                             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -291,7 +255,6 @@ const IntelligentChatbot: React.FC = () => {
                             </div>
                         ))}
 
-                        {/* Suggestions */}
                         {messages[messages.length - 1]?.suggestions && messages[messages.length - 1].sender === 'bot' && (
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {messages[messages.length - 1].suggestions?.map((suggestion, idx) => (
@@ -320,7 +283,6 @@ const IntelligentChatbot: React.FC = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input */}
                     <form onSubmit={(e) => handleSend(e)} className="p-3 bg-white border-t border-purple-100">
                         <div className="flex items-center space-x-2 bg-gray-50 rounded-full px-4 py-2 border border-purple-200 focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-100 transition-all">
                             <input
@@ -330,12 +292,6 @@ const IntelligentChatbot: React.FC = () => {
                                 onChange={(e) => setInputText(e.target.value)}
                                 placeholder="Posez votre question..."
                                 className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-gray-700 placeholder-gray-400"
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleSend(e);
-                                    }
-                                }}
                             />
                             <button
                                 type="submit"
@@ -349,21 +305,16 @@ const IntelligentChatbot: React.FC = () => {
                                 <Send className="w-4 h-4" />
                             </button>
                         </div>
-                        <p className="text-xs text-gray-400 mt-2 text-center">
-                            💬 Assistant intelligent • Réponses bienveillantes
-                        </p>
                     </form>
                 </div>
             )}
 
-            {/* Bouton flottant */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`p-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 ${isOpen
                     ? 'bg-gray-800 text-white rotate-90'
                     : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
                     }`}
-                aria-label={isOpen ? "Fermer le chat" : "Ouvrir le chat"}
             >
                 {isOpen ? (
                     <X className="w-6 h-6" />

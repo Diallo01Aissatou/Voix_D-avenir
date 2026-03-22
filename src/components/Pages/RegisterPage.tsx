@@ -1,6 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { UserPlus, Eye, EyeOff, Camera } from 'lucide-react';
-import Api from '../../data/Api';
+import { Eye, EyeOff, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface RegisterFormData {
@@ -32,7 +31,8 @@ interface RegisterPageProps {
 }
 
 const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
-  const { setCurrentUser } = useAuth();
+  const { register } = useAuth();
+
   const [formData, setFormData] = useState<RegisterFormData>({
     name: '',
     email: '',
@@ -63,7 +63,6 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
     'Kankan', 'Kérouane', 'Kindia', 'Kissidougou', 'Koubia', 'Koundara', 'Kouroussa',
     'Labé', 'Lélouma', 'Lola', 'Macenta', 'Mali', 'Mamou', 'Mandiana', 'N\'Zérékoré',
     'Pita', 'Siguiri', 'Télimélé', 'Tougue', 'Yomou',
-    // Toutes les villes de Guinée
     'Baro', 'Benti', 'Bignamou', 'Bintimodia', 'Bissikrima', 'Bomboli', 'Boussou',
     'Dabiss', 'Damaro', 'Diari', 'Diecke', 'Diountou', 'Ditinn', 'Doko', 'Donghol-Touma',
     'Douprou', 'Forécariah', 'Foulamory', 'Friguiagbé', 'Gadha-Woundou', 'Ganta',
@@ -127,27 +126,18 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
       if (formData.bio) fd.append('bio', formData.bio);
       if (photoFile) fd.append('photo', photoFile);
 
-      const response = await Api.post('/auth/register', fd, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const success = await register(fd);
 
-      const newUser = response.data.user;
-      setCurrentUser(newUser);
-      localStorage.setItem('mentora_user', JSON.stringify(newUser));
-
-      setMessage('Inscription réussie ! Redirection vers votre tableau de bord...');
-      setIsSuccess(true);
-      // La redirection sera gérée automatiquement par App.tsx quand currentUser changera
+      if (success) {
+        setMessage('Inscription réussie ! Redirection vers votre tableau de bord...');
+        setIsSuccess(true);
+      } else {
+        setMessage("Une erreur est survenue lors de l'inscription.");
+        setIsSuccess(false);
+      }
 
     } catch (err: any) {
-      const data = err?.response?.data;
-      const apiMessage =
-        data?.message ||
-        data?.error ||
-        (Array.isArray(data?.errors) ? data.errors.join(', ') : '') ||
-        "Erreur d'inscription. Veuillez réessayer.";
+      const apiMessage = err?.response?.data?.message || "Erreur d'inscription. Veuillez réessayer.";
       setMessage(apiMessage);
       setIsSuccess(false);
     } finally {
@@ -171,6 +161,11 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("L'image est trop lourde (max 2 Mo). Veuillez choisir une autre photo.");
+        e.target.value = '';
+        return;
+      }
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     } else {
@@ -381,7 +376,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                       <option value="Collège">Collège</option>
                       <option value="Lycée">Lycée</option>
                       <option value="Université">Université</option>
-                      <option value="Master">Masteur</option>
+                      <option value="Master">Master</option>
                     </select>
                   </div>
                 )}
@@ -455,7 +450,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Photo de profil
+                  Photo de profil (max 2 Mo)
                 </label>
                 <div className="flex items-center space-x-4">
                   {photoPreview ? (

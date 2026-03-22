@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import NotificationSystem from '../Dashboard/NotificationSystem';
+import Api, { BASE_URL } from '../../data/Api';
 
 // Fonction utilitaire pour corriger les URLs des photos
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `${BASE_URL}${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface HeaderProps {
@@ -23,12 +24,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
   const loadUserProfile = async () => {
     if (!currentUser) return;
     try {
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/users/profile', {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUserProfile(data);
+      const response = await Api.get('/users/profile');
+      if (response.data) {
+        setUserProfile(response.data);
       }
     } catch (error) {
       console.error('Erreur chargement profil header:', error);

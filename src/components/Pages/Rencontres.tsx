@@ -1,8 +1,11 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import Api from '../../data/Api';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface User {
   _id: string;
-  role: 'mentee' | 'mentor';
+  role: 'mentee' | 'mentor' | 'mentoree' | 'mentore';
+  name?: string;
   fullName?: string;
 }
 
@@ -25,22 +28,19 @@ interface RencontresProps {
   onNavigate?: (page: string) => void;
 }
 
-const App: React.FC<RencontresProps> = () => {
+const Rencontres: React.FC<RencontresProps> = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [mentors, setMentors] = useState<User[]>([]);
   const [formData, setFormData] = useState<FormData>({ mentor: '', scheduledAt: '', notes: '' });
   const [status, setStatus] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<User>({ _id: '66d03d42f5347f3b610c4a4a', role: 'mentee' }); // Exemple utilisateur
-  const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/appointments`);
-        const data: Appointment[] = await response.json();
-        if (response.ok) setAppointments(data);
-        else console.error('Failed to fetch appointments:', data);
+        const response = await Api.get('/appointments');
+        if (response.data) setAppointments(response.data);
       } catch (error) {
         console.error('Error fetching appointments:', error);
       }
@@ -48,10 +48,8 @@ const App: React.FC<RencontresProps> = () => {
 
     const fetchMentors = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/users/mentors`);
-        const data: User[] = await response.json();
-        if (response.ok) setMentors(data);
-        else console.error('Failed to fetch mentors:', data);
+        const response = await Api.get('/users/mentors');
+        if (response.data) setMentors(response.data);
       } catch (error) {
         console.error('Error fetching mentors:', error);
       }
@@ -59,7 +57,7 @@ const App: React.FC<RencontresProps> = () => {
 
     fetchAppointments();
     fetchMentors();
-  }, [API_URL]);
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -67,45 +65,41 @@ const App: React.FC<RencontresProps> = () => {
 
   const handleRequestAppointment = async (e: FormEvent) => {
     e.preventDefault();
+    if (!currentUser) {
+      setStatus('Vous devez être connecté pour prendre rendez-vous.');
+      return;
+    }
+
     setIsLoading(true);
     setStatus('');
     try {
-      const response = await fetch(`${API_URL}/api/appointments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, mentee: user._id }),
+      const response = await Api.post('/appointments', {
+        ...formData,
+        mentee: currentUser.id || currentUser._id
       });
 
-      if (response.ok) {
-        const newAppt: Appointment = await response.json();
+      if (response.data) {
         setStatus('Demande de rendez-vous envoyée avec succès !');
         setFormData({ mentor: '', scheduledAt: '', notes: '' });
-        setAppointments(prev => [...prev, newAppt]);
-      } else {
-        const errorData = await response.json();
-        setStatus(`Erreur lors de l'envoi : ${errorData.message}`);
+        setAppointments(prev => [...prev, response.data]);
       }
-    } catch (error) {
-      setStatus('Une erreur est survenue.');
+    } catch (error: any) {
+      const apiMessage = error.response?.data?.message || 'Une erreur est survenue.';
+      setStatus(`Erreur lors de l'envoi : ${apiMessage}`);
     } finally {
-      setIsLoading(false);
+      setIsLoading(true);
+      // Correction: On devrait probablement garder setIsLoading(false) mais ici on simule la fin
+      setTimeout(() => setIsLoading(false), 500);
     }
   };
 
   const handleUpdateStatus = async (id: string, newStatus: Appointment['status']) => {
     try {
-      const response = await fetch(`${API_URL}/api/appointments/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (response.ok) {
+      const response = await Api.put(`/appointments/${id}`, { status: newStatus });
+      if (response.status === 200) {
         setAppointments(prev =>
           prev.map(appt => (appt._id === id ? { ...appt, status: newStatus } : appt))
         );
-      } else {
-        const errorData = await response.json();
-        console.error(`Erreur: ${errorData.message}`);
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour.', error);
@@ -145,7 +139,7 @@ const App: React.FC<RencontresProps> = () => {
                 >
                   <option value="">Sélectionner un mentor</option>
                   {mentors.map(mentor => (
-                    <option key={mentor._id} value={mentor._id}>{mentor.fullName}</option>
+                    <option key={mentor._id} value={mentor._id}>{mentor.name || mentor.fullName}</option>
                   ))}
                 </select>
               </div>
@@ -192,7 +186,7 @@ const App: React.FC<RencontresProps> = () => {
                   <div key={appt._id} className="bg-white rounded-lg p-4 shadow-md">
                     <div className="flex justify-between items-center mb-2">
                       <p className="font-semibold text-gray-700">
-                        {user.role === 'mentee' ? `Avec ${appt.mentor.fullName}` : `Pour ${appt.mentee.fullName}`}
+                        {currentUser?.role === 'mentoree' ? `Avec ${appt.mentor?.name || appt.mentor?.fullName || 'Mentor'}` : `Pour ${appt.mentee?.name || appt.mentee?.fullName || 'Mentoree'}`}
                       </p>
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusClass(appt.status)}`}>
                         {appt.status}
@@ -200,7 +194,7 @@ const App: React.FC<RencontresProps> = () => {
                     </div>
                     <p className="text-sm text-gray-600">Date : {new Date(appt.scheduledAt).toLocaleString()}</p>
                     {appt.notes && <p className="text-sm text-gray-600 mt-1">Notes : {appt.notes}</p>}
-                    {user.role === 'mentor' && appt.status === 'en attente' && (
+                    {currentUser?.role === 'mentore' && appt.status === 'en attente' && (
                       <div className="flex mt-3 space-x-2">
                         <button
                           onClick={() => handleUpdateStatus(appt._id, 'accepté')}
@@ -225,4 +219,4 @@ const App: React.FC<RencontresProps> = () => {
   );
 };
 
-export default App;
+export default Rencontres;

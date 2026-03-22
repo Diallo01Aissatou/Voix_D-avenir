@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
 import ProfessionalNotification, { NotificationType } from '../UI/ProfessionalNotification';
+import Api from '../../data/Api';
 
 interface Notification {
   id: string;
-  type: 'request' | 'session' | 'message' | 'system';
+  type: NotificationType;
   title: string;
   message: string;
   time: string;
@@ -41,18 +42,18 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
     try {
       const localReadDb = JSON.parse(localStorage.getItem(`read_notifs_${userId}`) || '{}');
 
-      // Charger les notifications de séances
-      const sessionsResponse = await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications', {
-        credentials: 'include'
-      });
+      // Charger les notifications de séances et de mentorat
+      const [sessionsRes, mentorshipRes] = await Promise.all([
+        Api.get('/sessions/notifications').catch(() => ({ data: [] })),
+        Api.get('/mentorship/notifications').catch(() => ({ data: [] }))
+      ]);
 
       let allNotifications: Notification[] = [];
 
-      if (sessionsResponse.ok) {
-        const sessionsData = await sessionsResponse.json();
-        const sessionNotifs = sessionsData.map((notif: any) => ({
+      if (sessionsRes.data && Array.isArray(sessionsRes.data)) {
+        const sessionNotifs = sessionsRes.data.map((notif: any) => ({
           id: notif._id,
-          type: 'session',
+          type: 'session' as NotificationType,
           title: notif.title || getNotificationTitle(notif),
           message: notif.message,
           time: formatTime(notif.createdAt),
@@ -62,22 +63,16 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
         allNotifications = [...allNotifications, ...sessionNotifs];
       }
 
-      // Charger les notifications de mentorat (demandes)
       try {
-        const mentorshipResponse = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/notifications', {
-          credentials: 'include'
-        });
-
-        if (mentorshipResponse.ok) {
-          const mentorshipData = await mentorshipResponse.json();
-          const mentorshipNotifs = mentorshipData.map((notif: any) => {
+        if (mentorshipRes.data && Array.isArray(mentorshipRes.data)) {
+          const mentorshipNotifs = mentorshipRes.data.map((notif: any) => {
             const notifId = notif.id || `notif-${notif.data?.requestId || Math.random()}`;
             return {
               id: notifId,
-              type: notif.type,
+              type: notif.type as NotificationType,
               title: getNotificationTitle(notif),
               message: notif.message,
-              time: notif.time,
+              time: notif.time || formatTime(notif.createdAt),
               read: !!localReadDb[notifId],
               data: notif
             };
@@ -89,9 +84,12 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
       }
 
       // Trier par date (plus récent en premier)
-      allNotifications.sort((a, b) => new Date(b.data?.createdAt || 0).getTime() - new Date(a.data?.createdAt || 0).getTime());
+      allNotifications.sort((a, b) => {
+        const dateA = new Date(a.data?.createdAt || 0).getTime();
+        const dateB = new Date(b.data?.createdAt || 0).getTime();
+        return dateB - dateA;
+      });
 
-      // Retirer les notifications si besoin, mais ici on marque juste le status non lu
       setNotifications(allNotifications);
       setUnreadCount(allNotifications.filter(n => !n.read).length);
     } catch (error) {
@@ -131,15 +129,10 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
     }
   };
 
-
-
   const markAsRead = async (notificationId: string) => {
     try {
       // Marquer comme lu côté serveur
-      await fetch(`https://voix-avenir-backend.onrender.com/api/sessions/notifications/${notificationId}/read`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
+      await Api.put(`/sessions/notifications/${notificationId}/read`);
     } catch (error) {
       console.log('Erreur marquage notification:', error);
     }
@@ -169,10 +162,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
   const clearAllNotifications = async () => {
     try {
       // Marquer toutes les notifications comme lues côté serveur
-      await fetch('https://voix-avenir-backend.onrender.com/api/sessions/notifications/read-all', {
-        method: 'PUT',
-        credentials: 'include'
-      });
+      await Api.put('/sessions/notifications/read-all');
     } catch (error) {
       console.log('Erreur marquage toutes notifications:', error);
     }

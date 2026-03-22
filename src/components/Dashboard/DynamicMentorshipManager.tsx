@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, CheckCircle, XCircle, Clock, User, RefreshCw, Calendar } from 'lucide-react';
 import CreateSessionModal from './CreateSessionModal';
+import Api, { BASE_URL } from '../../data/Api';
 
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
+  return `${BASE_URL}${photo.startsWith('/') ? photo : '/' + photo}`;
 };
 
 interface DynamicMentorshipManagerProps {
@@ -13,9 +14,9 @@ interface DynamicMentorshipManagerProps {
   onNavigateToMessaging: (userId: string) => void;
 }
 
-const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({ 
-  userRole, 
-  onNavigateToMessaging 
+const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
+  userRole,
+  onNavigateToMessaging
 }) => {
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,67 +26,48 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
 
   useEffect(() => {
     loadRequests();
-    
+
     // Actualisation automatique toutes les 15 secondes
     const interval = setInterval(() => {
       loadRequests();
     }, 15000);
-    
+
     return () => clearInterval(interval);
   }, [userRole]);
 
   const loadRequests = async () => {
+    setLoading(true);
     try {
       const endpoint = userRole === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setRequests(data);
-        setLastUpdate(new Date());
-      }
+      const response = await Api.get(`/mentorship/${endpoint}`);
+
+      setRequests(response.data || []);
+      setLastUpdate(new Date());
     } catch (error) {
       console.error('Erreur chargement demandes:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleResponse = async (requestId: string, status: 'accepted' | 'rejected') => {
-    console.log('Réponse à la demande:', requestId, status);
     setProcessingRequest(requestId);
-    
+
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status })
+      await Api.put(`/mentorship/respond/${requestId}`, { status });
+
+      alert(`Demande ${status === 'accepted' ? 'acceptée' : 'rejetée'} avec succès !`);
+
+      await loadRequests();
+
+      // Émettre un événement pour actualiser les stats
+      const updateEvent = new CustomEvent('mentorshipUpdate', {
+        detail: { type: 'response', status, requestId }
       });
-      
-      console.log('Réponse API:', response.status);
-      
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Résultat:', result);
-        
-        alert(`Demande ${status === 'accepted' ? 'acceptée' : 'rejetée'} avec succès !`);
-        
-        await loadRequests();
-        
-        // Émettre un événement pour actualiser les stats
-        const updateEvent = new CustomEvent('mentorshipUpdate', {
-          detail: { type: 'response', status, requestId }
-        });
-        window.dispatchEvent(updateEvent);
-      } else {
-        const error = await response.json().catch(() => ({ message: 'Erreur serveur' }));
-        console.error('Erreur API:', error);
-        alert(`Erreur: ${error.message}`);
-      }
-    } catch (error) {
+      window.dispatchEvent(updateEvent);
+    } catch (error: any) {
       console.error('Erreur réponse:', error);
-      alert('Erreur de connexion');
+      alert(`Erreur: ${error.response?.data?.message || error.message || 'Une erreur est survenue'}`);
     } finally {
       setProcessingRequest(null);
     }
@@ -148,27 +130,27 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
         <div className="space-y-4">
           {requests.map((request: any, index: number) => {
             const otherUser = userRole === 'mentore' ? request.mentoree : request.mentore;
-            
+
             return (
               <div key={`${request._id}-${request.status}-${index}`} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 flex-1">
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center flex-shrink-0">
                       {getPhotoUrl(otherUser?.photo) ? (
-                        <img 
-                          src={getPhotoUrl(otherUser.photo)} 
-                          alt={otherUser.name} 
-                          className="w-16 h-16 object-cover rounded-full" 
+                        <img
+                          src={getPhotoUrl(otherUser.photo) || ''}
+                          alt={otherUser.name}
+                          className="w-16 h-16 object-cover rounded-full"
                         />
                       ) : (
                         <User className="w-8 h-8 text-white" />
                       )}
                     </div>
-                    
+
                     <div className="flex-1">
                       <h4 className="text-lg font-bold text-gray-800">{otherUser?.name}</h4>
                       <p className="text-purple-600 text-sm font-medium">{otherUser?.profession}</p>
-                      
+
                       <div className="mt-2 space-y-1 text-sm text-gray-600">
                         <p><strong>Ville:</strong> {otherUser?.city}</p>
                         {userRole === 'mentore' && (
@@ -193,12 +175,12 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
                           </>
                         )}
                       </div>
-                      
+
                       <div className="mt-3">
                         <p className="text-sm font-medium text-gray-700">Message:</p>
                         <p className="text-sm text-gray-600 mt-1">{request.message}</p>
                       </div>
-                      
+
                       <p className="text-xs text-gray-400 mt-2">
                         {new Date(request.createdAt).toLocaleDateString('fr-FR', {
                           day: 'numeric',
@@ -210,10 +192,10 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col items-end space-y-2">
                     {getStatusBadge(request.status)}
-                    
+
                     {userRole === 'mentore' && request.status === 'pending' && (
                       <div className="flex space-x-2">
                         <button
@@ -232,7 +214,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
                         </button>
                       </div>
                     )}
-                    
+
                     {request.status === 'accepted' && (
                       <div className="flex space-x-2">
                         {userRole === 'mentore' && (
@@ -246,9 +228,8 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
                         )}
                         <button
                           onClick={() => {
-                            console.log('Bouton Bavarder cliqué pour:', otherUser?.name, 'ID:', otherUser?._id);
-                            if (otherUser?._id) {
-                              onNavigateToMessaging(otherUser._id);
+                            if (otherUser?._id || otherUser?.id) {
+                              onNavigateToMessaging(otherUser._id || otherUser.id);
                             }
                           }}
                           className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center"
@@ -265,7 +246,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
           })}
         </div>
       )}
-      
+
       {/* Modal de création de séance */}
       {showCreateSession && (
         <CreateSessionModal
