@@ -272,7 +272,12 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
 };
 
 const ProfileManager = ({ currentUser, onUpdate }) => {
-  const [profileData, setProfileData] = useState({ bio: currentUser?.bio || '', expertise: currentUser?.expertise?.join(', ') || '' });
+  const [profileData, setProfileData] = useState({ 
+    bio: currentUser?.bio || '', 
+    expertise: currentUser?.expertise?.join(', ') || '',
+    city: currentUser?.city || '',
+    profession: currentUser?.profession || ''
+  });
   const [loading, setLoading] = useState(false);
   const API_URL = 'https://voix-avenir-backend.onrender.com';
 
@@ -289,8 +294,21 @@ const ProfileManager = ({ currentUser, onUpdate }) => {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <h3 className="text-xl font-bold">Modifier mon Profil de Mentore</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-1">Ville</label>
+          <input type="text" value={profileData.city} onChange={e => setProfileData({ ...profileData, city: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" placeholder="Ville" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-1">Profession</label>
+          <input type="text" value={profileData.profession} onChange={e => setProfileData({ ...profileData, profession: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" placeholder="Ex: Avocate, Médecin..." />
+        </div>
+      </div>
       <div><label className="block text-sm font-bold text-gray-700 mb-1">Ma Biographie</label><textarea value={profileData.bio} onChange={e => setProfileData({ ...profileData, bio: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" rows={5} placeholder="Décrivez votre parcours..." /></div>
-      <div><label className="block text-sm font-bold text-gray-700 mb-1">Mes Domaines d'Expertise (séparés par des virgules)</label><input type="text" value={profileData.expertise} onChange={e => setProfileData({ ...profileData, expertise: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" placeholder="Finance, Leadership, Technologie..." /></div>
+      <div>
+        <label className="block text-sm font-bold text-gray-700 mb-1">Mes Domaines d'Expertise (séparés par des virgules)</label>
+        <input type="text" value={profileData.expertise} onChange={e => setProfileData({ ...profileData, expertise: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" placeholder="Finance, Leadership, Technologie..." />
+      </div>
       <button onClick={handleSave} disabled={loading} className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-100 transition-all">{loading ? 'Enregistrement...' : 'Enregistrer mon profil'}</button>
     </div>
   );

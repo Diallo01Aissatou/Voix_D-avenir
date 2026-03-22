@@ -289,15 +289,33 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                <div className="max-w-4xl mx-auto py-4">
                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Mon Profil Personnel</h3>
                  {isEditingProfile ? (
-                   <form onSubmit={handleUpdateProfile} className="bg-white rounded-2xl p-8 border border-purple-100 shadow-sm space-y-4">
-                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Nom complet</label>
-                        <input value={userProfile?.name || ''} onChange={e => setUserProfile({ ...userProfile, name: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Nom" />
-                     </div>
-                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
-                        <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile({ ...userProfile, bio: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
-                     </div>
+                    <form onSubmit={handleUpdateProfile} className="bg-white rounded-2xl p-8 border border-purple-100 shadow-sm space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                           <label className="block text-sm font-bold text-gray-700 mb-1">Nom complet</label>
+                           <input value={userProfile?.name || ''} onChange={e => setUserProfile({ ...userProfile, name: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Nom" />
+                        </div>
+                        <div>
+                           <label className="block text-sm font-bold text-gray-700 mb-1">Âge</label>
+                           <input type="number" value={userProfile?.age || ''} onChange={e => setUserProfile({ ...userProfile, age: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Âge" />
+                        </div>
+                        <div>
+                           <label className="block text-sm font-bold text-gray-700 mb-1">Ville</label>
+                           <input value={userProfile?.city || ''} onChange={e => setUserProfile({ ...userProfile, city: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ville" />
+                        </div>
+                        <div>
+                           <label className="block text-sm font-bold text-gray-700 mb-1">Niveau d'études / Métier</label>
+                           <input value={userProfile?.level || ''} onChange={e => setUserProfile({ ...userProfile, level: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Étudiante en Droit" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
+                        <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(i => i.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
+                      </div>
+                      <div>
+                         <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
+                         <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile({ ...userProfile, bio: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
+                      </div>
                      <div className="flex space-x-3 pt-4">
                         <button type="submit" className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-100">Enregistrer les modifications</button>
                         <button type="button" onClick={() => setIsEditingProfile(false)} className="flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
@@ -314,8 +332,22 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                         />
                         <div className="flex-1 text-center md:text-left">
                            <h3 className="text-3xl font-black text-gray-800 mb-1">{userProfile?.name}</h3>
-                           <p className="text-purple-600 font-bold mb-4 uppercase tracking-widest text-xs">VOTRE COMPTE MENTORÉE</p>
-                           <p className="text-gray-500 mb-6 font-medium bg-gray-50 px-4 py-2 rounded-full inline-block">{userProfile?.email}</p>
+                           <p className="text-purple-600 font-bold mb-2 uppercase tracking-widest text-[10px]">VOTRE COMPTE MENTORÉE</p>
+                           <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
+                             <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.age || '?'} ans</span>
+                             <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.city || 'Ma ville'}</span>
+                             <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.level || 'Niveau d\'études'}</span>
+                           </div>
+                           <p className="text-gray-500 mb-4 font-medium bg-gray-50 px-4 py-2 rounded-xl inline-block text-sm">{userProfile?.email}</p>
+                           
+                           {userProfile?.interests?.length > 0 && (
+                             <div className="flex flex-wrap gap-1 mb-4 justify-center md:justify-start">
+                               {userProfile.interests.map((it, idx) => (
+                                 <span key={idx} className="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">#{it}</span>
+                               ))}
+                             </div>
+                           )}
+
                            <div className="p-4 bg-purple-50 rounded-2xl italic text-purple-800 text-sm mb-6 border-l-4 border-purple-400">
                              "{userProfile?.bio || "Partagez votre histoire et vos objectifs avec la communauté."}"
                            </div>
