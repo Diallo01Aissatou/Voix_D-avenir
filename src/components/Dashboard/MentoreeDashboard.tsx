@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, Calendar, MessageSquare, User, Settings, CheckCircle, Clock, Star, Plus, Edit } from 'lucide-react';
+import { Search, Bell, Calendar, MessageSquare, User, Settings, CheckCircle, Clock, Star, Plus, Edit, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';
@@ -34,7 +34,7 @@ const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | nul
 };
 
 const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('find-mentor');
   const [mentores, setMentores] = useState([]);
   const [mySessions, setMySessions] = useState([]);
@@ -50,6 +50,8 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
   const [userProfile, setUserProfile] = useState(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const API_URL = 'https://voix-avenir-backend.onrender.com';
 
@@ -112,12 +114,35 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
     } catch (e) { console.error(e); }
   };
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("L'image est trop lourde (max 2 Mo)");
+        return;
+      }
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // 1. Update text fields
       const res = await fetch(`${API_URL}/api/users/profile`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(userProfile)
       });
+      
+      // 2. Update photo if selected
+      if (photoFile) {
+        const formData = new FormData();
+        formData.append('photo', photoFile);
+        await fetch(`${API_URL}/api/users/profile/photo`, {
+          method: 'POST', credentials: 'include', body: formData
+        });
+      }
+
       if (res.ok) { 
         const data = await res.json();
         if (data.user) {
@@ -125,6 +150,8 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
           localStorage.setItem('mentora_user', JSON.stringify(data.user));
         }
         setIsEditingProfile(false); 
+        setPhotoFile(null);
+        setPhotoPreview(null);
         loadUserProfile();
         alert('Profil mis à jour !'); 
       }
@@ -299,6 +326,24 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Mon Profil Personnel</h3>
                  {isEditingProfile ? (
                     <form onSubmit={handleUpdateProfile} className="bg-white rounded-2xl p-8 border border-purple-100 shadow-sm space-y-4">
+                       <div className="flex items-center space-x-6 mb-6 pb-6 border-b border-gray-100">
+                         <div className="relative group">
+                           <ProfileImage 
+                             src={photoPreview || getPhotoUrl(userProfile?.photo)} 
+                             alt="Aperçu" 
+                             className="w-24 h-24 rounded-2xl object-cover shadow-md"
+                           />
+                           <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-2xl opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                             <Camera className="w-8 h-8" />
+                             <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
+                           </label>
+                         </div>
+                         <div>
+                           <h4 className="font-bold text-gray-800">Photo de profil</h4>
+                           <p className="text-xs text-gray-500">Cliquez sur l'image pour la modifier (max 2 Mo)</p>
+                         </div>
+                       </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                            <label className="block text-sm font-bold text-gray-700 mb-1">Nom complet</label>
@@ -319,7 +364,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                       </div>
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
-                        <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(i => i.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
+                        <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(it => it.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
                       </div>
                       <div>
                          <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
@@ -327,7 +372,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                       </div>
                      <div className="flex space-x-3 pt-4">
                         <button type="submit" className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-100">Enregistrer les modifications</button>
-                        <button type="button" onClick={() => setIsEditingProfile(false)} className="flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
+                        <button type="button" onClick={() => { setIsEditingProfile(false); setPhotoFile(null); setPhotoPreview(null); }} className="flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
                      </div>
                    </form>
                  ) : (
@@ -360,9 +405,10 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                            <div className="p-4 bg-purple-50 rounded-2xl italic text-purple-800 text-sm mb-6 border-l-4 border-purple-400">
                              "{userProfile?.bio || "Partagez votre histoire et vos objectifs avec la communauté."}"
                            </div>
-                           <button onClick={() => setIsEditingProfile(true)} className="px-6 py-3 bg-white border-2 border-purple-600 text-purple-600 font-bold rounded-xl flex items-center hover:bg-purple-600 hover:text-white transition-all mx-auto md:mx-0">
-                             <Edit className="w-5 h-5 mr-2" /> 
-                             Modifier mes informations
+                           
+                           <button onClick={() => setIsEditingProfile(true)} className="mt-6 flex items-center px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
+                             <Edit className="w-4 h-4 mr-2" />
+                             Modifier mon profil
                            </button>
                         </div>
                      </div>

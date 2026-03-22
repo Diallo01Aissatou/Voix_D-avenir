@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Calendar, MessageSquare, User, Settings, CheckCircle, XCircle, Clock, Plus, Edit } from 'lucide-react';
+import { Calendar, MessageSquare, User, Clock, CheckCircle, XCircle, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';
@@ -32,10 +32,10 @@ interface MentoreDashboardProps {
   onNavigate: (page: string) => void;
 }
 
-const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
+const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('requests');
-  const [requests, setRequests] = useState([]);
+  const [, setRequests] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [stats, setStats] = useState({
     totalRequests: 0,
@@ -51,7 +51,7 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
     loadSessions();
     loadStats();
 
-    const handleMentorshipUpdate = (event: CustomEvent) => {
+    const handleMentorshipUpdate = () => {
       loadRequests();
       loadSessions();
       loadStats();
@@ -93,10 +93,10 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
       let sess = sR.ok ? await sR.json() : [];
 
       const totalRequests = reqs.length;
-      const pendingRequests = reqs.filter(r => r.status === 'pending').length;
-      const acceptedRequests = reqs.filter(r => r.status === 'accepted').length;
-      const rejectedRequests = reqs.filter(r => r.status === 'rejected').length;
-      const totalHours = sess.filter(s => s.status === 'completed').reduce((t, s) => t + (s.duration || 60), 0) / 60;
+      const pendingRequests = reqs.filter((r: any) => r.status === 'pending').length;
+      const acceptedRequests = reqs.filter((r: any) => r.status === 'accepted').length;
+      const rejectedRequests = reqs.filter((r: any) => r.status === 'rejected').length;
+      const totalHours = sess.filter((s: any) => s.status === 'completed').reduce((t: number, s: any) => t + (s.duration || 60), 0) / 60;
 
       setStats({
         totalRequests, pendingRequests, acceptedRequests, rejectedRequests,
@@ -114,8 +114,8 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
             <p className="text-gray-600">Bienvenue, <span className="text-purple-600 font-bold">{currentUser?.name}</span></p>
           </div>
           <NotificationSystem
-            userId={currentUser?._id || currentUser?.id}
-            userRole={currentUser?.role}
+            userId={(currentUser?._id || currentUser?.id || '') as string}
+            userRole={(currentUser?.role || '') as string}
             onNotificationClick={(n) => {
               if (n.type === 'request') setActiveTab('requests');
               else if (n.type === 'session') setActiveTab('sessions');
@@ -220,17 +220,17 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
   );
 };
 
-const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
+const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }: { sessions: any[], onRefresh: () => void, onOpenChat: () => void }) => {
   const [showLinkModal, setShowLinkModal] = useState(null);
   const [meetingLink, setMeetingLink] = useState('');
   const API_URL = 'https://voix-avenir-backend.onrender.com';
 
-  const handleAction = async (id, action) => {
+  const handleAction = async (id: string, action: string) => {
     if (!confirm(`Confirmer ${action} ?`)) return;
     try { await fetch(`${API_URL}/api/sessions/${id}/${action}`, { method: 'PUT', credentials: 'include' }); onRefresh(); } catch (e) { console.error(e); }
   };
 
-  const saveMeetingLink = async (id) => {
+  const saveMeetingLink = async (id: string) => {
     try {
       const res = await fetch(`${API_URL}/api/sessions/${id}/update`, { 
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ meetingLink })
@@ -271,22 +271,48 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
   );
 };
 
-const ProfileManager = ({ currentUser, onUpdate }) => {
+const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate: () => void }) => {
+  const { setCurrentUser } = useAuth();
   const [profileData, setProfileData] = useState({ 
     bio: currentUser?.bio || '', 
     expertise: currentUser?.expertise?.join(', ') || '',
     city: currentUser?.city || '',
     profession: currentUser?.profession || ''
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const API_URL = 'https://voix-avenir-backend.onrender.com';
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("L'image est trop lourde (max 2 Mo)");
+        return;
+      }
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSave = async () => {
     setLoading(true);
     try {
+      // 1. Text fields
       const res = await fetch(`${API_URL}/api/users/profile`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ ...profileData, expertise: profileData.expertise.split(',').map(e => e.trim()) })
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ ...profileData, expertise: profileData.expertise.split(',').map((e: string) => e.trim()) })
       });
+
+      // 2. Photo
+      if (photoFile) {
+        const formData = new FormData();
+        formData.append('photo', photoFile);
+        await fetch(`${API_URL}/api/users/profile/photo`, {
+          method: 'POST', credentials: 'include', body: formData
+        });
+      }
+
       if (res.ok) { 
         const data = await res.json();
         if (data.user) {
@@ -294,6 +320,8 @@ const ProfileManager = ({ currentUser, onUpdate }) => {
            localStorage.setItem('mentora_user', JSON.stringify(data.user));
         }
         alert('Profil mis à jour !'); 
+        setPhotoFile(null);
+        setPhotoPreview(null);
         onUpdate(); 
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }
@@ -302,6 +330,25 @@ const ProfileManager = ({ currentUser, onUpdate }) => {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <h3 className="text-xl font-bold">Modifier mon Profil de Mentore</h3>
+      
+      <div className="flex items-center space-x-6 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+        <div className="relative group">
+          <ProfileImage 
+            src={photoPreview || getPhotoUrl(currentUser?.photo)} 
+            alt="Aperçu" 
+            className="w-24 h-24 rounded-2xl shadow-md border-4 border-white"
+          />
+          <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-2xl opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+            <Camera className="w-8 h-8" />
+            <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
+          </label>
+        </div>
+        <div>
+          <h4 className="font-bold text-gray-800 text-lg">Photo de profil</h4>
+          <p className="text-sm text-gray-500">Cliquez sur l'image pour la modifier</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-bold text-gray-700 mb-1">Ville</label>
