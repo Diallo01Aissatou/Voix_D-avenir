@@ -161,8 +161,8 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert("L'image est trop lourde (max 10 Mo). Veuillez choisir une autre photo.");
+      if (file.size > 2 * 1024 * 1024) {
+        alert("L'image est trop lourde (max 2 Mo). Veuillez choisir une autre photo.");
         e.target.value = '';
         return;
       }

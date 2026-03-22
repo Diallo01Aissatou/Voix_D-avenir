@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, Calendar, MessageSquare, User, Settings, CheckCircle, Clock, Star, Plus, Edit, Mail, MapPin } from 'lucide-react';
+import { Search, Bell, Calendar, MessageSquare, User, Settings, CheckCircle, Clock, Star, Plus, Edit } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';
@@ -18,11 +18,12 @@ const getPhotoUrl = (photo: string | undefined) => {
   return `https://voix-avenir-backend.onrender.com${cleanPath}`;
 };
 
+// Composant pour l'image de profil avec fallback
 const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | null, alt: string, className: string, iconSize?: number }) => {
   const [error, setError] = useState(false);
   if (!src || error) {
     return (
-      <div className={`${className} bg-purple-100 flex items-center justify-center border border-purple-200`}>
+      <div className={`${className} bg-purple-100 flex items-center justify-center`}>
         <User className={`w-${iconSize} h-${iconSize} text-purple-600`} />
       </div>
     );
@@ -46,7 +47,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
   const [searchFilters, setSearchFilters] = useState({ search: '', city: '', expertise: '' });
   const [cities, setCities] = useState([]);
   const [expertiseList, setExpertiseList] = useState([]);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
 
@@ -124,190 +125,154 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 py-8">
-        
-        {/* Barre de Profil Utilisateur Connecté - TRES VISIBLE */}
-        <div className="bg-white rounded-3xl p-6 shadow-xl border border-purple-100 mb-8 flex flex-col md:flex-row items-center justify-between">
-           <div className="flex items-center space-x-6">
-              <div className="relative">
-                <ProfileImage 
-                  src={getPhotoUrl(userProfile?.photo)} 
-                  alt={currentUser?.name || 'Moi'} 
-                  className="w-24 h-24 rounded-full border-4 border-purple-50 shadow-md" 
-                  iconSize={10} 
-                />
-                <div className="absolute -bottom-1 -right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-white"></div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-gray-800">Espace de <span className="text-purple-600">{currentUser?.name}</span></h1>
-                <div className="flex flex-wrap gap-3 mt-1">
-                   <span className="flex items-center text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full"><Mail className="w-3 h-3 mr-1" /> {currentUser?.email}</span>
-                   <span className="flex items-center text-xs font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full"><MapPin className="w-3 h-3 mr-1" /> {userProfile?.city || 'Ma ville'}</span>
-                </div>
-              </div>
-           </div>
-           <div className="mt-4 md:mt-0 flex items-center space-x-4">
-              <div className="text-right hidden md:block">
-                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Compte</p>
-                 <p className="text-sm font-bold text-purple-600">Mentorée Active</p>
-              </div>
-              <NotificationSystem userId={currentUser?._id || ''} userRole="mentoree" />
-              <SessionNotifications userId={currentUser?._id || ''} />
-           </div>
-        </div>
-
-        {/* Titre de la page */}
-        <div className="mb-8">
-           <h2 className="text-3xl font-extrabold text-gray-800 flex items-center">
-             <div className="w-2 h-8 bg-purple-600 rounded-full mr-4"></div>
-             Mon Tableau de Bord
-           </h2>
+        {/* Header */}
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentorée</h1>
+            <p className="text-gray-600 font-medium">Bienvenue, <span className="text-purple-600">{currentUser?.name}</span></p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <NotificationSystem userId={currentUser?._id || ''} userRole="mentoree" />
+            <SessionNotifications userId={currentUser?._id || ''} />
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center border-b-4 border-purple-500">
-            <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-14 h-14 bg-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <CheckCircle className="w-7 h-7" />
             </div>
             <div className="ml-4">
-              <p className="text-3xl font-black text-gray-800">{stats.activeMentorships}</p>
-              <p className="text-sm text-gray-500 font-bold uppercase tracking-tighter">Mentorats</p>
+              <p className="text-3xl font-bold">{stats.activeMentorships}</p>
+              <p className="text-sm text-gray-500 font-medium">Mentorats actifs</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center border-b-4 border-yellow-400">
-            <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center text-yellow-600">
+          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-14 h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <Clock className="w-7 h-7" />
             </div>
             <div className="ml-4">
-              <p className="text-3xl font-black text-gray-800">{stats.pendingRequests}</p>
-              <p className="text-sm text-gray-500 font-bold uppercase tracking-tighter">Attentes</p>
+              <p className="text-3xl font-bold">{stats.pendingRequests}</p>
+              <p className="text-sm text-gray-500 font-medium">Demandes en attente</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center border-b-4 border-green-500">
-            <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600">
+          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <Calendar className="w-7 h-7" />
             </div>
             <div className="ml-4">
-              <p className="text-3xl font-black text-gray-800">{stats.completedSessions}</p>
-              <p className="text-sm text-gray-500 font-bold uppercase tracking-tighter">Séances</p>
+              <p className="text-3xl font-bold">{stats.completedSessions}</p>
+              <p className="text-sm text-gray-500 font-medium">Séances terminées</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center border-b-4 border-blue-500">
-            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <Star className="w-7 h-7" />
             </div>
             <div className="ml-4">
-              <p className="text-3xl font-black text-gray-800">{stats.totalHours}h</p>
-              <p className="text-sm text-gray-500 font-bold uppercase tracking-tighter">Heures</p>
+              <p className="text-3xl font-bold">{stats.totalHours}h</p>
+              <p className="text-sm text-gray-500 font-medium">Heures cumulées</p>
             </div>
           </div>
         </div>
 
         {/* Main Content with Tabs */}
-        <div className="bg-white rounded-3xl shadow-2xl mb-12 overflow-hidden border border-gray-100">
-          <div className="border-b border-gray-100 bg-gray-50/80 p-3">
+        <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden border border-gray-100">
+          <div className="border-b border-gray-100 bg-gray-50/50 p-2">
             <nav className="flex space-x-2 px-2 overflow-x-auto no-scrollbar">
               {[
                 { id: 'find-mentor', icon: Search, label: 'Trouver une Mentore' },
-                { id: 'mentorship', icon: CheckCircle, label: 'Suivre mon Mentorat' },
+                { id: 'mentorship', icon: CheckCircle, label: 'Mon Mentorat' },
                 { id: 'sessions', icon: Calendar, label: 'Mes Séances' },
-                { id: 'requests', icon: Clock, label: 'Demandes Envoyées' },
-                { id: 'messagerie', icon: MessageSquare, label: 'Ma Messagerie' },
+                { id: 'requests', icon: Clock, label: 'Mes Demandes' },
+                { id: 'messagerie', icon: MessageSquare, label: 'Messagerie' },
                 { id: 'testimonials', icon: Star, label: 'Témoignages' },
-                { id: 'profile', icon: User, label: 'Mon Profil Complet' }
+                { id: 'profile', icon: User, label: 'Mon Profil' }
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-6 py-4 rounded-2xl font-bold text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
-                    ? 'bg-purple-600 text-white shadow-xl transform -translate-y-1'
-                    : 'text-gray-500 hover:bg-white hover:text-purple-600 hover:shadow-md'
+                  className={`flex items-center px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'text-gray-600 hover:bg-white hover:text-purple-600 hover:shadow-sm'
                     }`}
                 >
-                  <tab.icon className="w-5 h-5 mr-2" />
+                  <tab.icon className="w-4 h-4 mr-2" />
                   {tab.label}
                 </button>
               ))}
             </nav>
           </div>
 
-          <div className="p-8">
+          <div className="p-6">
             {activeTab === 'find-mentor' && (
-              <div className="space-y-8">
-                 {/* Explication claire */}
-                 <div className="bg-purple-50 p-6 rounded-2xl border border-dashed border-purple-200">
-                    <h3 className="text-xl font-bold text-purple-900 mb-2 flex items-center"><Search className="w-6 h-6 mr-2" /> Catalogue des Experts</h3>
-                    <p className="text-purple-700 font-medium">Ci-dessous, vous trouverez les mentores disponibles que vous pouvez solliciter pour vous accompagner dans votre parcours. Ce ne sont pas vos profils personnels, mais des professionnelles à votre écoute.</p>
-                 </div>
-
+              <div className="space-y-6">
                  {/* Recommandations */}
                  {userProfile?.interests?.length > 0 && (
-                  <div className="bg-gradient-to-br from-purple-700 to-indigo-800 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-150 transition-transform duration-700">
-                       <Star className="w-32 h-32" />
-                    </div>
-                    <h3 className="text-2xl font-black mb-6 flex items-center relative z-10">
-                      <Star className="w-8 h-8 mr-3 text-yellow-400 animate-pulse" />
-                      Sélectionnées pour vous
+                  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl mb-8">
+                    <h3 className="text-lg font-bold mb-4 flex items-center">
+                      <Star className="w-5 h-5 mr-2 text-yellow-300" />
+                      Recommandé pour vous
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {mentores.filter(m => m.expertise?.some(e => userProfile.interests.some(i => e.toLowerCase().includes(i.toLowerCase())))).slice(0, 2).map(m => (
-                        <div key={m.id} className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all cursor-pointer shadow-lg">
-                          <div className="flex items-center space-x-4 mb-4">
+                        <div key={m.id} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                          <div className="flex items-center space-x-3 mb-2">
                             <ProfileImage 
                               src={getPhotoUrl(m.photo)} 
                               alt={m.name} 
-                              className="w-16 h-16 rounded-full border-2 border-white/50 shadow-inner" 
-                              iconSize={8}
+                              className="w-12 h-12 rounded-full border-2 border-white/50" 
+                              iconSize={6}
                             />
                             <div>
-                               <p className="font-black text-lg">{m.name}</p> 
-                               <p className="text-xs text-purple-200 font-bold uppercase tracking-wider">{m.profession}</p>
+                               <p className="font-bold text-sm">{m.name}</p> 
+                               <p className="text-xs text-white/70">{m.profession}</p>
                             </div>
                           </div>
-                          <button onClick={() => { setActiveTab('find-mentor'); setShowRequestForm(true); }} className="w-full py-3 bg-white text-purple-700 rounded-xl font-black text-sm hover:scale-105 transition-transform active:scale-95 shadow-md">Voir son profil & Contacter</button>
+                          <button onClick={() => { setActiveTab('find-mentor'); setShowRequestForm(true); }} className="w-full py-2 bg-white text-purple-600 rounded-lg text-xs font-bold mt-2 hover:bg-purple-50 transition-colors">Contacter</button>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Filtres de recherche */}
-                <div className="bg-gray-50 border border-gray-100 p-6 rounded-3xl grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input type="text" placeholder="Qui cherchez-vous ?" value={searchFilters.search} onChange={e => setSearchFilters({ ...searchFilters, search: e.target.value })} className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent border-gray-100 rounded-2xl focus:border-purple-500 outline-none transition-all font-medium" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input type="text" placeholder="Rechercher par nom..." value={searchFilters.search} onChange={e => setSearchFilters({ ...searchFilters, search: e.target.value })} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none" />
                   </div>
-                  <select value={searchFilters.city} onChange={e => setSearchFilters({ ...searchFilters, city: e.target.value })} className="px-6 py-4 bg-white border-2 border-transparent border-gray-100 rounded-2xl outline-none focus:border-purple-500 transition-all font-bold text-gray-700">
-                    <option value="">Toutes les Villes</option>
+                  <select value={searchFilters.city} onChange={e => setSearchFilters({ ...searchFilters, city: e.target.value })} className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="">Toutes les villes</option>
                     {cities.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
-                  <select value={searchFilters.expertise} onChange={e => setSearchFilters({ ...searchFilters, expertise: e.target.value })} className="px-6 py-4 bg-white border-2 border-transparent border-gray-100 rounded-2xl outline-none focus:border-purple-500 transition-all font-bold text-gray-700">
-                    <option value="">Tous les Domaines</option>
+                  <select value={searchFilters.expertise} onChange={e => setSearchFilters({ ...searchFilters, expertise: e.target.value })} className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="">Tous les domaines d'expertise</option>
                     {expertiseList.map(e => <option key={e} value={e}>{e}</option>)}
                   </select>
                 </div>
 
-                {/* Liste des Mentores */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {mentores.map(m => (
-                    <div key={m.id} className="bg-white rounded-3xl p-8 shadow-xl border border-gray-50 hover:border-purple-200 hover:shadow-2xl transition-all group relative pt-16">
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2">
-                         <ProfileImage 
-                            src={getPhotoUrl(m.photo)} 
-                            alt={m.name} 
-                            className="w-24 h-24 rounded-3xl shadow-2xl group-hover:rotate-3 transition-transform duration-300 ring-8 ring-white" 
-                            iconSize={12}
-                         />
-                      </div>
-                      <div className="text-center">
-                         <div className="inline-block px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-2">Mentore Experte</div>
-                         <h3 className="text-xl font-black text-gray-800 mb-1 group-hover:text-purple-600 transition-colors line-clamp-1">{m.name}</h3>
-                         <p className="text-purple-600 font-bold text-sm mb-4">{m.profession}</p>
-                         <p className="text-xs text-gray-400 font-medium mb-6 flex items-center justify-center"><MapPin className="w-3 h-3 mr-1" /> {m.city}</p>
-                         <button onClick={() => { setActiveTab('find-mentor'); setShowRequestForm(true); }} className="px-6 py-3 bg-purple-600 text-white rounded-2xl font-black text-sm w-full hover:bg-purple-700 hover:shadow-lg active:scale-95 transition-all">
-                           Demander à {m.name.split(' ')[0]}
-                         </button>
+                    <div key={m.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+                      <div className="flex items-start space-x-4">
+                        <ProfileImage 
+                          src={getPhotoUrl(m.photo)} 
+                          alt={m.name} 
+                          className="w-20 h-20 rounded-2xl flex-shrink-0" 
+                          iconSize={10}
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                             <h3 className="text-lg font-bold group-hover:text-purple-600 transition-colors">{m.name}</h3>
+                             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest bg-gray-100 px-2 py-1 rounded">Mentore</span>
+                          </div>
+                          <p className="text-purple-600 font-medium text-sm mb-1">{m.profession}</p>
+                          <p className="text-xs text-gray-500 mb-4">{m.city}</p>
+                          <button onClick={() => { setActiveTab('find-mentor'); setShowRequestForm(true); }} className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold w-full hover:bg-purple-700 transition-colors shadow-lg shadow-purple-100">
+                            Contacter
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -315,70 +280,48 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
               </div>
             )}
 
-            {activeTab === 'mentorship' && <div className="bg-white rounded-3xl p-8 border border-gray-100"><SimpleMentorship /></div>}
+            {activeTab === 'mentorship' && <div className="bg-white rounded-xl p-6 border border-gray-100"><SimpleMentorship /></div>}
             {activeTab === 'sessions' && <SessionsManagerMentoree sessions={mySessions} onRefresh={loadMySessions} onOpenChat={() => setActiveTab('messagerie')} />}
             {activeTab === 'requests' && <DynamicMentorshipManager userRole="mentoree" onNavigateToMessaging={() => setActiveTab('messagerie')} />}
-            {activeTab === 'messagerie' && <div className="h-[650px] border border-gray-100 rounded-3xl overflow-hidden shadow-2xl bg-white"><MessageriePage /></div>}
+            {activeTab === 'messagerie' && <div className="h-[600px] border border-gray-100 rounded-xl overflow-hidden shadow-inner"><MessageriePage /></div>}
             {activeTab === 'testimonials' && <TestimonialManager />}
             {activeTab === 'profile' && (
-               <div className="max-w-4xl mx-auto py-8">
-                 <h3 className="text-3xl font-black text-gray-800 mb-8 flex items-center"><User className="w-8 h-8 mr-3 text-purple-600" /> Gestion de Mon Profil</h3>
+               <div className="max-w-4xl mx-auto py-4">
+                 <h3 className="text-2xl font-bold text-gray-800 mb-6">Mon Profil Personnel</h3>
                  {isEditingProfile ? (
-                   <form onSubmit={handleUpdateProfile} className="bg-white rounded-3xl p-10 border border-purple-100 shadow-2xl space-y-6">
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                           <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-wide">Nom complet</label>
-                           <input value={userProfile?.name || ''} onChange={e => setUserProfile({ ...userProfile, name: e.target.value })} className="w-full border-2 border-gray-50 bg-gray-50 p-4 rounded-2xl focus:bg-white focus:border-purple-500 outline-none transition-all font-bold" placeholder="Votre nom" />
-                        </div>
-                        <div>
-                           <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-wide">Ville</label>
-                           <input value={userProfile?.city || ''} onChange={e => setUserProfile({ ...userProfile, city: e.target.value })} className="w-full border-2 border-gray-50 bg-gray-50 p-4 rounded-2xl focus:bg-white focus:border-purple-500 outline-none transition-all font-bold" placeholder="Ville" />
-                        </div>
+                   <form onSubmit={handleUpdateProfile} className="bg-white rounded-2xl p-8 border border-purple-100 shadow-sm space-y-4">
+                     <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">Nom complet</label>
+                        <input value={userProfile?.name || ''} onChange={e => setUserProfile({ ...userProfile, name: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Nom" />
                      </div>
                      <div>
-                        <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-wide">Ma Biographie & Objectifs</label>
-                        <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile({ ...userProfile, bio: e.target.value })} className="w-full border-2 border-gray-50 bg-gray-50 p-4 rounded-2xl focus:bg-white focus:border-purple-500 outline-none transition-all font-bold" rows={6} placeholder="Parlez-nous de vous..." />
+                        <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
+                        <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile({ ...userProfile, bio: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
                      </div>
-                     <div className="flex space-x-4 pt-4">
-                        <button type="submit" className="flex-1 bg-purple-600 text-white py-4 rounded-2xl font-black hover:bg-purple-700 shadow-xl active:scale-95 transition-all">Enregistrer mon Profil</button>
-                        <button type="button" onClick={() => setIsEditingProfile(false)} className="flex-1 bg-white border-2 border-gray-200 py-4 rounded-2xl font-black text-gray-500 hover:bg-gray-50 transition-all">Abandonner</button>
+                     <div className="flex space-x-3 pt-4">
+                        <button type="submit" className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-100">Enregistrer les modifications</button>
+                        <button type="button" onClick={() => setIsEditingProfile(false)} className="flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
                      </div>
                    </form>
                  ) : (
-                   <div className="bg-white rounded-3xl p-10 border border-gray-100 shadow-2xl overflow-hidden relative">
-                     <div className="absolute top-0 right-0 p-8 text-purple-50 opacity-10">
-                        <User className="w-64 h-64" />
-                     </div>
-                     <div className="flex flex-col md:flex-row items-center md:items-start space-y-8 md:space-y-0 md:space-x-12 relative z-10">
+                   <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+                     <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-8">
                         <ProfileImage 
                           src={getPhotoUrl(userProfile?.photo)} 
-                          alt={userProfile?.name || 'Moi'} 
-                          className="w-48 h-48 rounded-3xl shadow-2xl ring-8 ring-purple-50" 
-                          iconSize={20}
+                          alt={userProfile?.name || 'Profil'} 
+                          className="w-32 h-32 rounded-3xl shadow-xl ring-4 ring-purple-50" 
+                          iconSize={12}
                         />
                         <div className="flex-1 text-center md:text-left">
-                           <div className="inline-block px-4 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">Compte Vérifié</div>
-                           <h3 className="text-4xl font-black text-gray-800 mb-2">{userProfile?.name}</h3>
-                           <p className="text-gray-500 font-bold mb-8 text-lg">{userProfile?.email}</p>
-                           
-                           <div className="grid grid-cols-2 gap-4 mb-8">
-                              <div className="bg-gray-50 p-4 rounded-2xl">
-                                 <p className="text-[10px] font-bold text-gray-400 uppercase">Localisation</p>
-                                 <p className="font-black text-gray-700">{userProfile?.city || 'N/A'}</p>
-                              </div>
-                              <div className="bg-gray-50 p-4 rounded-2xl">
-                                 <p className="text-[10px] font-bold text-gray-400 uppercase">Âge</p>
-                                 <p className="font-black text-gray-700">{userProfile?.age || 'N/A'} ans</p>
-                              </div>
+                           <h3 className="text-3xl font-black text-gray-800 mb-1">{userProfile?.name}</h3>
+                           <p className="text-purple-600 font-bold mb-4 uppercase tracking-widest text-xs">VOTRE COMPTE MENTORÉE</p>
+                           <p className="text-gray-500 mb-6 font-medium bg-gray-50 px-4 py-2 rounded-full inline-block">{userProfile?.email}</p>
+                           <div className="p-4 bg-purple-50 rounded-2xl italic text-purple-800 text-sm mb-6 border-l-4 border-purple-400">
+                             "{userProfile?.bio || "Partagez votre histoire et vos objectifs avec la communauté."}"
                            </div>
-
-                           <div className="p-6 bg-purple-50 rounded-3xl italic text-purple-900 border-l-8 border-purple-400 shadow-inner mb-8">
-                             "{userProfile?.bio || "Aucune biographie rédigée. Pourquoi ne pas en ajouter une ?"}"
-                           </div>
-
-                           <button onClick={() => setIsEditingProfile(true)} className="px-8 py-4 bg-white border-2 border-purple-600 text-purple-600 font-black rounded-2xl flex items-center hover:bg-purple-600 hover:text-white transition-all shadow-lg active:scale-95 mx-auto md:mx-0">
-                             <Edit className="w-6 h-6 mr-2" /> 
-                             Mettre à jour mes informations
+                           <button onClick={() => setIsEditingProfile(true)} className="px-6 py-3 bg-white border-2 border-purple-600 text-purple-600 font-bold rounded-xl flex items-center hover:bg-purple-600 hover:text-white transition-all mx-auto md:mx-0">
+                             <Edit className="w-5 h-5 mr-2" /> 
+                             Modifier mes informations
                            </button>
                         </div>
                      </div>
