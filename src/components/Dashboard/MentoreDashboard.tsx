@@ -287,7 +287,15 @@ const ProfileManager = ({ currentUser, onUpdate }) => {
       const res = await fetch(`${API_URL}/api/users/profile`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ ...profileData, expertise: profileData.expertise.split(',').map(e => e.trim()) })
       });
-      if (res.ok) { alert('Profil mis à jour !'); onUpdate(); }
+      if (res.ok) { 
+        const data = await res.json();
+        if (data.user) {
+           setCurrentUser(data.user);
+           localStorage.setItem('mentora_user', JSON.stringify(data.user));
+        }
+        alert('Profil mis à jour !'); 
+        onUpdate(); 
+      }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 

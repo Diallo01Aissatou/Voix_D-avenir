@@ -118,7 +118,16 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
       const res = await fetch(`${API_URL}/api/users/profile`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(userProfile)
       });
-      if (res.ok) { setIsEditingProfile(false); alert('Profil mis à jour !'); }
+      if (res.ok) { 
+        const data = await res.json();
+        if (data.user) {
+          setCurrentUser(data.user);
+          localStorage.setItem('mentora_user', JSON.stringify(data.user));
+        }
+        setIsEditingProfile(false); 
+        loadUserProfile();
+        alert('Profil mis à jour !'); 
+      }
     } catch (err) { console.error(err); }
   };
 
