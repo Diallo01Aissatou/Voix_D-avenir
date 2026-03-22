@@ -9,7 +9,22 @@ import DynamicMentorshipManager from './DynamicMentorshipManager';
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
+  const cleanPath = photo.startsWith('/') ? photo : '/' + photo;
+  return `https://voix-avenir-backend.onrender.com${cleanPath}`;
+};
+
+const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | null, alt: string, className: string, iconSize?: number }) => {
+  const [error, setError] = useState(false);
+  if (!src || error) {
+    return (
+      <div className={`${className} bg-purple-100 flex items-center justify-center`}>
+        <User className={`w-${iconSize} h-${iconSize} text-purple-600`} />
+      </div>
+    );
+  }
+  return (
+    <img src={src} alt={alt} className={`${className} object-cover`} onError={() => setError(true)} />
+  );
 };
 
 interface MentoreDashboardProps {
@@ -29,25 +44,19 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
     totalSessions: 0,
     totalHours: 0
   });
-  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     loadRequests();
     loadSessions();
     loadStats();
-    loadNotifications();
 
-    // Écouter les mises à jour de mentorat
     const handleMentorshipUpdate = (event: CustomEvent) => {
-      console.log('Mise à jour mentorat détectée:', event.detail);
       loadRequests();
       loadSessions();
       loadStats();
     };
 
     window.addEventListener('mentorshipUpdate', handleMentorshipUpdate as EventListener);
-
-    // Actualiser les données toutes les 30 secondes
     const interval = setInterval(() => {
       loadSessions();
       loadStats();
@@ -61,128 +70,57 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
 
   const loadRequests = async () => {
     try {
-      console.log('Chargement des demandes reçues...');
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', {
-        credentials: 'include'
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setRequests(data);
-      } else {
-        setRequests([]);
-      }
-    } catch (error) {
-      console.error('Erreur chargement demandes:', error);
-      setRequests([]);
-    }
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', { credentials: 'include' });
+      if (response.ok) setRequests(await response.json());
+    } catch (error) { console.error(error); }
   };
 
   const loadSessions = async () => {
     try {
-      console.log('Chargement des séances...');
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/sessions', {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSessions(data);
-      } else {
-        setSessions([]);
-      }
-    } catch (error) {
-      console.error('Erreur chargement séances:', error);
-      setSessions([]);
-    }
+      const response = await fetch('https://voix-avenir-backend.onrender.com/api/sessions', { credentials: 'include' });
+      if (response.ok) setSessions(await response.json());
+    } catch (error) { console.error(error); }
   };
 
   const loadStats = async () => {
     try {
-      const [requestsResponse, sessionsResponse] = await Promise.all([
+      const [rR, sR] = await Promise.all([
         fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', { credentials: 'include' }),
         fetch('https://voix-avenir-backend.onrender.com/api/sessions', { credentials: 'include' })
       ]);
-
-      let reqs = [];
-      let sess = [];
-
-      if (requestsResponse.ok) reqs = await requestsResponse.json();
-      if (sessionsResponse.ok) sess = await sessionsResponse.json();
+      let reqs = rR.ok ? await rR.json() : [];
+      let sess = sR.ok ? await sR.json() : [];
 
       const totalRequests = reqs.length;
       const pendingRequests = reqs.filter(r => r.status === 'pending').length;
       const acceptedRequests = reqs.filter(r => r.status === 'accepted').length;
       const rejectedRequests = reqs.filter(r => r.status === 'rejected').length;
-
-      const completedSessions = sess.filter(s => s.status === 'completed');
-      const totalHours = completedSessions.reduce((total, session) => {
-        return total + (session.duration || 60);
-      }, 0) / 60;
+      const totalHours = sess.filter(s => s.status === 'completed').reduce((t, s) => t + (s.duration || 60), 0) / 60;
 
       setStats({
-        totalRequests,
-        pendingRequests,
-        acceptedRequests,
-        rejectedRequests,
-        totalSessions: sess.length,
-        totalHours: Math.round(totalHours * 10) / 10
+        totalRequests, pendingRequests, acceptedRequests, rejectedRequests,
+        totalSessions: sess.length, totalHours: Math.round(totalHours * 10) / 10
       });
-    } catch (error) {
-      console.error('Erreur chargement stats:', error);
-    }
-  };
-
-  const loadNotifications = async () => {
-    setNotifications([
-      { id: 1, type: 'request', message: 'Nouvelle demande de mentorat', time: '5 min' },
-      { id: 2, type: 'session', message: 'Séance dans 1 heure', time: '1h' }
-    ]);
-  };
-
-  const handleRequestResponse = async (requestId: string, status: 'accepted' | 'rejected') => {
-    try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status })
-      });
-
-      if (response.ok) {
-        window.dispatchEvent(new CustomEvent('mentorshipUpdate', {
-          detail: { type: 'response', status, requestId }
-        }));
-        alert(`Demande ${status === 'accepted' ? 'acceptée' : 'rejetée'} avec succès !`);
-        loadRequests();
-        loadStats();
-      }
-    } catch (error) {
-      console.error('Erreur réponse demande:', error);
-    }
+    } catch (error) { console.error(error); }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentore</h1>
-              <p className="text-gray-600">Bienvenue {currentUser?.name}</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <NotificationSystem
-                userId={currentUser?._id || currentUser?.id}
-                userRole={currentUser?.role}
-                onNotificationClick={(notification) => {
-                  if (notification.type === 'request') setActiveTab('requests');
-                  else if (notification.type === 'session') setActiveTab('sessions');
-                  else if (notification.type === 'message') setActiveTab('messaging');
-                }}
-              />
-            </div>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentore</h1>
+            <p className="text-gray-600">Bienvenue, <span className="text-purple-600 font-bold">{currentUser?.name}</span></p>
           </div>
+          <NotificationSystem
+            userId={currentUser?._id || currentUser?.id}
+            userRole={currentUser?.role}
+            onNotificationClick={(n) => {
+              if (n.type === 'request') setActiveTab('requests');
+              else if (n.type === 'session') setActiveTab('sessions');
+              else if (n.type === 'message') setActiveTab('messaging');
+            }}
+          />
         </div>
 
         {/* Stats Cards */}
@@ -249,17 +187,17 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
           <div className="border-b border-gray-100 bg-gray-50/50 p-2">
             <nav className="flex space-x-2 px-2 overflow-x-auto no-scrollbar">
               {[
-                { id: 'requests', icon: MessageSquare, label: 'Demandes' },
-                { id: 'sessions', icon: Calendar, label: 'Séances' },
+                { id: 'requests', icon: MessageSquare, label: 'Demandes Reçues' },
+                { id: 'sessions', icon: Calendar, label: 'Mes Séances' },
                 { id: 'messaging', icon: MessageSquare, label: 'Messagerie' },
-                { id: 'profile', icon: User, label: 'Profil' },
+                { id: 'profile', icon: User, label: 'Mon Profil & Bio' },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 ${activeTab === tab.id
-                    ? 'bg-purple-600 text-white'
-                    : 'text-gray-600 hover:bg-white hover:text-purple-600'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'text-gray-600 hover:bg-white hover:text-purple-600 hover:shadow-sm whitespace-nowrap'
                     }`}
                 >
                   <tab.icon className="w-4 h-4 mr-2" />
@@ -281,15 +219,9 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = ({ onNavigate }) => {
   );
 };
 
-// --- Sous-composants ---
-// (J'inclus ici les versions simplifiées pour le moment car ce qui compte est le layout original à onglets)
-
 const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
   const [showLinkModal, setShowLinkModal] = useState(null);
   const [meetingLink, setMeetingLink] = useState('');
-  const [showEditModal, setShowEditModal] = useState(null);
-  const [editData, setEditData] = useState({ topic: '', date: '', time: '', duration: 60 });
-  const [loading, setLoading] = useState(false);
   const API_URL = 'https://voix-avenir-backend.onrender.com';
 
   const handleAction = async (id, action) => {
@@ -298,48 +230,38 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
   };
 
   const saveMeetingLink = async (id) => {
-    setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/sessions/${id}/update`, { 
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ meetingLink })
       });
       if (res.ok) { setShowLinkModal(null); onRefresh(); }
-    } catch (e) { console.error(e); } finally { setLoading(false); }
+    } catch (e) { console.error(e); }
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-xl">Vos Séances</h3>
-        <button onClick={onRefresh} className="text-purple-600 font-bold">Actualiser</button>
-      </div>
+      <div className="flex justify-between items-center mb-4"><h3 className="font-bold text-xl">Vos Séances de Mentorat</h3><button onClick={onRefresh} className="text-purple-600 font-bold">Actualiser</button></div>
       {sessions.map(s => (
-        <div key={s._id} className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center">
+        <div key={s._id} className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center hover:bg-white transition-colors">
           <div className="flex items-center space-x-3">
-             <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden">
-                {s.mentoree?.photo ? <img src={getPhotoUrl(s.mentoree.photo)!} className="w-full h-full object-cover" /> : <User className="w-6 h-6 text-purple-600" />}
-             </div>
-             <div>
-                <p className="font-bold">{s.mentoree?.name}</p>
-                <p className="text-sm text-purple-600">{s.topic}</p>
-                <p className="text-xs text-gray-500">{new Date(s.scheduledDate).toLocaleDateString()} à {s.scheduledTime}</p>
-             </div>
+             <ProfileImage src={getPhotoUrl(s.mentoree?.photo)} alt={s.mentoree?.name || ''} className="w-12 h-12 rounded-full border-2 border-purple-100" iconSize={6} />
+             <div><p className="font-bold">{s.mentoree?.name}</p><p className="text-sm text-purple-600">{s.topic}</p><p className="text-xs text-gray-500">{new Date(s.scheduledDate).toLocaleDateString()} à {s.scheduledTime}</p></div>
           </div>
           <div className="flex space-x-2">
-            <button onClick={() => { setMeetingLink(s.meetingLink || ''); setShowLinkModal(s._id); }} className="px-3 py-1 bg-green-600 text-white rounded-lg text-xs">Lien</button>
-            <button onClick={() => handleAction(s._id, 'complete')} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-xs">Terminer</button>
-            <button onClick={() => onOpenChat()} className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs text-nowrap">Chat</button>
+            <button onClick={() => { setMeetingLink(s.meetingLink || ''); setShowLinkModal(s._id); }} className="px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-bold">Lien</button>
+            <button onClick={() => handleAction(s._id, 'complete')} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-xs font-bold">Terminer</button>
+            <button onClick={() => onOpenChat()} className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold">Chat</button>
           </div>
         </div>
       ))}
       {showLinkModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-xl w-full max-w-sm">
-            <h4 className="font-bold mb-4">Lien de réunion</h4>
-            <input type="url" value={meetingLink} onChange={e => setMeetingLink(e.target.value)} className="w-full border p-2 rounded mb-4" />
+          <div className="bg-white p-6 rounded-xl w-full max-w-sm shadow-2xl">
+            <h4 className="font-bold mb-4">Lien de la réunion Google Meet / Zoom</h4>
+            <input type="url" value={meetingLink} onChange={e => setMeetingLink(e.target.value)} className="w-full border-2 border-gray-100 p-2 rounded-xl mb-4 focus:border-purple-500 outline-none" placeholder="https://..." />
             <div className="flex space-x-2">
-              <button onClick={() => setShowLinkModal(null)} className="flex-1 border py-2 rounded">Annuler</button>
-              <button onClick={() => saveMeetingLink(showLinkModal)} className="flex-1 bg-purple-600 text-white py-2 rounded">Sauver</button>
+              <button onClick={() => setShowLinkModal(null)} className="flex-1 border-2 border-gray-100 py-2 rounded-xl font-bold">Annuler</button>
+              <button onClick={() => saveMeetingLink(showLinkModal)} className="flex-1 bg-purple-600 text-white py-2 rounded-xl font-bold">Enregistrer</button>
             </div>
           </div>
         </div>
@@ -349,10 +271,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }) => {
 };
 
 const ProfileManager = ({ currentUser, onUpdate }) => {
-  const [profileData, setProfileData] = useState({
-    bio: currentUser?.bio || '',
-    expertise: currentUser?.expertise?.join(', ') || ''
-  });
+  const [profileData, setProfileData] = useState({ bio: currentUser?.bio || '', expertise: currentUser?.expertise?.join(', ') || '' });
   const [loading, setLoading] = useState(false);
   const API_URL = 'https://voix-avenir-backend.onrender.com';
 
@@ -367,11 +286,11 @@ const ProfileManager = ({ currentUser, onUpdate }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-xl font-bold">Profil & Disponibilité</h3>
-      <textarea value={profileData.bio} onChange={e => setProfileData({ ...profileData, bio: e.target.value })} className="w-full border p-2 rounded" rows={4} placeholder="Bio..." />
-      <input type="text" value={profileData.expertise} onChange={e => setProfileData({ ...profileData, expertise: e.target.value })} className="w-full border p-2 rounded" placeholder="Expertises..." />
-      <button onClick={handleSave} disabled={loading} className="w-full bg-purple-600 text-white py-2 rounded-lg font-bold">Sauvegarder</button>
+    <div className="max-w-2xl mx-auto space-y-6">
+      <h3 className="text-xl font-bold">Modifier mon Profil de Mentore</h3>
+      <div><label className="block text-sm font-bold text-gray-700 mb-1">Ma Biographie</label><textarea value={profileData.bio} onChange={e => setProfileData({ ...profileData, bio: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" rows={5} placeholder="Décrivez votre parcours..." /></div>
+      <div><label className="block text-sm font-bold text-gray-700 mb-1">Mes Domaines d'Expertise (séparés par des virgules)</label><input type="text" value={profileData.expertise} onChange={e => setProfileData({ ...profileData, expertise: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" placeholder="Finance, Leadership, Technologie..." /></div>
+      <button onClick={handleSave} disabled={loading} className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-100 transition-all">{loading ? 'Enregistrement...' : 'Enregistrer mon profil'}</button>
     </div>
   );
 };
