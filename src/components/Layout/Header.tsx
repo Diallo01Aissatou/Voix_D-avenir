@@ -141,6 +141,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                     }}
                     onViewAll={() => onNavigate('notification-demo')}
                   />
+                  {currentUser.role === 'admin' && (
                   <button
                     onClick={() => {
                       const dashboardPage = currentUser.role === 'admin' ? 'admin-dashboard' :
@@ -170,6 +171,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                       <p className="text-xs text-gray-500 capitalize">{currentUser.role}</p>
                     </div>
                   </button>
+                  )}
                 </div>
                 <button
                   onClick={handleLogout}
@@ -281,6 +283,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                   >
                     Mon Dashboard
                   </button>
+                  {currentUser.role === 'admin' && (
                   <div className="flex items-center space-x-3 px-2 py-2 border-t border-gray-200 mt-3 pt-3">
                     <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                       {getPhotoUrl(userProfile?.photo) ? (
@@ -303,6 +306,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                       <p className="text-xs text-gray-500 capitalize">{currentUser.role}</p>
                     </div>
                   </div>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout();

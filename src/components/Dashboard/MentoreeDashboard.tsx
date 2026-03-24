@@ -163,9 +163,23 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentorée</h1>
-            <p className="text-gray-600 font-medium">Bienvenue, <span className="text-purple-600">{currentUser?.name}</span></p>
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
+              {getPhotoUrl(userProfile?.photo || currentUser?.photo) ? (
+                <img
+                  src={getPhotoUrl(userProfile?.photo || currentUser?.photo)!}
+                  alt={userProfile?.name || currentUser?.name || ''}
+                  className="w-16 h-16 rounded-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              ) : (
+                <User className="w-8 h-8 text-white" />
+              )}
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentorée</h1>
+              <p className="text-gray-600 font-medium">Bienvenue, <span className="text-purple-600">{currentUser?.name}</span></p>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <NotificationSystem userId={currentUser?._id || ''} userRole="mentoree" />
