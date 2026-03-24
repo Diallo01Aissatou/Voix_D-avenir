@@ -141,48 +141,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                     }}
                     onViewAll={() => onNavigate('notification-demo')}
                   />
-                  {currentUser.role !== 'admin' && (
-                    <button
-                      onClick={() => {
-                        const dashboardPage = currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard';
-                        onNavigate(dashboardPage);
-                      }}
-                      className="px-4 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors font-medium"
-                    >
-                      Tableau de bord
-                    </button>
-                  )}
-                  {currentUser.role === 'admin' && (
                   <button
                     onClick={() => {
                       const dashboardPage = currentUser.role === 'admin' ? 'admin-dashboard' :
                         currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard';
                       onNavigate(dashboardPage);
                     }}
-                    className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition-colors"
+                    className="hidden md:flex items-center space-x-2 px-4 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors font-medium"
                   >
-                    <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                      {getPhotoUrl(userProfile?.photo) ? (
-                        <img
-                          src={getPhotoUrl(userProfile.photo)!}
-                          alt={userProfile.name || currentUser.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                          onError={(e) => {
-                            console.log('Erreur photo header desktop:', userProfile?.photo);
-                            e.currentTarget.style.display = 'none';
-                          }}
-                          onLoad={() => console.log('Photo header desktop chargée:', getPhotoUrl(userProfile?.photo))}
-                        />
-                      ) : (
-                        <User className="w-5 h-5 text-white" />
-                      )}
-                    </div>
-                    <div className="text-sm">
-                      <p className="font-medium text-gray-800">{currentUser.name}</p>
-                      <p className="text-xs text-gray-500 capitalize">{currentUser.role}</p>
-                    </div>
+                    <span>Tableau de bord</span>
                   </button>
-                  )}
                 </div>
                 <button
                   onClick={handleLogout}
@@ -294,30 +262,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                   >
                     Mon Dashboard
                   </button>
-                  {currentUser.role === 'admin' && (
-                  <div className="flex items-center space-x-3 px-2 py-2 border-t border-gray-200 mt-3 pt-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                      {getPhotoUrl(userProfile?.photo) ? (
-                        <img
-                          src={getPhotoUrl(userProfile.photo)!}
-                          alt={userProfile.name || currentUser.name}
-                          className="w-12 h-12 rounded-full object-cover"
-                          onError={(e) => {
-                            console.log('Erreur photo header mobile:', userProfile?.photo);
-                            e.currentTarget.style.display = 'none';
-                          }}
-                          onLoad={() => console.log('Photo header mobile chargée:', getPhotoUrl(userProfile?.photo))}
-                        />
-                      ) : (
-                        <User className="w-6 h-6 text-white" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">{currentUser.name}</p>
-                      <p className="text-xs text-gray-500 capitalize">{currentUser.role}</p>
-                    </div>
-                  </div>
-                  )}
+
                   <button
                     onClick={() => {
                       handleLogout();

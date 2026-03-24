@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar } from 'lucide-react';
+import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, User } from 'lucide-react';
 import Api from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -707,9 +707,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Administrateur</h1>
-          <p className="text-gray-600">Bienvenue {currentUser?.name}</p>
+        <div className="mb-8 flex items-center space-x-4">
+          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
+            {currentUser?.photo ? (
+              <img
+                src={currentUser?.photo.startsWith('http') ? currentUser.photo : `https://voix-avenir-backend.onrender.com${currentUser.photo.startsWith('/') ? '' : '/'}${currentUser.photo}`}
+                alt={currentUser?.name || ''}
+                className="w-16 h-16 rounded-full object-cover"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            ) : (
+              <User className="w-8 h-8 text-white" />
+            )}
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Administrateur</h1>
+            <p className="text-gray-600">Bienvenue <span className="text-purple-600 font-bold">{currentUser?.name}</span></p>
+          </div>
         </div>
 
         {/* Stats */}
