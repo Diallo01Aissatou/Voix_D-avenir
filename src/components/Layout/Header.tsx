@@ -141,6 +141,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                     }}
                     onViewAll={() => onNavigate('notification-demo')}
                   />
+                  {currentUser.role !== 'admin' && (
+                    <button
+                      onClick={() => {
+                        const dashboardPage = currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard';
+                        onNavigate(dashboardPage);
+                      }}
+                      className="px-4 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors font-medium"
+                    >
+                      Tableau de bord
+                    </button>
+                  )}
                   {currentUser.role === 'admin' && (
                   <button
                     onClick={() => {
