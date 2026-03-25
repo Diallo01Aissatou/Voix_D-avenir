@@ -10,6 +10,34 @@ import SessionsManagerMentoree from './SessionsManagerMentoree';
 import SessionNotifications from './SessionNotifications';
 import TestimonialManager from './TestimonialManager';
 
+// Fonction utilitaire pour compresser les images
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const max = 800;
+        if (width > height && width > max) { height *= max / width; width = max; }
+        else if (height > max) { width *= max / height; height = max; }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (blob) resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+          else resolve(file);
+        }, 'image/jpeg', 0.7);
+      };
+    };
+  });
+};
+
 // Fonction utilitaire pour corriger les URLs des photos
 let photoVersion = Date.now(); // Version globale stable par session
 const getPhotoUrl = (photo: string | undefined) => {
@@ -135,14 +163,16 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
     } catch (e) { console.error(e); }
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Attention : Cette photo est très lourde (> 5Mo). Le chargement risque d'être lent ou d'échouer sur le serveur gratuit.");
+      if (file.size > 2 * 1024 * 1024) {
+        // Optionnel : on peut informer l'utilisateur qu'on compresse
+        console.log("Compression en cours...");
       }
-      setPhotoFile(file);
-      setPhotoPreview(URL.createObjectURL(file));
+      const compressed = await compressImage(file);
+      setPhotoFile(compressed);
+      setPhotoPreview(URL.createObjectURL(compressed));
     }
   };
 
