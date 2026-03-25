@@ -13,12 +13,15 @@ const getPhotoUrl = (photo: string | undefined) => {
     const fileName = photo.split('/').pop();
     url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
   }
-  return url.replace('http://', 'https://');
+  const bust = new Date().getTime();
+  return (url.replace('http://', 'https://')) + `?v=${bust}`;
 };
 
 // Composant pour l'image de profil avec fallback
 const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | null, alt: string, className: string, iconSize?: number }) => {
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   if (!src || error) {
     return (
       <div className={`${className} bg-purple-100 flex items-center justify-center`}>
@@ -26,8 +29,22 @@ const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | nul
       </div>
     );
   }
+
   return (
-    <img src={src} alt={alt} className={`${className} object-cover`} onError={() => setError(true)} />
+    <div className={`${className} relative overflow-hidden flex items-center justify-center`}>
+      {loading && (
+        <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+          <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        className={`${className} object-cover w-full h-full`} 
+        onLoad={() => setLoading(false)}
+        onError={() => { setError(true); setLoading(false); }} 
+      />
+    </div>
   );
 };
 
