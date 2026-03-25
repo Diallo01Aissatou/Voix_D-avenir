@@ -55,6 +55,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const API_URL = 'https://voix-avenir-backend.onrender.com';
 
