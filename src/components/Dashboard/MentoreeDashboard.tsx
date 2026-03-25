@@ -350,7 +350,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                          </div>
                          <div>
                            <h4 className="font-bold text-gray-800">Photo de profil</h4>
-                           <p className="text-xs text-gray-500">Cliquez sur l'image pour la modifier (max 2 Mo)</p>
+                           <p className="text-xs text-gray-500">Cliquez sur l'image pour la modifier</p>
                          </div>
                        </div>
 
