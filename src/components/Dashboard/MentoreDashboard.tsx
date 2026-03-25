@@ -113,20 +113,13 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
-              {getPhotoUrl(currentUser?.photo) ? (
-                <img
-                  src={getPhotoUrl(currentUser?.photo)!}
-                  alt={currentUser?.name || ''}
-                  className="w-16 h-16 rounded-full object-cover"
-                  onError={(e) => {
-                    console.error("Photo error:", currentUser?.photo);
-                    e.currentTarget.style.display = 'none'; 
-                  }}
-                />
-              ) : (
-                <User className="w-8 h-8 text-white" />
-              )}
+            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 shadow-md">
+              <ProfileImage 
+                src={getPhotoUrl(currentUser?.photo)} 
+                alt={currentUser?.name || 'Profil'} 
+                className="w-16 h-16"
+                iconSize={8}
+              />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentore</h1>
