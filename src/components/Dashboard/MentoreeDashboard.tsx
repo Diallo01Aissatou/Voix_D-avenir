@@ -127,34 +127,53 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isUpdating) return;
+    setIsUpdating(true);
+    
     try {
-      // 1. Update text fields
+      // 1. Mettre à jour les champs texte
       const res = await fetch(`${API_URL}/api/users/profile`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(userProfile)
+        method: 'PUT', 
+        headers: { 'Content-Type': 'application/json' }, 
+        credentials: 'include', 
+        body: JSON.stringify(userProfile)
       });
       
-      // 2. Update photo if selected
+      if (!res.ok) {
+        throw new Error('Erreur lors de la mise à jour des informations.');
+      }
+
+      // 2. Mettre à jour la photo si une nouvelle est sélectionnée
       if (photoFile) {
         const formData = new FormData();
         formData.append('photo', photoFile);
-        await fetch(`${API_URL}/api/users/profile/photo`, {
-          method: 'POST', credentials: 'include', body: formData
+        const photoRes = await fetch(`${API_URL}/api/users/profile/photo`, {
+          method: 'POST', 
+          credentials: 'include', 
+          body: formData
         });
+        if (!photoRes.ok) {
+          throw new Error('Erreur lors de l\'upload de la photo.');
+        }
       }
 
-      if (res.ok) { 
-        const data = await res.json();
-        if (data.user) {
-          setCurrentUser(data.user);
-          localStorage.setItem('mentora_user', JSON.stringify(data.user));
-        }
-        setIsEditingProfile(false); 
-        setPhotoFile(null);
-        setPhotoPreview(null);
-        loadUserProfile();
-        alert('Profil mis à jour !'); 
+      const data = await res.json();
+      if (data.user) {
+        setCurrentUser(data.user);
+        localStorage.setItem('mentora_user', JSON.stringify(data.user));
       }
-    } catch (err) { console.error(err); }
+      
+      setIsEditingProfile(false); 
+      setPhotoFile(null);
+      setPhotoPreview(null);
+      await loadUserProfile();
+      alert('Profil mis à jour avec succès !'); 
+    } catch (err: any) { 
+      console.error(err);
+      alert(err.message || 'Une erreur est survenue lors de la mise à jour.');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
