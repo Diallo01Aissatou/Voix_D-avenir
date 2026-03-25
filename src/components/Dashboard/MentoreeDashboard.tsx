@@ -117,10 +117,6 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("L'image est trop lourde (max 2 Mo)");
-        return;
-      }
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     }

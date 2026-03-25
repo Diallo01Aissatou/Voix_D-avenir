@@ -116,7 +116,10 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
                   src={getPhotoUrl(currentUser?.photo)!}
                   alt={currentUser?.name || ''}
                   className="w-16 h-16 rounded-full object-cover"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  onError={(e) => {
+                    console.error("Photo error:", currentUser?.photo);
+                    e.currentTarget.style.display = 'none'; 
+                  }}
                 />
               ) : (
                 <User className="w-8 h-8 text-white" />
@@ -301,10 +304,6 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("L'image est trop lourde (max 2 Mo)");
-        return;
-      }
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     }

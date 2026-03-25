@@ -161,11 +161,6 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("L'image est trop lourde (max 2 Mo). Veuillez choisir une autre photo.");
-        e.target.value = '';
-        return;
-      }
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     } else {
@@ -450,7 +445,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Photo de profil (max 2 Mo)
+                  Photo de profil
                 </label>
                 <div className="flex items-center space-x-4">
                   {photoPreview ? (
