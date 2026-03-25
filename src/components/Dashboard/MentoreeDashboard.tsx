@@ -139,6 +139,9 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Attention : Cette photo est très lourde (> 5Mo). Le chargement risque d'être lent ou d'échouer sur le serveur gratuit.");
+      }
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     }
@@ -412,15 +415,28 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
                         <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(it => it.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
+                         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
+                         <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(it => it.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
                       </div>
                       <div>
                          <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
                          <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile({ ...userProfile, bio: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
                       </div>
-                     <div className="flex space-x-3 pt-4">
-                        <button type="submit" className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-100">Enregistrer les modifications</button>
-                        <button type="button" onClick={() => { setIsEditingProfile(false); setPhotoFile(null); setPhotoPreview(null); }} className="flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
-                     </div>
+                      <div className="flex space-x-3 pt-4">
+                         <button 
+                           type="submit" 
+                           disabled={isUpdating}
+                           className={`flex-1 ${isUpdating ? 'bg-purple-400' : 'bg-purple-600 hover:bg-purple-700'} text-white py-3 rounded-xl font-bold shadow-lg transition-all`}
+                         >
+                           {isUpdating ? (
+                             <span className="flex items-center justify-center">
+                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                               Enregistrement...
+                             </span>
+                           ) : 'Enregistrer les modifications'}
+                         </button>
+                         <button type="button" onClick={() => { setIsEditingProfile(false); setPhotoFile(null); setPhotoPreview(null); }} className="flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
+                      </div>
                    </form>
                  ) : (
                    <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
