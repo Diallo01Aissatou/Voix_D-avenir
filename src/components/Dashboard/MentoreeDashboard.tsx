@@ -11,6 +11,7 @@ import SessionNotifications from './SessionNotifications';
 import TestimonialManager from './TestimonialManager';
 
 // Fonction utilitaire pour corriger les URLs des photos
+let photoVersion = Date.now(); // Version globale stable par session
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   let url = photo;
@@ -18,9 +19,7 @@ const getPhotoUrl = (photo: string | undefined) => {
     const fileName = photo.split('/').pop();
     url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
   }
-  // Add a timestamp to bust cache
-  const bust = new Date().getTime();
-  return (url.replace('http://', 'https://')) + `?v=${bust}`;
+  return (url.replace('http://', 'https://')) + `?v=${photoVersion}`;
 };
 
 // Composant pour l'image de profil avec fallback
@@ -188,6 +187,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
       setIsEditingProfile(false); 
       setPhotoFile(null);
       setPhotoPreview(null);
+      photoVersion = Date.now(); // Forcer la mise à jour de la photo partout lors du prochain rendu
       await loadUserProfile();
       alert('Profil mis à jour avec succès !'); 
     } catch (err: any) { 
