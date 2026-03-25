@@ -415,8 +415,6 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
                         <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(it => it.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
-                         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
-                         <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(it => it.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
                       </div>
                       <div>
                          <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>

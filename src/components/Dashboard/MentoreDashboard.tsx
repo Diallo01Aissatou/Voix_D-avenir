@@ -317,6 +317,9 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Attention : Cette photo est très lourde (> 5Mo). Le chargement risque d'être lent ou d'échouer sur le serveur gratuit.");
+      }
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     }
@@ -390,7 +393,18 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Domaines d'Expertise (séparés par des virgules)</label>
         <input type="text" value={profileData.expertise} onChange={e => setProfileData({ ...profileData, expertise: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" placeholder="Finance, Leadership, Technologie..." />
       </div>
-      <button onClick={handleSave} disabled={loading} className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 shadow-lg shadow-purple-100 transition-all">{loading ? 'Enregistrement...' : 'Enregistrer mon profil'}</button>
+      <button 
+        onClick={handleSave} 
+        disabled={loading} 
+        className={`w-full ${loading ? 'bg-purple-400' : 'bg-purple-600 hover:bg-purple-700'} text-white py-3 rounded-xl font-bold shadow-lg transition-all`}
+      >
+        {loading ? (
+          <span className="flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+            Enregistrement en cours...
+          </span>
+        ) : 'Enregistrer mon profil'}
+      </button>
     </div>
   );
 };
