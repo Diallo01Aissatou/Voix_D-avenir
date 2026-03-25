@@ -9,8 +9,8 @@ import DynamicMentorshipManager from './DynamicMentorshipManager';
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  const cleanPath = photo.startsWith('/') ? photo : '/' + photo;
-  return `https://voix-avenir-backend.onrender.com${cleanPath}`;
+  const fileName = photo.split('/').pop();
+  return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
 };
 
 // Composant pour l'image de profil avec fallback

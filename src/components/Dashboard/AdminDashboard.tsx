@@ -10,6 +10,13 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+
+  const getPhotoUrl = (photo: string | undefined) => {
+    if (!photo) return null;
+    if (photo.startsWith('http')) return photo;
+    const fileName = photo.split('/').pop();
+    return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
+  };
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
   const [stats, setStats] = useState({
@@ -709,9 +716,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex items-center space-x-4">
           <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
-            {currentUser?.photo ? (
+            {getPhotoUrl(currentUser?.photo) ? (
               <img
-                src={currentUser?.photo.startsWith('http') ? currentUser.photo : `https://voix-avenir-backend.onrender.com${currentUser.photo.startsWith('/') ? '' : '/'}${currentUser.photo}`}
+                src={getPhotoUrl(currentUser?.photo)!}
                 alt={currentUser?.name || ''}
                 className="w-16 h-16 rounded-full object-cover"
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}

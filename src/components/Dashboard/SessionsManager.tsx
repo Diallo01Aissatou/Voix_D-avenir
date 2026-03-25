@@ -5,7 +5,8 @@ import { Calendar, Clock, User, Video, MessageSquare, CheckCircle, XCircle, Aler
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   if (photo.startsWith('http')) return photo;
-  return `https://voix-avenir-backend.onrender.com${photo.startsWith('/') ? photo : '/' + photo}`;
+  const fileName = photo.split('/').pop();
+  return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
 };
 
 interface SessionsManagerProps {
