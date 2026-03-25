@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, Calendar, MessageSquare, User, Settings, CheckCircle, Clock, Star, Plus, Edit, Camera } from 'lucide-react';
+import { Search, Calendar, MessageSquare, User, CheckCircle, Clock, Star, Edit, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';

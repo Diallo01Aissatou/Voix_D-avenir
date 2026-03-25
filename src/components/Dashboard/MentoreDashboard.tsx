@@ -6,6 +6,7 @@ import NotificationSystem from './NotificationSystem';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
 
 // Fonction utilitaire pour corriger les URLs des photos
+let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   let url = photo;
@@ -13,8 +14,7 @@ const getPhotoUrl = (photo: string | undefined) => {
     const fileName = photo.split('/').pop();
     url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
   }
-  const bust = new Date().getTime();
-  return (url.replace('http://', 'https://')) + `?v=${bust}`;
+  return (url.replace('http://', 'https://')) + `?v=${photoVersion}`;
 };
 
 // Composant pour l'image de profil avec fallback
@@ -351,7 +351,8 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
         alert('Profil mis à jour !'); 
         setPhotoFile(null);
         setPhotoPreview(null);
-        onUpdate(); 
+         photoVersion = Date.now();
+         onUpdate(); 
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
