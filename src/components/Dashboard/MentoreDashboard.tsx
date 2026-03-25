@@ -8,9 +8,12 @@ import DynamicMentorshipManager from './DynamicMentorshipManager';
 // Fonction utilitaire pour corriger les URLs des photos
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  if (photo.startsWith('http')) return photo;
-  const fileName = photo.split('/').pop();
-  return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
+  let url = photo;
+  if (!photo.startsWith('http')) {
+    const fileName = photo.split('/').pop();
+    url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
+  }
+  return url.replace('http://', 'https://');
 };
 
 // Composant pour l'image de profil avec fallback
