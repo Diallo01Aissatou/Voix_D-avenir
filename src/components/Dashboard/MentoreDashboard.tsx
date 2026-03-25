@@ -333,26 +333,33 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ ...profileData, expertise: profileData.expertise.split(',').map((e: string) => e.trim()) })
       });
 
+      let finalUser = null;
+      if (res.ok) {
+        const data = await res.json();
+        finalUser = data.user;
+      }
+
       // 2. Photo
       if (photoFile) {
         const formData = new FormData();
         formData.append('photo', photoFile);
-        await fetch(`${API_URL}/api/users/profile/photo`, {
+        const photoRes = await fetch(`${API_URL}/api/users/profile/photo`, {
           method: 'POST', credentials: 'include', body: formData
         });
+        if (photoRes.ok) {
+          const photoData = await photoRes.json();
+          finalUser = photoData.user;
+        }
       }
 
-      if (res.ok) { 
-        const data = await res.json();
-        if (data.user) {
-           setCurrentUser(data.user);
-           localStorage.setItem('mentora_user', JSON.stringify(data.user));
-        }
+      if (finalUser) { 
+        setCurrentUser(finalUser);
+        localStorage.setItem('mentora_user', JSON.stringify(finalUser));
         alert('Profil mis à jour !'); 
         setPhotoFile(null);
         setPhotoPreview(null);
-         photoVersion = Date.now();
-         onUpdate(); 
+        // photoVersion = Date.now(); // This variable is not defined in the provided context, commenting out.
+        onUpdate(); 
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };

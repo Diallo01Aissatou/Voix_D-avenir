@@ -152,6 +152,8 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
     setIsUpdating(true);
     
     try {
+      let finalUser = null;
+
       // 1. Mettre à jour les champs texte
       const res = await fetch(`${API_URL}/api/users/profile`, {
         method: 'PUT', 
@@ -160,8 +162,9 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
         body: JSON.stringify(userProfile)
       });
       
-      if (!res.ok) {
-        throw new Error('Erreur lors de la mise à jour des informations.');
+      if (res.ok) {
+        const data = await res.json();
+        finalUser = data.user;
       }
 
       // 2. Mettre à jour la photo si une nouvelle est sélectionnée
@@ -173,15 +176,16 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
           credentials: 'include', 
           body: formData
         });
-        if (!photoRes.ok) {
-          throw new Error('Erreur lors de l\'upload de la photo.');
+        if (photoRes.ok) {
+          const photoData = await photoRes.json();
+          finalUser = photoData.user; // Utiliser l'utilisateur mis à jour avec la nouvelle photo
         }
       }
 
-      const data = await res.json();
-      if (data.user) {
-        setCurrentUser(data.user);
-        localStorage.setItem('mentora_user', JSON.stringify(data.user));
+      if (finalUser) {
+        setCurrentUser(finalUser);
+        localStorage.setItem('mentora_user', JSON.stringify(finalUser));
+        setUserProfile(finalUser);
       }
       
       setIsEditingProfile(false); 
