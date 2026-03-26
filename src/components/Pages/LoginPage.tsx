@@ -140,15 +140,45 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                 disabled={isLoading}
                 className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
               >
-                {isLoading ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Connexion...</span>
-                  </div>
-                ) : (
-                  'Se connecter'
                 )}
               </button>
+
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500 uppercase">Ou se connecter avec</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3">
+                <a
+                  href="https://voix-avenir-backend.onrender.com/api/auth/google"
+                  className="flex items-center justify-center space-x-2 py-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                  <span className="font-semibold text-gray-700">Google</span>
+                </a>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <a
+                    href="https://voix-avenir-backend.onrender.com/api/auth/facebook"
+                    className="flex items-center justify-center space-x-2 py-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    <img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" className="w-5 h-5" />
+                    <span className="font-semibold text-gray-700">Facebook</span>
+                  </a>
+                  
+                  <a
+                    href="https://voix-avenir-backend.onrender.com/api/auth/linkedin"
+                    className="flex items-center justify-center space-x-2 py-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" alt="LinkedIn" className="w-5 h-5" />
+                    <span className="font-semibold text-gray-700">LinkedIn</span>
+                  </a>
+                </div>
+              </div>
 
               <div className="text-center">
                 <button
