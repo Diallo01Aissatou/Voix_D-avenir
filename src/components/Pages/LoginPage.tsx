@@ -140,6 +140,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                 disabled={isLoading}
                 className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
               >
+                {isLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Connexion...</span>
+                  </div>
+                ) : (
+                  'Se connecter'
                 )}
               </button>
 
