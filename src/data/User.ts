@@ -1,4 +1,4 @@
-import { User, MentorshipRequest } from "../types/index";
+import { User } from "../types/index";
 import Api from "./Api";
 
 export const UserServices = {
@@ -24,6 +24,11 @@ export const UserServices = {
 
     logout: async (): Promise<any> => {
         const response = await Api.post("/auth/logout");
+        return response.data;
+    },
+    
+    getMe: async (): Promise<any> => {
+        const response = await Api.get("/auth/me");
         return response.data;
     },
 

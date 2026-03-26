@@ -27,22 +27,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Récupérer l'utilisateur connecté depuis localStorage
-    const loadUser = () => {
+    const loadUser = async () => {
+      // 1. Essayer de charger depuis localStorage pour un affichage immédiat
       const savedUser = localStorage.getItem('mentora_user');
       if (savedUser) {
         try {
           setCurrentUser(JSON.parse(savedUser));
         } catch (error) {
           localStorage.removeItem('mentora_user');
-          setCurrentUser(null);
         }
-      } else {
-        setCurrentUser(null);
+      }
+
+      // 2. Vérifier la session réelle auprès du serveur (important pour social login)
+      try {
+        const data = await UserServices.getMe();
+        if (data && data.user) {
+          setCurrentUser(data.user);
+          localStorage.setItem('mentora_user', JSON.stringify(data.user));
+        }
+      } catch (error) {
+        // Si 401 ou erreur, l'utilisateur n'est pas connecté ou session expirée
+        if (savedUser) {
+           setCurrentUser(null);
+           localStorage.removeItem('mentora_user');
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadUser();
-    setIsLoading(false);
 
     // Écouter les changements de localStorage
     window.addEventListener('storage', loadUser);
