@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, X, Video, MapPin, Link } from 'lucide-react';
+import { X } from 'lucide-react';
+import Api from '../../data/Api'; // Importation du service Api
 
 interface CreateSessionModalProps {
   isOpen: boolean;
@@ -38,26 +39,18 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({
 
     setLoading(true);
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/sessions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          mentorshipRequestId,
-          ...formData
-        })
+      const res = await Api.post('/sessions', {
+        mentorshipRequestId,
+        ...formData
       });
 
-      if (response.ok) {
+      if (res.data) {
         alert('Séance créée avec succès !');
         onSuccess();
-      } else {
-        const error = await response.json().catch(() => ({ message: 'Erreur serveur' }));
-        alert(`Erreur: ${error.message}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur création séance:', error);
-      alert('Erreur de connexion');
+      alert(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
     } finally {
       setLoading(false);
     }

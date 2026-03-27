@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Send, Check, X, MessageCircle, User, Clock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Api from '../../data/Api'; // Importation du service Api
 import DynamicChat from './DynamicChat';
 
 interface MentorshipRequest {
@@ -19,9 +20,9 @@ interface Mentore {
   photo?: string;
   profession: string;
   expertise: string[];
+  city?: string;
 }
 
-const BASE_API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'https://voix-avenir-backend.onrender.com';
 
 const MentorshipSystem: React.FC = () => {
   const { currentUser } = useAuth();
@@ -46,13 +47,8 @@ const MentorshipSystem: React.FC = () => {
   const loadRequests = async () => {
     try {
       const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`${BASE_API_URL}/api/mentorship/${endpoint}`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setRequests(data);
-      }
+      const res = await Api.get(`/mentorship/${endpoint}`);
+      setRequests(res.data);
     } catch (error) {
       console.error('Erreur:', error);
     }
@@ -61,16 +57,9 @@ const MentorshipSystem: React.FC = () => {
   const loadMentores = async () => {
     try {
       console.log('Chargement des mentores...');
-      const response = await fetch(`${BASE_API_URL}/api/users?role=mentore`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Mentores chargées:', data);
-        setMentores(data);
-      } else {
-        console.error('Erreur réponse:', response.status);
-      }
+      const res = await Api.get('/users?role=mentore');
+      console.log('Mentores chargées:', res.data);
+      setMentores(res.data);
     } catch (error) {
       console.error('Erreur chargement mentores:', error);
     }
@@ -79,39 +68,25 @@ const MentorshipSystem: React.FC = () => {
   const createRequest = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${BASE_API_URL}/api/mentorship/request`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ mentoreId: selectedMentore, message: message })
-      });
-
-      if (response.ok) {
+      const res = await Api.post('/mentorship/request', { mentoreId: selectedMentore, message: message });
+      if (res.data) {
         alert('Demande envoyée avec succès!');
         setShowModal(false);
         setSelectedMentore('');
         setMessage('');
         setSearchTerm('');
         loadRequests();
-      } else {
-        alert('Erreur lors de l\'envoi');
       }
     } catch (error) {
-      alert('Erreur réseau');
+      alert('Erreur lors de l\'envoi');
     }
     setLoading(false);
   };
 
   const respondToRequest = async (requestId: string, status: 'accepted' | 'rejected') => {
     try {
-      const response = await fetch(`${BASE_API_URL}/api/mentorship/respond/${requestId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status, response: responseMessage.trim() || undefined })
-      });
-
-      if (response.ok) {
+      const res = await Api.put(`/mentorship/respond/${requestId}`, { status, response: responseMessage.trim() || undefined });
+      if (res.data) {
         setRespondingTo(null);
         setResponseMessage('');
         loadRequests();

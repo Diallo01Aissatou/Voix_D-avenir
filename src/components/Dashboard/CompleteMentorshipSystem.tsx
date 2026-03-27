@@ -4,14 +4,11 @@ import {
   Send, 
   CheckCircle, 
   XCircle, 
-  Clock, 
   User, 
   Paperclip,
   Phone,
   Video,
   MoreVertical,
-  Search,
-  Filter
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MentorshipRequest, Message, User as UserType } from '../../types';
@@ -22,7 +19,7 @@ interface CompleteMentorshipSystemProps {
   onNavigate?: (page: string) => void;
 }
 
-const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onNavigate }) => {
+const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onNavigate: _onNavigate }) => {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState<'requests' | 'mentorships' | 'chat'>('requests');
   const [requests, setRequests] = useState<MentorshipRequest[]>([]);
@@ -31,7 +28,6 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // const { socket } = useSocket();
@@ -42,7 +38,7 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   useEffect(() => {
     loadRequests();
     loadMentorships();
-  }, []);
+  }, [currentUser]);
 
   // Load messages when mentorship is selected
   useEffect(() => {
@@ -54,13 +50,8 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   const loadRequests = async () => {
     try {
       const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setRequests(data);
-      }
+      const res = await Api.get(`/mentorship/${endpoint}`);
+      setRequests(res.data);
     } catch (error) {
       console.error('Erreur chargement demandes:', error);
     }
@@ -69,31 +60,21 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   const loadMentorships = async () => {
     try {
       const endpoint = currentUser?.role === 'mentore' ? 'received' : 'sent';
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/${endpoint}`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const activeMentorships = data.filter((r: any) => r.status === 'accepted');
-        setMentorships(activeMentorships);
-      }
+      const res = await Api.get(`/mentorship/${endpoint}`);
+      const activeMentorships = res.data.filter((r: any) => r.status === 'accepted');
+      setMentorships(activeMentorships);
     } catch (error) {
       console.error('Erreur chargement mentorats:', error);
     }
   };
 
-  const loadMessages = async (mentorshipId: string) => {
+  const loadMessages = async (_mentorshipId: string) => {
     try {
       const otherUserId = getOtherUserId(selectedMentorship);
       if (otherUserId) {
-        const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${otherUserId}`, {
-          credentials: 'include'
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setMessages(data);
-          scrollToBottom();
-        }
+        const res = await Api.get(`/messages/${otherUserId}`);
+        setMessages(res.data);
+        scrollToBottom();
       }
     } catch (error) {
       console.error('Erreur chargement messages:', error);
@@ -125,22 +106,14 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
     if (!otherUserId) return;
 
     try {
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          recipient: otherUserId,
-          content: newMessage
-        })
+      const res = await Api.post('/messages', {
+        recipient: otherUserId,
+        content: newMessage
       });
 
-      if (response.ok) {
-        const sentMessage = await response.json();
-        setMessages(prev => [...prev, sentMessage]);
-        setNewMessage('');
-        scrollToBottom();
-      }
+      setMessages(prev => [...prev, res.data]);
+      setNewMessage('');
+      scrollToBottom();
     } catch (error) {
       console.error('Erreur envoi message:', error);
     }
@@ -153,7 +126,7 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
     const formData = new FormData();
     formData.append('file', file);
     formData.append('recipient', getOtherUserId(selectedMentorship) || '');
-    formData.append('mentorshipId', selectedMentorship._id);
+    formData.append('mentorshipId', selectedMentorship._id || '');
 
     try {
       const response = await Api.post('/messages', formData, {
@@ -169,14 +142,8 @@ const CompleteMentorshipSystem: React.FC<CompleteMentorshipSystemProps> = ({ onN
   const handleRequestAction = async (requestId: string, action: 'accepted' | 'rejected', responseMessage?: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/mentorship/respond/${requestId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status: action, responseMessage })
-      });
-      
-      if (response.ok) {
+      const res = await Api.put(`/mentorship/respond/${requestId}`, { status: action, responseMessage });
+      if (res.data) {
         loadRequests();
         loadMentorships();
       }

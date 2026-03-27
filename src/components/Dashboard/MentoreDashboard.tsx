@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MessageSquare, User, Clock, CheckCircle, XCircle, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Api from '../../data/Api'; // Importation du service Api
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
@@ -83,8 +84,8 @@ interface MentoreDashboardProps {
 const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('requests');
-  const [, setRequests] = useState([]);
-  const [sessions, setSessions] = useState([]);
+  const [, setRequests] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalRequests: 0,
     pendingRequests: 0,
@@ -119,26 +120,26 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
 
   const loadRequests = async () => {
     try {
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', { credentials: 'include' });
-      if (response.ok) setRequests(await response.json());
+      const response = await Api.get('/mentorship/received');
+      setRequests(response.data);
     } catch (error) { console.error(error); }
   };
 
   const loadSessions = async () => {
     try {
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/sessions', { credentials: 'include' });
-      if (response.ok) setSessions(await response.json());
+      const response = await Api.get('/sessions');
+      setSessions(response.data);
     } catch (error) { console.error(error); }
   };
 
   const loadStats = async () => {
     try {
       const [rR, sR] = await Promise.all([
-        fetch('https://voix-avenir-backend.onrender.com/api/mentorship/received', { credentials: 'include' }),
-        fetch('https://voix-avenir-backend.onrender.com/api/sessions', { credentials: 'include' })
+        Api.get('/mentorship/received'),
+        Api.get('/sessions')
       ]);
-      let reqs = rR.ok ? await rR.json() : [];
-      let sess = sR.ok ? await sR.json() : [];
+      let reqs = rR.data || [];
+      let sess = sR.data || [];
 
       const totalRequests = reqs.length;
       const pendingRequests = reqs.filter((r: any) => r.status === 'pending').length;
@@ -279,21 +280,18 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
 };
 
 const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }: { sessions: any[], onRefresh: () => void, onOpenChat: () => void }) => {
-  const [showLinkModal, setShowLinkModal] = useState(null);
+  const [showLinkModal, setShowLinkModal] = useState<string | null>(null);
   const [meetingLink, setMeetingLink] = useState('');
-  const API_URL = 'https://voix-avenir-backend.onrender.com';
 
   const handleAction = async (id: string, action: string) => {
     if (!confirm(`Confirmer ${action} ?`)) return;
-    try { await fetch(`${API_URL}/api/sessions/${id}/${action}`, { method: 'PUT', credentials: 'include' }); onRefresh(); } catch (e) { console.error(e); }
+    try { await Api.put(`/sessions/${id}/${action}`); onRefresh(); } catch (e) { console.error(e); }
   };
 
   const saveMeetingLink = async (id: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/sessions/${id}/update`, { 
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ meetingLink })
-      });
-      if (res.ok) { setShowLinkModal(null); onRefresh(); }
+      const res = await Api.put(`/sessions/${id}/update`, { meetingLink });
+      if (res.data) { setShowLinkModal(null); onRefresh(); }
     } catch (e) { console.error(e); }
   };
 
@@ -340,7 +338,6 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const API_URL = 'https://voix-avenir-backend.onrender.com';
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -355,26 +352,20 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
     setLoading(true);
     try {
       // 1. Text fields
-      const res = await fetch(`${API_URL}/api/users/profile`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ ...profileData, expertise: profileData.expertise.split(',').map((e: string) => e.trim()) })
-      });
+      const res = await Api.put('/users/profile', { ...profileData, expertise: profileData.expertise.split(',').map((e: string) => e.trim()) });
 
       let finalUser = null;
-      if (res.ok) {
-        const data = await res.json();
-        finalUser = data.user;
+      if (res.data && res.data.user) {
+        finalUser = res.data.user;
       }
 
       // 2. Photo
       if (photoFile) {
         const formData = new FormData();
         formData.append('photo', photoFile);
-        const photoRes = await fetch(`${API_URL}/api/users/profile/photo`, {
-          method: 'POST', credentials: 'include', body: formData
-        });
-        if (photoRes.ok) {
-          const photoData = await photoRes.json();
-          finalUser = photoData.user;
+        const photoRes = await Api.post('/users/profile/photo', formData);
+        if (photoRes.data && photoRes.data.user) {
+          finalUser = photoRes.data.user;
         }
       }
 
@@ -384,7 +375,7 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
         alert('Profil mis à jour !'); 
         setPhotoFile(null);
         setPhotoPreview(null);
-        // photoVersion = Date.now(); // This variable is not defined in the provided context, commenting out.
+        photoVersion = Date.now(); 
         onUpdate(); 
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }

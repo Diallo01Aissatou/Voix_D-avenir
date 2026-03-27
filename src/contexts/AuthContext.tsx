@@ -26,9 +26,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Récupérer l'utilisateur connecté depuis localStorage
+    // Récupérer l'utilisateur connecté depuis localStorage et vérifier les tokens URL
     const loadUser = async () => {
-      // 1. Essayer de charger depuis localStorage pour un affichage immédiat
+      // 1. Vérifier si un token est présent dans l'URL (retour social login)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get('token');
+      
+      if (urlToken) {
+        localStorage.setItem('mentora_token', urlToken);
+        // Nettoyer l'URL sans recharger la page
+        const newUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+
+      // 2. Essayer de charger depuis localStorage pour un affichage immédiat
       const savedUser = localStorage.getItem('mentora_user');
       if (savedUser) {
         try {
@@ -38,20 +49,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // 2. Vérifier la session réelle auprès du serveur (important pour social login)
-      try {
-        const data = await UserServices.getMe();
-        if (data && data.user) {
-          setCurrentUser(data.user);
-          localStorage.setItem('mentora_user', JSON.stringify(data.user));
+      // 3. Vérifier la session réelle auprès du serveur (important pour social login)
+      const token = localStorage.getItem('mentora_token');
+      if (token || urlToken) {
+        try {
+          const data = await UserServices.getMe();
+          if (data && data.user) {
+            setCurrentUser(data.user);
+            localStorage.setItem('mentora_user', JSON.stringify(data.user));
+          }
+        } catch (error) {
+          // Si 401 ou erreur, l'utilisateur n'est pas connecté ou session expirée
+          setCurrentUser(null);
+          localStorage.removeItem('mentora_user');
+          localStorage.removeItem('mentora_token');
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        // Si 401 ou erreur, l'utilisateur n'est pas connecté ou session expirée
-        if (savedUser) {
-           setCurrentUser(null);
-           localStorage.removeItem('mentora_user');
-        }
-      } finally {
+      } else {
         setIsLoading(false);
       }
     };
@@ -71,7 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       const data = await UserServices.login({ email, password, role });
 
-      if (data && data.user) {
+      if (data && data.user && data.token) {
+        localStorage.setItem('mentora_token', data.token);
         setCurrentUser(data.user);
         localStorage.setItem('mentora_user', JSON.stringify(data.user));
         return true;
@@ -88,11 +104,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (userData: Partial<User> | FormData): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const newUser = await UserServices.aregistre(userData);
+      const data = await UserServices.aregistre(userData);
 
-      if (newUser && newUser.id) {
-        setCurrentUser(newUser);
-        localStorage.setItem("mentora_user", JSON.stringify(newUser));
+      if (data && data.user && data.token) {
+        localStorage.setItem('mentora_token', data.token);
+        setCurrentUser(data.user);
+        localStorage.setItem("mentora_user", JSON.stringify(data.user));
         return true;
       }
       return false;
@@ -112,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setCurrentUser(null);
       localStorage.removeItem('mentora_user');
+      localStorage.removeItem('mentora_token');
       window.dispatchEvent(new Event('storage'));
     }
   };

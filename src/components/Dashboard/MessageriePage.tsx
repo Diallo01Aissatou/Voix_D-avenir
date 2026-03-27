@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Search, User, MessageCircle, Plus, X } from 'lucide-react';
+import { Send, Search, User, Plus, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Api from '../../data/Api'; // Importation du service Api
 // import { useSocket } from '../../hooks/useSocket';
 
 // Fonction utilitaire pour corriger les URLs des photos
@@ -42,8 +43,6 @@ interface Message {
 
 const MessageriePage: React.FC = () => {
   const { currentUser } = useAuth();
-  // const { socket } = useSocket();
-  const socket = null; // Désactiver temporairement les WebSockets
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -55,7 +54,6 @@ const MessageriePage: React.FC = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const API_URL = 'https://voix-avenir-backend.onrender.com';
 
   useEffect(() => {
     console.log('CurrentUser dans MessageriePage:', currentUser);
@@ -100,15 +98,8 @@ const MessageriePage: React.FC = () => {
 
   const loadConversations = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/messages/conversations`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setConversations(data);
-      } else {
-        setConversations([]);
-      }
+      const res = await Api.get('/messages/conversations');
+      setConversations(res.data || []);
     } catch (error) {
       console.error('Erreur chargement conversations:', error);
       setConversations([]);
@@ -117,15 +108,8 @@ const MessageriePage: React.FC = () => {
 
   const loadAvailableUsers = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/messages/users/available`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setAvailableUsers(data);
-      } else {
-        setAvailableUsers([]);
-      }
+      const res = await Api.get('/messages/users/available');
+      setAvailableUsers(res.data || []);
     } catch (error) {
       console.error('Erreur chargement utilisateurs:', error);
       setAvailableUsers([]);
@@ -134,13 +118,8 @@ const MessageriePage: React.FC = () => {
 
   const loadUserProfile = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/users/profile`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUserProfile(data);
-      }
+      const res = await Api.get('/users/profile');
+      setUserProfile(res.data);
     } catch (error) {
       console.error('Erreur chargement profil:', error);
     }
@@ -155,15 +134,8 @@ const MessageriePage: React.FC = () => {
 
   const loadMessages = async (userId: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/messages/${userId}`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(data);
-      } else {
-        setMessages([]);
-      }
+      const res = await Api.get(`/messages/${userId}`);
+      setMessages(res.data || []);
     } catch (error) {
       console.error('Erreur chargement messages:', error);
       setMessages([]);
@@ -178,19 +150,13 @@ const MessageriePage: React.FC = () => {
     setNewMessage('');
 
     try {
-      const response = await fetch(`${API_URL}/api/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          recipient: selectedConversation,
-          content: messageContent
-        })
+      const res = await Api.post('/messages', {
+        recipient: selectedConversation,
+        content: messageContent
       });
 
-      if (response.ok) {
-        const savedMessage = await response.json();
-        setMessages(prev => [...prev, savedMessage]);
+      if (res.data) {
+        setMessages(prev => [...prev, res.data]);
         loadConversations();
       }
     } catch (error) {
@@ -318,7 +284,7 @@ const MessageriePage: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">{conversation.user.name}</h3>
-                      {conversation.unreadCount > 0 && (
+                      {(conversation.unreadCount || 0) > 0 && (
                         <span className="bg-purple-600 text-white text-xs rounded-full px-2 py-1">
                           {conversation.unreadCount}
                         </span>

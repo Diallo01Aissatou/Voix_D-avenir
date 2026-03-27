@@ -12,9 +12,9 @@ export const UserServices = {
         return response.data;
     },
 
-    aregistre: async (payload: Partial<User> | FormData): Promise<User> => {
+    aregistre: async (payload: Partial<User> | FormData): Promise<any> => {
         const response = await Api.post("/auth/register", payload);
-        return response.data.user;
+        return response.data; // Retourne l'objet complet { message, user, token }
     },
 
     login: async (data: any): Promise<any> => {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, Video, MessageSquare, CheckCircle, XCircle, AlertCircle, ExternalLink, FileText, Edit, Trash2, Plus } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
+import Api from '../../data/Api'; // Importation du service Api
 
 // Fonction utilitaire pour corriger les URLs des photos
 const getPhotoUrl = (photo: string | undefined) => {
@@ -25,11 +26,10 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
   onOpenChat, 
   onRequestMentorship 
 }) => {
-  const [selectedSession, setSelectedSession] = useState(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [confirmingPresence, setConfirmingPresence] = useState(null);
+  const [_selectedSession, _setSelectedSession] = useState<any>(null);
+  const [_showDetails, _setShowDetails] = useState(false);
+  const [_confirmingPresence, setConfirmingPresence] = useState<string | null>(null);
 
-  const API_URL = 'https://voix-avenir-backend.onrender.com';
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,20 +67,14 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
   const confirmPresence = async (sessionId: string) => {
     setConfirmingPresence(sessionId);
     try {
-      const response = await fetch(`${API_URL}/api/mentorship/sessions/${sessionId}/confirm`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      if (response.ok) {
+      const res = await Api.put(`/mentorship/sessions/${sessionId}/confirm`);
+      if (res.data) {
         alert('Présence confirmée avec succès !');
         onRefresh();
-      } else {
-        const error = await response.json().catch(() => ({ message: 'Erreur serveur' }));
-        alert(`Erreur: ${error.message}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur confirmation présence:', error);
-      alert('Erreur de connexion');
+      alert(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
     } finally {
       setConfirmingPresence(null);
     }
@@ -89,29 +83,23 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
   const cancelSession = async (sessionId: string) => {
     if (!confirm('Êtes-vous sûre de vouloir annuler cette séance ?')) return;
     try {
-      const response = await fetch(`${API_URL}/api/mentorship/sessions/${sessionId}/cancel`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      if (response.ok) {
+      const res = await Api.put(`/mentorship/sessions/${sessionId}/cancel`);
+      if (res.data) {
         alert('Séance annulée avec succès !');
         onRefresh();
-      } else {
-        const error = await response.json().catch(() => ({ message: 'Erreur serveur' }));
-        alert(`Erreur: ${error.message}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur annulation séance:', error);
-      alert('Erreur de connexion');
+      alert(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
     }
   };
 
-  const SessionCard = ({ session }) => (
+  const SessionCard = ({ session }: { session: any }) => (
     <div className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
       <div className="flex items-start space-x-4">
         <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
           {getPhotoUrl(session.mentore?.photo) ? (
-            <img src={getPhotoUrl(session.mentore.photo)} alt={session.mentore.name} className="w-16 h-16 rounded-full object-cover" />
+            <img src={getPhotoUrl(session.mentore.photo)!} alt={session.mentore.name} className="w-16 h-16 rounded-full object-cover" />
           ) : (
             <User className="w-8 h-8 text-white" />
           )}
@@ -137,9 +125,12 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => {setSelectedSession(session); setShowDetails(true);}} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm">Détails</button>
+            <button onClick={() => _setShowDetails(true)} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm">Détails</button>
             {session.status === 'scheduled' && (
               <button onClick={() => confirmPresence(session._id)} className="px-3 py-1 bg-green-600 text-white rounded-lg text-sm">Confirmer</button>
+            )}
+            {session.status === 'scheduled' && (
+              <button onClick={() => cancelSession(session._id)} className="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-sm">Annuler</button>
             )}
             <button onClick={() => onOpenChat(session.mentore._id)} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-sm">Contacter</button>
           </div>

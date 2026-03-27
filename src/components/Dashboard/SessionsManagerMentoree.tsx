@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Video, MapPin, Link, MessageSquare, CheckCircle, XCircle, Edit, Eye, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, User, Video, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import Api from '../../data/Api'; // Importation du service Api
 import { Session } from '../../types';
 
 interface SessionsManagerMentoreeProps {
@@ -13,22 +14,21 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
   onRefresh, 
   onOpenChat 
 }) => {
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [_selectedSession, _setSelectedSession] = useState<Session | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [confirmedSessions, setConfirmedSessions] = useState<Set<string>>(new Set());
+  const [_confirmedSessions, _setConfirmedSessions] = useState<Set<string>>(new Set());
 
-  const API_URL = 'https://voix-avenir-backend.onrender.com';
 
-  const getStatusBadge = (status: string, sessionId: string) => {
-    const actualStatus = confirmedSessions.has(sessionId) ? 'confirmed' : status;
+  const getStatusBadge = (status: string, _sessionId: string) => {
+    const actualStatus = status; // confirmedSessions.has(sessionId) ? 'confirmed' : status;
     const badges = {
       scheduled: { color: 'bg-blue-100 text-blue-700', text: 'À venir', icon: Clock },
       confirmed: { color: 'bg-green-100 text-green-700', text: 'Confirmée', icon: CheckCircle },
       completed: { color: 'bg-gray-100 text-gray-700', text: 'Terminée', icon: CheckCircle },
       canceled: { color: 'bg-red-100 text-red-700', text: 'Annulée', icon: XCircle }
     };
-    const badge = badges[actualStatus] || badges.scheduled;
+    const badge = (badges as any)[actualStatus] || badges.scheduled;
     const Icon = badge.icon;
     return (
       <span className={`px-3 py-1 rounded-full text-sm flex items-center ${badge.color}`}>
@@ -40,18 +40,13 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
   const handleConfirmPresence = async (sessionId: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/sessions/${sessionId}/confirm`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      if (response.ok) {
+      const res = await Api.put(`/sessions/${sessionId}/confirm`);
+      if (res.data) {
         alert('Présence confirmée avec succès !');
         onRefresh();
-      } else {
-        alert('Erreur lors de la confirmation');
       }
     } catch (error) {
-      alert('Erreur de connexion');
+      alert('Erreur lors de la confirmation');
     } finally {
       setLoading(false);
       setShowConfirmModal(null);
@@ -62,11 +57,8 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
     if (!confirm('Voulez-vous annuler cette séance ?')) return;
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/sessions/${sessionId}/cancel`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      if (response.ok) {
+      const res = await Api.put(`/sessions/${sessionId}/cancel`);
+      if (res.data) {
         alert('Séance annulée');
         onRefresh();
       }
@@ -92,7 +84,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden">
                   {session.mentore?.photo ? (
-                    <img src={`${API_URL}${session.mentore.photo}`} alt={session.mentore.name} className="w-12 h-12 rounded-full object-cover" />
+                    <img src={session.mentore.photo.startsWith('http') ? session.mentore.photo : `https://voix-avenir-backend.onrender.com${session.mentore.photo}`} alt={session.mentore.name} className="w-12 h-12 rounded-full object-cover" />
                   ) : <User className="w-6 h-6 text-purple-600" />}
                 </div>
                 <div>
@@ -110,7 +102,10 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                 {session.meetingLink && (
                    <a href={session.meetingLink} target="_blank" className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm flex items-center"><Video className="w-4 h-4 mr-1" /> Rejoindre</a>
                 )}
-                <button onClick={() => onOpenChat(session.mentore._id)} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-sm">Chat</button>
+                <button onClick={() => onOpenChat(session.mentore?._id || '')} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-sm">Chat</button>
+                {session.status === 'scheduled' && (
+                  <button onClick={() => handleCancelSession(session._id)} className="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-sm">Annuler</button>
+                )}
               </div>
             </div>
           </div>

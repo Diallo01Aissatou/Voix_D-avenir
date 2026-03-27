@@ -1,12 +1,12 @@
 export interface User {
-  id: string;
+  id?: string;
   _id?: string;
   name: string;
   email: string;
-  password: string; // 🔑 ajouté
-  role: 'mentoree' | 'mentore' | 'admin';
+  password?: string;
+  role: 'mentoree' | 'mentore' | 'admin' | string;
   photo: string;
-  age?: number;
+  age?: number | string;
   city?: string;
   profession?: string;
   expertise?: string[];
@@ -16,6 +16,7 @@ export interface User {
   availableDays?: string[];
   startTime?: string;
   endTime?: string;
+  level?: string;
 }
 
 

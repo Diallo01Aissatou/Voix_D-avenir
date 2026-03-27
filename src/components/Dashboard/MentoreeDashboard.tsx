@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Calendar, MessageSquare, User, CheckCircle, Clock, Star, Edit, Camera } from 'lucide-react';
+import { Search, Calendar, MessageSquare, User as UserIcon, CheckCircle, Clock, Star, Edit, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { User } from '../../types/index';
+import Api from '../../data/Api'; // Importation du service Api
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
@@ -58,7 +60,7 @@ const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | nul
   if (!src || error) {
     return (
       <div className={`${className} bg-purple-100 flex items-center justify-center`}>
-        <User className={`w-${iconSize} h-${iconSize} text-purple-600`} />
+        <UserIcon className={`w-${iconSize} h-${iconSize} text-purple-600`} />
       </div>
     );
   }
@@ -81,11 +83,11 @@ const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | nul
   );
 };
 
-const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
+const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate: _onNavigate }) => {
   const { currentUser, setCurrentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('find-mentor');
-  const [mentores, setMentores] = useState([]);
-  const [mySessions, setMySessions] = useState([]);
+  const [mentores, setMentores] = useState<User[]>([]);
+  const [mySessions, setMySessions] = useState<any[]>([]);
   const [stats, setStats] = useState({
     activeMentorships: 0,
     pendingRequests: 0,
@@ -93,16 +95,15 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
     totalHours: 0
   });
   const [searchFilters, setSearchFilters] = useState({ search: '', city: '', expertise: '' });
-  const [cities, setCities] = useState([]);
-  const [expertiseList, setExpertiseList] = useState([]);
-  const [userProfile, setUserProfile] = useState(null);
+  const [cities, setCities] = useState<string[]>([]);
+  const [expertiseList, setExpertiseList] = useState<string[]>([]);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const API_URL = 'https://voix-avenir-backend.onrender.com';
 
   useEffect(() => {
     loadMentors();
@@ -114,52 +115,54 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
 
   const loadMentors = async () => {
     try {
-      const params = new URLSearchParams();
-      if (searchFilters.search) params.append('search', searchFilters.search);
-      if (searchFilters.city) params.append('city', searchFilters.city);
-      if (searchFilters.expertise) params.append('expertise', searchFilters.expertise);
-      const res = await fetch(`${API_URL}/api/users?role=mentore&${params.toString()}`);
-      if (res.ok) setMentores(await res.json());
+      const params: any = {};
+      if (searchFilters.search) params.search = searchFilters.search;
+      if (searchFilters.city) params.city = searchFilters.city;
+      if (searchFilters.expertise) params.expertise = searchFilters.expertise;
+      
+      const res = await Api.get('/users', { params: { role: 'mentore', ...params } });
+      setMentores(res.data);
     } catch (e) { console.error(e); }
   };
 
   const loadFiltersData = async () => {
     try {
-      const [c, e] = await Promise.all([fetch(`${API_URL}/api/users/cities`), fetch(`${API_URL}/api/users/expertise`)]);
-      if (c.ok) setCities(await c.json());
-      if (e.ok) setExpertiseList(await e.json());
+      const [c, e] = await Promise.all([
+        Api.get('/users/cities'),
+        Api.get('/users/expertise')
+      ]);
+      setCities(c.data);
+      setExpertiseList(e.data);
     } catch (err) { console.error(err); }
   };
 
   const loadUserProfile = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/users/profile`, { credentials: 'include' });
-      if (res.ok) setUserProfile(await res.json());
+      const res = await Api.get('/users/profile');
+      setUserProfile(res.data);
     } catch (e) { console.error(e); }
   };
 
   const loadMySessions = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/sessions`, { credentials: 'include' });
-      if (res.ok) setMySessions(await res.json());
+      const res = await Api.get('/sessions');
+      setMySessions(res.data);
     } catch (e) { console.error(e); }
   };
 
   const loadStats = async () => {
     try {
       const [mRes, sRes] = await Promise.all([
-        fetch(`${API_URL}/api/mentorship/sent`, { credentials: 'include' }),
-        fetch(`${API_URL}/api/sessions`, { credentials: 'include' })
+        Api.get('/mentorship/sent'),
+        Api.get('/sessions')
       ]);
-      if (mRes.ok && sRes.ok) {
-        const m = await mRes.json();
-        const s = await sRes.json();
-        const active = m.filter(x => x.status === 'accepted').length;
-        const pending = m.filter(x => x.status === 'pending').length;
-        const completed = s.filter(x => x.status === 'completed').length;
-        const hours = s.filter(x => x.status === 'completed').reduce((acc, curr) => acc + (curr.duration || 60), 0) / 60;
-        setStats({ activeMentorships: active, pendingRequests: pending, completedSessions: completed, totalHours: Math.round(hours * 10) / 10 });
-      }
+      const m = mRes.data;
+      const s = sRes.data;
+      const active = m.filter((x: any) => x.status === 'accepted').length;
+      const pending = m.filter((x: any) => x.status === 'pending').length;
+      const completed = s.filter((x: any) => x.status === 'completed').length;
+      const hours = s.filter((x: any) => x.status === 'completed').reduce((acc: number, curr: any) => acc + (curr.duration || 60), 0) / 60;
+      setStats({ activeMentorships: active, pendingRequests: pending, completedSessions: completed, totalHours: Math.round(hours * 10) / 10 });
     } catch (e) { console.error(e); }
   };
 
@@ -185,30 +188,18 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
       let finalUser = null;
 
       // 1. Mettre à jour les champs texte
-      const res = await fetch(`${API_URL}/api/users/profile`, {
-        method: 'PUT', 
-        headers: { 'Content-Type': 'application/json' }, 
-        credentials: 'include', 
-        body: JSON.stringify(userProfile)
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        finalUser = data.user;
+      const res = await Api.put('/users/profile', userProfile);
+      if (res.data && res.data.user) {
+        finalUser = res.data.user;
       }
 
       // 2. Mettre à jour la photo si une nouvelle est sélectionnée
       if (photoFile) {
         const formData = new FormData();
         formData.append('photo', photoFile);
-        const photoRes = await fetch(`${API_URL}/api/users/profile/photo`, {
-          method: 'POST', 
-          credentials: 'include', 
-          body: formData
-        });
-        if (photoRes.ok) {
-          const photoData = await photoRes.json();
-          finalUser = photoData.user; // Utiliser l'utilisateur mis à jour avec la nouvelle photo
+        const photoRes = await Api.post('/users/profile/photo', formData);
+        if (photoRes.data && photoRes.data.user) {
+          finalUser = photoRes.data.user; // Utiliser l'utilisateur mis à jour avec la nouvelle photo
         }
       }
 
@@ -308,7 +299,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                 { id: 'requests', icon: Clock, label: 'Mes Demandes' },
                 { id: 'messagerie', icon: MessageSquare, label: 'Messagerie' },
                 { id: 'testimonials', icon: Star, label: 'Témoignages' },
-                { id: 'profile', icon: User, label: 'Mon Profil' }
+                { id: 'profile', icon: UserIcon, label: 'Mon Profil' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -336,7 +327,7 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                       Recommandé pour vous
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {mentores.filter(m => m.expertise?.some(e => userProfile.interests.some(i => e.toLowerCase().includes(i.toLowerCase())))).slice(0, 2).map(m => (
+                      {mentores.filter((m: User) => m.expertise?.some((e: string) => (userProfile?.interests || []).some((i: string) => e.toLowerCase().includes(i.toLowerCase())))).slice(0, 2).map((m: User) => (
                         <div key={m.id} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
                           <div className="flex items-center space-x-3 mb-2">
                             <ProfileImage 
@@ -431,28 +422,28 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                            <label className="block text-sm font-bold text-gray-700 mb-1">Nom complet</label>
-                           <input value={userProfile?.name || ''} onChange={e => setUserProfile({ ...userProfile, name: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Nom" />
+                           <input value={userProfile?.name || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, name: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Nom" />
                         </div>
                         <div>
                            <label className="block text-sm font-bold text-gray-700 mb-1">Âge</label>
-                           <input type="number" value={userProfile?.age || ''} onChange={e => setUserProfile({ ...userProfile, age: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Âge" />
+                           <input type="number" value={userProfile?.age || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, age: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Âge" />
                         </div>
                         <div>
                            <label className="block text-sm font-bold text-gray-700 mb-1">Ville</label>
-                           <input value={userProfile?.city || ''} onChange={e => setUserProfile({ ...userProfile, city: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ville" />
+                           <input value={userProfile?.city || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, city: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ville" />
                         </div>
                         <div>
                            <label className="block text-sm font-bold text-gray-700 mb-1">Niveau d'études / Métier</label>
-                           <input value={userProfile?.level || ''} onChange={e => setUserProfile({ ...userProfile, level: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Étudiante en Droit" />
+                           <input value={userProfile?.level || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, level: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Étudiante en Droit" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
-                        <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile({ ...userProfile, interests: e.target.value.split(',').map(it => it.trim()) })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
+                        <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, interests: e.target.value.split(',').map(it => it.trim()) } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
                       </div>
                       <div>
                          <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
-                         <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile({ ...userProfile, bio: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
+                         <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, bio: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
                       </div>
                       <div className="flex space-x-3 pt-4">
                          <button 
@@ -489,9 +480,9 @@ const MentoreeDashboard: React.FC<{ onNavigate: (page: string) => void }> = ({ o
                            </div>
                            <p className="text-gray-500 mb-4 font-medium bg-gray-50 px-4 py-2 rounded-xl inline-block text-sm">{userProfile?.email}</p>
                            
-                           {userProfile?.interests?.length > 0 && (
+                           {(userProfile?.interests?.length || 0) > 0 && (
                              <div className="flex flex-wrap gap-1 mb-4 justify-center md:justify-start">
-                               {userProfile.interests.map((it, idx) => (
+                               {userProfile?.interests?.map((it, idx) => (
                                  <span key={idx} className="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">#{it}</span>
                                ))}
                              </div>

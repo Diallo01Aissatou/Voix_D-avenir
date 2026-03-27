@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, ArrowLeft, User, Paperclip, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Api from '../../data/Api'; // Importation du service Api
 
 interface Message {
   _id: string;
@@ -43,13 +44,8 @@ const DynamicChat: React.FC<DynamicChatProps> = ({ otherUserId, otherUserName, o
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch(`https://voix-avenir-backend.onrender.com/api/messages/${otherUserId}`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(data);
-      }
+      const res = await Api.get(`/messages/${otherUserId}`);
+      setMessages(res.data);
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
@@ -71,19 +67,14 @@ const DynamicChat: React.FC<DynamicChatProps> = ({ otherUserId, otherUserName, o
         formData.append('file', fileInputRef.current.files[0]);
       }
 
-      const response = await fetch('https://voix-avenir-backend.onrender.com/api/messages', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData
+      const res = await Api.post('/messages', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (response.ok) {
-        const sentMessage = await response.json();
-        setMessages(prev => [...prev, sentMessage]);
-        setNewMessage('');
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+      setMessages(prev => [...prev, res.data]);
+      setNewMessage('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
     } catch (error) {
       console.error('Erreur:', error);
