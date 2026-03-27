@@ -6,7 +6,7 @@ interface ResourcesPageProps {
   onNavigate: (page: string) => void;
 }
 
-const ResourcesPage: React.FC = () => {
+const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedType, setSelectedType] = useState('');

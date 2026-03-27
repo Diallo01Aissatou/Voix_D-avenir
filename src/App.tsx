@@ -68,8 +68,8 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <span className="text-white font-bold text-2xl">V</span>
+          <div className="w-24 h-24 bg-transparent flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Logo Voix d'Avenir" className="w-20 h-20 object-contain mix-blend-multiply" />
           </div>
           <p className="text-gray-600">Chargement de Voix D'avenir...</p>
         </div>
