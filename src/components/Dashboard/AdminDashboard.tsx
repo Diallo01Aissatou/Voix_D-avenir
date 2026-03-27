@@ -20,12 +20,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     }
     return url.replace('http://', 'https://');
   };
-  const [users, setUsers] = useState([]);
-  const [requests, setRequests] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalMentores: 0,
     totalMentorees: 0,
+    approvedMentores: 0,
     totalRequests: 0,
     pendingRequests: 0,
     acceptedRequests: 0
@@ -599,6 +600,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         totalUsers: 0,
         totalMentores: 0,
         totalMentorees: 0,
+        approvedMentores: 0,
         totalRequests: 0,
         pendingRequests: 0,
         acceptedRequests: 0
@@ -756,8 +758,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <UserCheck className="w-6 h-6 text-purple-600" />
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-800">{stats.totalMentores}</p>
-                <p className="text-sm text-gray-600">Mentores</p>
+                <p className="text-2xl font-bold text-gray-800">{stats.approvedMentores || 0} / {stats.totalMentores}</p>
+                <p className="text-sm text-gray-600">Mentores (Approuvés / Total)</p>
               </div>
             </div>
           </div>
@@ -925,26 +927,47 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                  }`}>
-                                  {user.verified ? 'Actif' : 'Inactif'}
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                  {user.verified ? 'Vérifié' : 'Non vérifié'}
                                 </span>
+                                {user.role === 'mentore' && (
+                                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${user.isApproved ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                    {user.isApproved ? 'Approuvé' : 'En attente'}
+                                  </span>
+                                )}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <button
-                                  onClick={() => toggleUserStatus(user._id, user.verified)}
-                                  disabled={isLoading}
-                                  className={`px-3 py-1 rounded text-xs transition-colors disabled:opacity-50 ${user.verified ? 'bg-yellow-600 text-white hover:bg-yellow-700' : 'bg-green-600 text-white hover:bg-green-700'
-                                    }`}
-                                >
-                                  {user.verified ? 'Désactiver' : 'Activer'}
-                                </button>
+                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                 <button
                                   onClick={() => deleteUser(user._id)}
-                                  disabled={isLoading}
                                   className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors disabled:opacity-50"
                                 >
                                   Supprimer
+                                </button>
+                                {user.role === 'mentore' && !user.isApproved && (
+                                  <button
+                                    onClick={async () => {
+                                      if (confirm(`Approuver ${user.name} en tant que mentor ?`)) {
+                                        try {
+                                          await Api.put(`/users/admin/approve/${user._id}`);
+                                          loadUsers();
+                                          refreshStats();
+                                          alert('Mentor approuvé');
+                                        } catch (err) {
+                                          alert('Erreur lors de l\'approbation');
+                                        }
+                                      }
+                                    }}
+                                    className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors disabled:opacity-50"
+                                  >
+                                    Approuver
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => toggleUserStatus(user._id, user.verified)}
+                                  className={`px-3 py-1 rounded text-xs transition-colors disabled:opacity-50 ${user.verified ? 'bg-yellow-600 text-white hover:bg-yellow-700' : 'bg-blue-600 text-white hover:bg-blue-700'
+                                    }`}
+                                >
+                                  {user.verified ? 'Désactiver' : 'Activer'}
                                 </button>
                               </td>
                             </tr>
