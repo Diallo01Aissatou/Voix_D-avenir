@@ -16,7 +16,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <img
                 src={`${import.meta.env.BASE_URL}logo.png`}
                 alt="Voix d'Avenir Logo"
-                className="h-16 w-auto object-contain bg-white rounded-lg p-1"
+                className="h-16 w-auto object-contain"
               />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
