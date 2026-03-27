@@ -161,7 +161,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
 
               <div className="grid grid-cols-1 gap-3">
                 <a
-                  href="https://voix-avenir-backend.onrender.com/api/auth/google"
+                  href={`https://voix-avenir-backend.onrender.com/api/auth/google?role=${formData.role}`}
                   className="flex items-center justify-center space-x-2 py-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
