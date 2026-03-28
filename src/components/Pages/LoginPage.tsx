@@ -170,11 +170,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <a
-                    href="https://voix-avenir-backend.onrender.com/api/auth/facebook"
+                    href="https://voix-avenir-backend.onrender.com/api/auth/tiktok"
                     className="flex items-center justify-center space-x-2 py-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
                   >
-                    <img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" className="w-5 h-5" />
-                    <span className="font-semibold text-gray-700">Facebook</span>
+                    <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok" className="w-5 h-5 rounded" />
+                    <span className="font-semibold text-gray-700">TikTok</span>
                   </a>
                   
                   <a
