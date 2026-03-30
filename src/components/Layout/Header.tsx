@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
             <img
               src={`${import.meta.env.BASE_URL}logo.png`}
               alt="Voix D'avenir Logo"
-              className="h-10 w-auto bg-transparent mix-blend-multiply"
+              className="h-10 w-auto bg-transparent"
             />
           </div>
 
