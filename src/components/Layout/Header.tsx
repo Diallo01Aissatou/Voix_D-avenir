@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import NotificationSystem from '../Dashboard/NotificationSystem';
-import Api, { BASE_URL } from '../../data/Api';
+
 
 
 interface HeaderProps {
