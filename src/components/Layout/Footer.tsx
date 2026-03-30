@@ -12,11 +12,11 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo et Description */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-3">
+            <div className="bg-white p-2 rounded-xl inline-block mb-2">
               <img
                 src={`${import.meta.env.BASE_URL}logo.png`}
                 alt="Voix d'Avenir Logo"
-                className="h-16 w-auto object-contain bg-transparent mix-blend-multiply"
+                className="h-16 w-auto object-contain"
               />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
