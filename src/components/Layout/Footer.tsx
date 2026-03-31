@@ -12,11 +12,13 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo et Description */}
           <div className="space-y-4">
+            <div className="bg-white/95 p-3 rounded-2xl inline-block shadow-lg backdrop-blur-sm transform hover:scale-105 transition-all">
               <img
                 src={`${import.meta.env.BASE_URL}logo.png`}
                 alt="Voix d'Avenir Logo"
                 className="h-24 w-auto object-contain"
               />
+            </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Plateforme de mentorat pour connecter les jeunes filles guinéennes
               à des femmes expertes et inspirantes. En route avec Voix D'avenir.
