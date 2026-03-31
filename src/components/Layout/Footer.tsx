@@ -7,7 +7,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-gradient-to-br from-[#1a0b2e] to-[#0d0517] text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo et Description */}
@@ -222,7 +222,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <hr className="my-8 border-gray-800" />
+        <hr className="my-8 border-purple-800/30" />
 
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
           <div className="flex items-center space-x-1">
