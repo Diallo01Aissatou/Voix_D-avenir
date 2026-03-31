@@ -57,25 +57,6 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const [message, setMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
-  const cities: string[] = [...new Set([
-    'Beyla', 'Boffa', 'Boké', 'Coléah', 'Conakry', 'Coyah', 'Dabola', 'Dalaba',
-    'Dinguiraye', 'Dubreka', 'Faranah', 'Forcécariah', 'Fria', 'Gaoual', 'Guéckédou',
-    'Kankan', 'Kérouane', 'Kindia', 'Kissidougou', 'Koubia', 'Koundara', 'Kouroussa',
-    'Labé', 'Lélouma', 'Lola', 'Macenta', 'Mali', 'Mamou', 'Mandiana', 'N\'Zérékoré',
-    'Pita', 'Siguiri', 'Télimélé', 'Tougue', 'Yomou',
-    'Baro', 'Benti', 'Bignamou', 'Bintimodia', 'Bissikrima', 'Bomboli', 'Boussou',
-    'Dabiss', 'Damaro', 'Diari', 'Diecke', 'Diountou', 'Ditinn', 'Doko', 'Donghol-Touma',
-    'Douprou', 'Forécariah', 'Foulamory', 'Friguiagbé', 'Gadha-Woundou', 'Ganta',
-    'Gbangbadou', 'Gberedou-Baranama', 'Gbessoba', 'Gouécké', 'Hafia', 'Hérico',
-    'Kamsar', 'Kania', 'Kassa', 'Koba', 'Kolangui', 'Kolda', 'Kondétou', 'Konia',
-    'Koumbia', 'Kouremalé', 'Koyamah', 'Kpéléyah', 'Lansanaya', 'Lelouma', 'Linsan',
-    'Loguéya', 'Madina-Oula', 'Maférinyah', 'Malapouya', 'Mambia', 'Mandiana',
-    'Matakang', 'Matoto', 'Médina-Gounass', 'Morodou', 'Moussaya', 'Nafadji',
-    'Niagassola', 'Norasoba', 'Ouende-Kénéma', 'Ouré-Kaba', 'Pamalap', 'Popodara',
-    'Ratoma', 'Sagalé', 'Sambailo', 'Sangarédi', 'Saramoussaya', 'Sérédou',
-    'Singuéléya', 'Sokotoro', 'Soumba', 'Tabounsou', 'Tanéné', 'Tolo', 'Tondon',
-    'Tougnifili', 'Wendou-Bosséya', 'Wonkifong', 'Yalenzou', 'Yembéring', 'Youkounkoun'
-  ])].sort();
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -337,19 +318,16 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                   <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                     Ville *
                   </label>
-                  <select
+                  <input
+                    type="text"
                     id="city"
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
+                    placeholder="Votre ville"
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${errors.city ? 'border-red-500' : 'border-gray-300'
                       }`}
-                  >
-                    <option value="">Sélectionnez votre ville</option>
-                    {cities.map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
+                  />
                   {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                 </div>
               </div>
