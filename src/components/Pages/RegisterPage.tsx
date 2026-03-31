@@ -175,7 +175,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Voix D'avenir Logo" className="h-16 w-auto bg-transparent" />
+              <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Voix D'avenir Logo" className="h-24 w-auto bg-transparent" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Créer un Compte</h1>
             <p className="text-gray-600">Rejoignez la communauté Voix D'avenir</p>
