@@ -170,7 +170,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <a
-                    href="https://voix-avenir-backend.onrender.com/api/auth/tiktok"
+                    href={`https://voix-avenir-backend.onrender.com/api/auth/tiktok?role=${formData.role}`}
                     className="flex items-center justify-center space-x-2 py-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
                   >
                     <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok" className="w-5 h-5 rounded" />
@@ -185,6 +185,25 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                     <span className="font-semibold text-gray-700">LinkedIn</span>
                   </a>
                 </div>
+              </div>
+
+              <div className="text-center text-xs text-gray-500 my-4">
+                En continuant, vous acceptez nos{' '}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('terms-of-service')}
+                  className="text-purple-600 hover:underline"
+                >
+                  Conditions d'Utilisation
+                </button>{' '}
+                et notre{' '}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('privacy-policy')}
+                  className="text-purple-600 hover:underline"
+                >
+                  Politique de Confidentialité
+                </button>.
               </div>
 
               <div className="text-center">

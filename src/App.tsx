@@ -22,6 +22,8 @@ import NotificationDemoPage from './components/Pages/NotificationDemoPage';
 import VoixAvenirNotificationsDemo from './components/Pages/VoixAvenirNotificationsDemo';
 import ContactPage from './components/Pages/ContactPage';
 import HelpCenterPage from './components/Pages/HelpCenterPage';
+import PrivacyPolicy from './components/Pages/PrivacyPolicy';
+import TermsOfService from './components/Pages/TermsOfService';
 import IntelligentChatbot from './components/Chatbot/IntelligentChatbot';
 
 
@@ -115,6 +117,10 @@ function AppContent() {
         return <ContactPage onNavigate={handleNavigate} />;
       case 'help-center':
         return <HelpCenterPage onNavigate={handleNavigate} />;
+      case 'privacy-policy':
+        return <PrivacyPolicy onNavigate={handleNavigate} />;
+      case 'terms-of-service':
+        return <TermsOfService onNavigate={handleNavigate} />;
       case 'notification-demo':
         return <NotificationDemoPage onNavigate={handleNavigate} />;
       case 'voix-avenir-notifications':

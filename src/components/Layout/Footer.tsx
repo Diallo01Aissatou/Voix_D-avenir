@@ -104,6 +104,29 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </ul>
           </div>
 
+          {/* Légal */}
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Légal</h3>
+            <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => onNavigate('privacy-policy')}
+                  className="text-gray-600 hover:text-purple-600 transition-colors text-sm font-medium text-left"
+                >
+                  Politique de Confidentialité
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('terms-of-service')}
+                  className="text-gray-600 hover:text-purple-600 transition-colors text-sm font-medium text-left"
+                >
+                  Conditions d'Utilisation
+                </button>
+              </li>
+            </ul>
+          </div>
+
           {/* Contact */}
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Contact</h3>

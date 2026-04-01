@@ -455,6 +455,25 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                 </div>
               </div>
 
+              <div className="text-center text-xs text-gray-500 my-4">
+                En créant un compte, vous acceptez nos{' '}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('terms-of-service')}
+                  className="text-purple-600 hover:underline"
+                >
+                  Conditions d'Utilisation
+                </button>{' '}
+                et notre{' '}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('privacy-policy')}
+                  className="text-purple-600 hover:underline"
+                >
+                  Politique de Confidentialité
+                </button>.
+              </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
