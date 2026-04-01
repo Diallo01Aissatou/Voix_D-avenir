@@ -178,7 +178,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                   </a>
                   
                   <a
-                    href="https://voix-avenir-backend.onrender.com/api/auth/linkedin"
+                    href={`https://voix-avenir-backend.onrender.com/api/auth/linkedin?role=${formData.role}`}
                     className="flex items-center justify-center space-x-2 py-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors"
                   >
                     <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" alt="LinkedIn" className="w-5 h-5" />
