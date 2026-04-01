@@ -40,6 +40,10 @@ function AppContent() {
 
     if (page === 'reset-password' && token) {
       setCurrentPage('reset-password');
+    } else if (page === 'privacy-policy') {
+      setCurrentPage('privacy-policy');
+    } else if (page === 'terms-of-service') {
+      setCurrentPage('terms-of-service');
     }
   }, []);
 
