@@ -161,7 +161,7 @@ const IntelligentChatbot: React.FC = () => {
 
             const botMessage: Message = {
                 id: (Date.now() + 1).toString(),
-                text: "Désolé, je rencontre une petite difficulté technique pour me connecter à mon cerveau IA. 🧠 Peux-tu réessayer dans un instant ?\n\n[INFO POUR DEBUG: " + (error.response?.data?.details || error.response?.data?.error || error.message || String(error)) + "]",
+                text: "Désolé, je rencontre une petite difficulté technique pour me connecter à mon cerveau IA. 🧠 Peux-tu réessayer dans un instant ?",
                 sender: 'bot',
                 timestamp: new Date(),
             };
