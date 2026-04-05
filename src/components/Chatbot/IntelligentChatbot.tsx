@@ -291,7 +291,7 @@ const IntelligentChatbot: React.FC = () => {
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 placeholder="Posez votre question..."
-                                className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-gray-700 placeholder-gray-400"
+                                className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-sm text-gray-700 placeholder-gray-400"
                             />
                             <button
                                 type="submit"
