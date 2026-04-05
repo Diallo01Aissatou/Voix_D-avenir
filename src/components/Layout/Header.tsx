@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
   return (
     <header className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-0">
-        <div className="flex items-center justify-between py-4 lg:py-1">
+        <div className="flex items-center justify-between py-2 lg:py-1">
           {/* Logo */}
           <div
             className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
             <img
               src={`${import.meta.env.BASE_URL}logo.png`}
               alt="Voix D'avenir Logo"
-              className="h-14 w-auto bg-transparent"
+              className="h-24 w-auto bg-transparent"
             />
           </div>
 

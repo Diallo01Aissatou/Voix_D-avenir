@@ -93,9 +93,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return true;
       }
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur de connexion:', error);
-      return false;
+      throw new Error(error.response?.data?.message || "Une erreur est survenue lors de la connexion");
     } finally {
       setIsLoading(false);
     }

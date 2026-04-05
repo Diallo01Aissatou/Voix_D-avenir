@@ -43,7 +43,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
         setError('Email ou mot de passe incorrect');
       }
     } catch (err: any) {
-      setError('Une erreur est survenue lors de la connexion');
+      setError(err.message || 'Une erreur est survenue lors de la connexion');
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +63,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Voix D'avenir Logo" className="h-24 w-auto bg-transparent" />
+              <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Voix D'avenir Logo" className="h-48 w-auto bg-transparent" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Connexion</h1>
             <p className="text-gray-600">Accédez à votre espace personnel</p>
