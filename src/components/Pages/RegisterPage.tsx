@@ -94,6 +94,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
 
 
   const validateForm = (): boolean => {
@@ -128,30 +129,32 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
         ? formData.interests.split(',').map(s => s.trim()).filter(Boolean)
         : [];
 
-      const fd = new FormData();
-      fd.append('name', formData.name);
-      fd.append('email', formData.email);
-      fd.append('password', formData.password);
-      fd.append('role', formData.role);
+      const payload: any = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        city: formData.city,
+        level: formData.education,
+        profession: formData.profession,
+        expertise: expertiseArray.join(', '),
+        interests: interestsArray.join(', ')
+      };
 
-      if (formData.age) fd.append('age', String(parseInt(formData.age, 10)));
-      if (formData.city) fd.append('city', formData.city);
-      if (formData.education) fd.append('level', formData.education);
-      if (formData.profession) fd.append('profession', formData.profession);
+      if (formData.age) payload.age = parseInt(formData.age, 10);
 
-      if (expertiseArray.length) fd.append('expertise', expertiseArray.join(', '));
-      if (interestsArray.length) fd.append('interests', interestsArray.join(', '));
-
-      if (formData.bio) fd.append('bio', formData.bio);
+      if (formData.bio) payload.bio = formData.bio;
       
       // Compression et conversion en Base64 si une photo est présente
       if (photoFile) {
+        setLoadingMessage('Optimisation de la photo...');
         const compressed = await compressImage(photoFile);
         const base64 = await fileToBase64(compressed);
-        fd.append('photo', base64);
+        payload.photo = base64;
       }
 
-      const success = await register(fd);
+      setLoadingMessage('Création de votre compte...');
+      const success = await register(payload);
 
       if (success) {
         setMessage('Inscription réussie ! Redirection vers votre tableau de bord...');
@@ -518,7 +521,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                 </button>.
               </div>
 
-               <button
+              <button
                 type="submit"
                 disabled={isLoading}
                 className={`w-full py-4 px-6 rounded-lg font-semibold text-white transition-all duration-300 ${isLoading
@@ -526,7 +529,12 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                   : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105'
                   }`}
               >
-                {isLoading ? 'Inscription en cours...' : 'Créer mon compte'}
+                {isLoading ? (
+                   <div className="flex flex-col items-center">
+                     <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mb-2"></div>
+                     <span className="text-sm">{loadingMessage || 'Inscription en cours...'}</span>
+                   </div>
+                ) : 'Créer mon compte'}
               </button>
 
               {/* Les options d'inscription sociale ont été supprimées à la demande de l'utilisateur */}
