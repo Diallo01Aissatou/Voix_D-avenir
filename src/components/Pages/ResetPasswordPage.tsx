@@ -88,8 +88,16 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = ({ onNavigate, token
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-700 text-sm">{error}</p>
+          <div className="mb-4">
+             <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-2">
+               <p className="text-red-700 text-sm font-semibold">{error}</p>
+             </div>
+             {/* Bloc de diagnostic technique */}
+             <div className="p-3 bg-gray-100 border border-gray-200 rounded text-[10px] font-mono break-all text-gray-500">
+               <p>URL: {window.location.search}</p>
+               <p>Token final: {token || new URLSearchParams(window.location.search).get('token') || 'O_NON_TROUVE'}</p>
+               <p>Note: Si le token est O_NON_TROUVE, copiez l'URL complète de votre navigateur et envoyez-la moi.</p>
+             </div>
           </div>
         )}
 
