@@ -30,6 +30,44 @@ interface RegisterPageProps {
   onNavigate: (page: string) => void;
 }
 
+// Fonction utilitaire pour convertir un fichier en Base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+// Fonction utilitaire pour compresser les images
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const max = 250; // Format réduit pour la performance
+        if (width > height && width > max) { height *= max / width; width = max; }
+        else if (height > max) { width *= max / height; height = max; }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (blob) resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+          else resolve(file);
+        }, 'image/jpeg', 0.5);
+      };
+    };
+  });
+};
+
 const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const { register } = useAuth();
 
@@ -105,7 +143,13 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
       if (interestsArray.length) fd.append('interests', interestsArray.join(', '));
 
       if (formData.bio) fd.append('bio', formData.bio);
-      if (photoFile) fd.append('photo', photoFile);
+      
+      // Compression et conversion en Base64 si une photo est présente
+      if (photoFile) {
+        const compressed = await compressImage(photoFile);
+        const base64 = await fileToBase64(compressed);
+        fd.append('photo', base64);
+      }
 
       const success = await register(fd);
 
