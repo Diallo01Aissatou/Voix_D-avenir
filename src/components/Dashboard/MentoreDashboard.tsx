@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MessageSquare, User, Clock, CheckCircle, XCircle, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import Api from '../../data/Api'; // Importation du service Api
+import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
@@ -38,12 +38,12 @@ const compressImage = (file: File): Promise<File> => {
 let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  let url = photo;
-  if (!photo.startsWith('http')) {
-    const fileName = photo.split('/').pop();
-    url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
-  }
-  return (url.replace('http://', 'https://')) + `?v=${photoVersion}`;
+  if (photo.startsWith('http')) return photo + `?v=${photoVersion}`;
+
+  // Utiliser l'URL de l'API dynamiquement au lieu de la coder en dur
+  const baseUrlClean = BASE_URL.replace(/\/api$/, '');
+  const fileName = photo.split('/').pop();
+  return `${baseUrlClean}/uploads/${fileName}?v=${photoVersion}`;
 };
 
 // Composant pour l'image de profil avec fallback
@@ -392,8 +392,11 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
             alt="Aperçu" 
             className="w-24 h-24 rounded-2xl shadow-md border-4 border-white"
           />
-          <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-2xl opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
-            <Camera className="w-8 h-8" />
+          <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-2xl opacity-100 md:opacity-0 md:group-hover:opacity-100 cursor-pointer transition-opacity">
+            <div className="text-center">
+              <Camera className="w-8 h-8 mx-auto" />
+              <span className="text-[10px] font-bold">Modifier</span>
+            </div>
             <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
           </label>
         </div>
