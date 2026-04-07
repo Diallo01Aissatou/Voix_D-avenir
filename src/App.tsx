@@ -39,6 +39,8 @@ function AppContent() {
     const token = urlParams.get('token');
 
     if (page === 'reset-password' && token) {
+      // Sauvegarder le token en localStorage par sécurité pour éviter les pertes lors des redirections
+      localStorage.setItem('resetPasswordToken', token);
       setCurrentPage('reset-password');
     } else if (page === 'privacy-policy') {
       setCurrentPage('privacy-policy');

@@ -32,9 +32,9 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = ({ onNavigate, token
 
     setIsLoading(true);
 
-    // S'assurer de récupérer le token du prop OU de l'URL si prop manquant
+    // S'assurer de récupérer le token du prop, de l'URL, OU du localStorage (Dernière chance)
     const urlParams = new URLSearchParams(window.location.search);
-    const finalToken = token || urlParams.get('token');
+    const finalToken = token || urlParams.get('token') || localStorage.getItem('resetPasswordToken');
 
     if (!finalToken) {
       setError('Lien de réinitialisation invalide ou corrompu (Token non trouvé)');
@@ -44,6 +44,8 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = ({ onNavigate, token
 
     try {
       await Api.post(`/auth/reset-password/${finalToken}`, { password });
+      // Nettoyer après succès
+      localStorage.removeItem('resetPasswordToken');
       setSuccess(true);
     } catch (error: any) {
       setError(error.response?.data?.message || 'Erreur lors de la réinitialisation');
@@ -94,9 +96,10 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = ({ onNavigate, token
              </div>
              {/* Bloc de diagnostic technique */}
              <div className="p-3 bg-gray-100 border border-gray-200 rounded text-[10px] font-mono break-all text-gray-500">
-               <p>URL: {window.location.search}</p>
-               <p>Token final: {token || new URLSearchParams(window.location.search).get('token') || 'O_NON_TROUVE'}</p>
-               <p>Note: Si le token est O_NON_TROUVE, copiez l'URL complète de votre navigateur et envoyez-la moi.</p>
+               <p>URL Search: {window.location.search || 'VIDE'}</p>
+               <p>Prop Token: {token || 'NON_RECU'}</p>
+               <p>Local Storage: {localStorage.getItem('resetPasswordToken') || 'VIDE'}</p>
+               <p>Token final: {token || new URLSearchParams(window.location.search).get('token') || localStorage.getItem('resetPasswordToken') || 'TOTAL_ECHEC'}</p>
              </div>
           </div>
         )}
