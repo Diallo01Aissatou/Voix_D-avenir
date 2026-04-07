@@ -5,6 +5,16 @@ import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
 import MessageriePage from './MessageriePage';
 import NotificationSystem from './NotificationSystem';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
+ 
+// Fonction utilitaire pour convertir un fichier en Base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
 
 // Fonction utilitaire pour compresser les images
 const compressImage = (file: File): Promise<File> => {
@@ -18,7 +28,7 @@ const compressImage = (file: File): Promise<File> => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const max = 800;
+        const max = 250; 
         if (width > height && width > max) { height *= max / width; width = max; }
         else if (height > max) { width *= max / height; height = max; }
         canvas.width = width;
@@ -28,7 +38,7 @@ const compressImage = (file: File): Promise<File> => {
         canvas.toBlob((blob) => {
           if (blob) resolve(new File([blob], file.name, { type: 'image/jpeg' }));
           else resolve(file);
-        }, 'image/jpeg', 0.7);
+        }, 'image/jpeg', 0.5);
       };
     };
   });
@@ -38,7 +48,7 @@ const compressImage = (file: File): Promise<File> => {
 let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  if (photo.startsWith('http')) return photo + `?v=${photoVersion}`;
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
 
   // Utiliser l'URL de l'API dynamiquement au lieu de la coder en dur
   const baseUrlClean = BASE_URL.replace(/\/api$/, '');
@@ -333,9 +343,10 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
     bio: currentUser?.bio || '', 
     expertise: currentUser?.expertise?.join(', ') || '',
     city: currentUser?.city || '',
-    profession: currentUser?.profession || ''
+    profession: currentUser?.profession || '',
+    photo: currentUser?.photo || ''
   });
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -343,36 +354,31 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
     const file = e.target.files?.[0];
     if (file) {
       const compressed = await compressImage(file);
+      const base64 = await fileToBase64(compressed);
+      setProfileData({ ...profileData, photo: base64 });
       setPhotoFile(compressed);
-      setPhotoPreview(URL.createObjectURL(compressed));
+      setPhotoPreview(base64);
     }
   };
 
   const handleSave = async () => {
     setLoading(true);
     try {
-      // 1. Text fields
-      const res = await Api.put('/users/profile', { ...profileData, expertise: profileData.expertise.split(',').map((e: string) => e.trim()) });
+      // 1. Mettre à jour tous les champs (y compris la photo en Base64 si modifiée)
+      const res = await Api.put('/users/profile', { 
+        ...profileData, 
+        expertise: profileData.expertise.split(',').map((e: string) => e.trim()) 
+      });
 
       let finalUser = null;
       if (res.data && res.data.user) {
         finalUser = res.data.user;
       }
 
-      // 2. Photo
-      if (photoFile) {
-        const formData = new FormData();
-        formData.append('photo', photoFile);
-        const photoRes = await Api.post('/users/profile/photo', formData);
-        if (photoRes.data && photoRes.data.user) {
-          finalUser = photoRes.data.user;
-        }
-      }
-
       if (finalUser) { 
         setCurrentUser(finalUser);
         localStorage.setItem('mentora_user', JSON.stringify(finalUser));
-        alert('Profil mis à jour !'); 
+        alert('Profil mis à jour (stockage permanent) !'); 
         setPhotoFile(null);
         setPhotoPreview(null);
         photoVersion = Date.now(); 

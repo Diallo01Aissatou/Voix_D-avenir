@@ -12,6 +12,16 @@ import SessionsManagerMentoree from './SessionsManagerMentoree';
 import SessionNotifications from './SessionNotifications';
 import TestimonialManager from './TestimonialManager';
 
+// Fonction utilitaire pour convertir un fichier en Base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 // Fonction utilitaire pour compresser les images
 const compressImage = (file: File): Promise<File> => {
   return new Promise((resolve) => {
@@ -24,7 +34,7 @@ const compressImage = (file: File): Promise<File> => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const max = 800;
+        const max = 250; // Réduit drastiquement pour la performance (Base64 permanent)
         if (width > height && width > max) { height *= max / width; width = max; }
         else if (height > max) { width *= max / height; height = max; }
         canvas.width = width;
@@ -34,7 +44,7 @@ const compressImage = (file: File): Promise<File> => {
         canvas.toBlob((blob) => {
           if (blob) resolve(new File([blob], file.name, { type: 'image/jpeg' }));
           else resolve(file);
-        }, 'image/jpeg', 0.7);
+        }, 'image/jpeg', 0.5); // Qualité réduite pour alléger la base de données
       };
     };
   });
@@ -44,7 +54,7 @@ const compressImage = (file: File): Promise<File> => {
 let photoVersion = Date.now(); // Version globale stable par session
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  if (photo.startsWith('http')) return photo + `?v=${photoVersion}`;
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
   
   // Utiliser l'URL de l'API dynamiquement au lieu de la coder en dur
   const baseUrlClean = BASE_URL.replace(/\/api$/, '');
@@ -100,7 +110,7 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -170,12 +180,13 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        // Optionnel : on peut informer l'utilisateur qu'on compresse
         console.log("Compression en cours...");
       }
       const compressed = await compressImage(file);
+      const base64 = await fileToBase64(compressed);
+      setUserProfile(prev => prev ? { ...prev, photo: base64 } : null);
+      setPhotoPreview(base64);
       setPhotoFile(compressed);
-      setPhotoPreview(URL.createObjectURL(compressed));
     }
   };
 
@@ -187,20 +198,10 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
     try {
       let finalUser = null;
 
-      // 1. Mettre à jour les champs texte
+      // 1. Mettre à jour tous les champs (y compris la photo en Base64)
       const res = await Api.put('/users/profile', userProfile);
       if (res.data && res.data.user) {
         finalUser = res.data.user;
-      }
-
-      // 2. Mettre à jour la photo si une nouvelle est sélectionnée
-      if (photoFile) {
-        const formData = new FormData();
-        formData.append('photo', photoFile);
-        const photoRes = await Api.post('/users/profile/photo', formData);
-        if (photoRes.data && photoRes.data.user) {
-          finalUser = photoRes.data.user; // Utiliser l'utilisateur mis à jour avec la nouvelle photo
-        }
       }
 
       if (finalUser) {
@@ -212,9 +213,9 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
       setIsEditingProfile(false); 
       setPhotoFile(null);
       setPhotoPreview(null);
-      photoVersion = Date.now(); // Forcer la mise à jour de la photo partout lors du prochain rendu
+      photoVersion = Date.now();
       await loadUserProfile();
-      alert('Profil mis à jour avec succès !'); 
+      alert('Profil mis à jour avec succès (stockage permanent débloqué) !'); 
     } catch (err: any) { 
       console.error(err);
       alert(err.message || 'Une erreur est survenue lors de la mise à jour.');
@@ -320,7 +321,7 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
             {activeTab === 'find-mentor' && (
               <div className="space-y-6">
                  {/* Recommandations */}
-                 {userProfile?.interests?.length > 0 && (
+                 {(userProfile?.interests?.length || 0) > 0 && (
                   <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl mb-8">
                     <h3 className="text-lg font-bold mb-4 flex items-center">
                       <Star className="w-5 h-5 mr-2 text-yellow-300" />
