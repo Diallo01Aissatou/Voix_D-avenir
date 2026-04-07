@@ -32,8 +32,18 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = ({ onNavigate, token
 
     setIsLoading(true);
 
+    // S'assurer de récupérer le token du prop OU de l'URL si prop manquant
+    const urlParams = new URLSearchParams(window.location.search);
+    const finalToken = token || urlParams.get('token');
+
+    if (!finalToken) {
+      setError('Lien de réinitialisation invalide ou corrompu (Token non trouvé)');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await Api.post(`/auth/reset-password/${token}`, { password });
+      await Api.post(`/auth/reset-password/${finalToken}`, { password });
       setSuccess(true);
     } catch (error: any) {
       setError(error.response?.data?.message || 'Erreur lors de la réinitialisation');
