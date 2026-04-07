@@ -13,12 +13,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const getPhotoUrl = (photo: string | undefined) => {
     if (!photo) return null;
-    let url = photo;
-    if (!photo.startsWith('http')) {
-      const fileName = photo.split('/').pop();
-      url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
-    }
-    return url.replace('http://', 'https://');
+    if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+    
+    // Si c'est un chemin relatif, construire l'URL complète
+    const fileName = photo.split('/').pop();
+    return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
   };
   const [users, setUsers] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
@@ -904,8 +903,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
                                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                                    {user.photo ? (
-                                      <img src={`https://voix-avenir-backend.onrender.com${user.photo}`} alt={user.name} className="w-10 h-10 object-cover" />
+                                    {getPhotoUrl(user.photo) ? (
+                                      <img src={getPhotoUrl(user.photo)!} alt={user.name} className="w-10 h-10 object-cover" />
                                     ) : (
                                       <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
                                         {user.name?.charAt(0)?.toUpperCase()}
@@ -949,8 +948,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                       if (confirm(`Approuver ${user.name} en tant que mentor ?`)) {
                                         try {
                                           await Api.put(`/users/admin/approve/${user._id}`);
-                                          loadUsers();
-                                          refreshStats();
+                                          await loadUsers();
+                                          await refreshStats();
                                           alert('Mentor approuvé');
                                         } catch (err) {
                                           alert('Erreur lors de l\'approbation');
