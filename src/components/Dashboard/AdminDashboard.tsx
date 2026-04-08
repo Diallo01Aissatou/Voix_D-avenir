@@ -106,23 +106,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const loadPendingMentors = async () => {
+    // 1. Essayer l'endpoint dédié
     try {
       const response = await Api.get('/users/admin/pending');
       const fromApi = response.data.mentors || [];
       if (fromApi.length > 0) {
         setPendingMentors(fromApi);
-      } else {
-        // Fallback: filter from already-loaded users
-        const allResponse = await Api.get('/users/admin/all');
-        const allUsers = allResponse.data.users || allResponse.data || [];
-        const pending = allUsers.filter((u: any) => u.role === 'mentore' && !u.isApproved);
-        setPendingMentors(pending);
+        return;
       }
     } catch (error) {
-      console.error('Erreur chargement mentores en attente:', error);
-      // Fallback on error: filter from users
-      const pending = users.filter((u: any) => u.role === 'mentore' && !u.isApproved);
+      console.error('Erreur /admin/pending (endpoint peut-être pas encore déployé):', error);
+    }
+
+    // 2. Repli: charger TOUS les utilisateurs et filtrer côté frontend
+    try {
+      const allResponse = await Api.get('/users/admin/all');
+      const allUsers = allResponse.data.users || allResponse.data || [];
+      const pending = allUsers.filter((u: any) => u.role === 'mentore' && u.isApproved === false);
       setPendingMentors(pending);
+    } catch (err) {
+      console.error('Erreur repli pending mentors:', err);
+      setPendingMentors([]);
     }
   };
 
