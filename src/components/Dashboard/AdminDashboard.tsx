@@ -10,6 +10,9 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const [pendingMentors, setPendingMentors] = useState<any[]>([]);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
 
   const getPhotoUrl = (photo: string | undefined) => {
     if (!photo) return null;
@@ -55,11 +58,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     loadUsers(); // Charger au démarrage
     loadRequests();
     loadPartners();
+    loadPendingMentors();
   }, []);
 
   useEffect(() => {
     if (activeTab === 'users') {
       loadUsers();
+    }
+    if (activeTab === 'approvals') {
+      loadPendingMentors();
     }
     if (activeTab === 'testimonials') {
       loadTestimonials();
@@ -95,6 +102,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   // Recharger les stats après certaines actions
   const refreshStats = () => {
     loadStats();
+    loadPendingMentors();
+  };
+
+  const loadPendingMentors = async () => {
+    try {
+      const response = await Api.get('/users/admin/pending');
+      setPendingMentors(response.data.mentors || []);
+    } catch (error) {
+      console.error('Erreur chargement mentores en attente:', error);
+      setPendingMentors([]);
+    }
   };
 
   const loadExperts = async () => {
@@ -795,6 +813,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 Vue d'ensemble
               </button>
               <button
+                onClick={() => setActiveTab('approvals')}
+                className={`py-4 border-b-2 font-medium text-sm transition-colors flex items-center ${ activeTab === 'approvals'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <UserCheck className="w-4 h-4 inline mr-2" />
+                Approbation Mentores
+                {pendingMentors.length > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {pendingMentors.length}
+                  </span>
+                )}
+              </button>
+              <button
                 onClick={() => setActiveTab('users')}
                 className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'users'
                   ? 'border-purple-500 text-purple-600'
@@ -851,6 +884,137 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
           </div>
 
           <div className="p-6">
+            {/* ===== ONGLET APPROBATION MENTORES ===== */}
+            {activeTab === 'approvals' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-800">Approbation des Mentores</h3>
+                  <button onClick={loadPendingMentors} className="text-sm text-purple-600 font-medium hover:underline">
+                    Actualiser
+                  </button>
+                </div>
+                {pendingMentors.length === 0 ? (
+                  <div className="text-center py-16 text-gray-400">
+                    <UserCheck className="w-16 h-16 mx-auto mb-4 text-green-300" />
+                    <p className="text-lg font-medium text-gray-500">Aucune mentore en attente d'approbation</p>
+                    <p className="text-sm mt-1">Toutes les demandes ont été traitées.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {pendingMentors.map(mentor => (
+                      <div key={mentor._id} className="bg-white border border-gray-100 rounded-2xl shadow-md overflow-hidden flex flex-col">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-5 flex items-center space-x-4">
+                          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-purple-200">
+                            {getPhotoUrl(mentor.photo) ? (
+                              <img src={getPhotoUrl(mentor.photo)!} alt={mentor.name} className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display='none'; }} />
+                            ) : (
+                              <div className="w-full h-full bg-purple-100 flex items-center justify-center">
+                                <span className="text-xl font-bold text-purple-600">{mentor.name?.charAt(0)?.toUpperCase()}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-800">{mentor.name}</h4>
+                            <p className="text-xs text-gray-500">{mentor.email}</p>
+                            {mentor.city && <p className="text-xs text-purple-600 mt-0.5">📍 {mentor.city}</p>}
+                          </div>
+                        </div>
+                        {/* Details */}
+                        <div className="p-5 flex-1 space-y-3">
+                          {mentor.profession && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Profession</p>
+                              <p className="text-sm text-gray-700">{mentor.profession}</p>
+                            </div>
+                          )}
+                          {mentor.expertise && mentor.expertise.length > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Expertises</p>
+                              <div className="flex flex-wrap gap-1">
+                                {(Array.isArray(mentor.expertise) ? mentor.expertise : [mentor.expertise]).map((e: string, i: number) => (
+                                  <span key={i} className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">{e}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {mentor.bio && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Biographie</p>
+                              <p className="text-sm text-gray-600 line-clamp-4">{mentor.bio}</p>
+                            </div>
+                          )}
+                          {!mentor.profession && !mentor.bio && (!mentor.expertise || mentor.expertise.length === 0) && (
+                            <p className="text-sm text-gray-400 italic">Profil incomplet — aucune expertise ou bio renseignée.</p>
+                          )}
+                        </div>
+                        {/* Actions */}
+                        <div className="p-5 pt-0 space-y-2">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await Api.put(`/users/admin/approve/${mentor._id}`);
+                                  await loadPendingMentors();
+                                  await refreshStats();
+                                  alert(`${mentor.name} a été approuvée !`);
+                                } catch (err) { alert('Erreur lors de l\'approbation'); }
+                              }}
+                              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-bold text-sm transition-colors"
+                            >
+                              ✅ Approuver
+                            </button>
+                            <button
+                              onClick={() => setRejectingId(mentor._id)}
+                              className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-bold text-sm transition-colors"
+                            >
+                              ❌ Rejeter
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Modal de rejet */}
+                {rejectingId && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+                      <h4 className="font-bold text-lg mb-4 text-gray-800">Raison du rejet (optionnel)</h4>
+                      <textarea
+                        value={rejectReason}
+                        onChange={e => setRejectReason(e.target.value)}
+                        className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-red-400 outline-none"
+                        rows={4}
+                        placeholder="Ex: Profil incomplet, expertise non vérifiable..."
+                      />
+                      <div className="flex space-x-2 mt-4">
+                        <button onClick={() => { setRejectingId(null); setRejectReason(''); }} className="flex-1 border-2 border-gray-100 py-2 rounded-xl font-bold text-sm">
+                          Annuler
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await Api.put(`/users/admin/reject/${rejectingId}`, { reason: rejectReason });
+                              setRejectingId(null);
+                              setRejectReason('');
+                              await loadPendingMentors();
+                              await refreshStats();
+                              alert('Mentore rejetée et notifiée.');
+                            } catch (err) { alert('Erreur lors du rejet'); }
+                          }}
+                          className="flex-1 bg-red-500 text-white py-2 rounded-xl font-bold text-sm"
+                        >
+                          Confirmer le rejet
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {activeTab === 'overview' && (
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Vue d'ensemble de la plateforme</h3>
