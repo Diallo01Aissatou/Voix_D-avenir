@@ -108,10 +108,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const loadPendingMentors = async () => {
     try {
       const response = await Api.get('/users/admin/pending');
-      setPendingMentors(response.data.mentors || []);
+      const fromApi = response.data.mentors || [];
+      if (fromApi.length > 0) {
+        setPendingMentors(fromApi);
+      } else {
+        // Fallback: filter from already-loaded users
+        const allResponse = await Api.get('/users/admin/all');
+        const allUsers = allResponse.data.users || allResponse.data || [];
+        const pending = allUsers.filter((u: any) => u.role === 'mentore' && !u.isApproved);
+        setPendingMentors(pending);
+      }
     } catch (error) {
       console.error('Erreur chargement mentores en attente:', error);
-      setPendingMentors([]);
+      // Fallback on error: filter from users
+      const pending = users.filter((u: any) => u.role === 'mentore' && !u.isApproved);
+      setPendingMentors(pending);
     }
   };
 
