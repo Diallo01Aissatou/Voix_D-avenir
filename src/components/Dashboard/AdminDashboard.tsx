@@ -1478,7 +1478,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                     <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                                       {mentore.photo ? (
                                         <img
-                                          src={`https://voix-avenir-backend.onrender.com${mentore.photo}`}
+                                          src={getPhotoUrl(mentore.photo)!}
                                           alt={mentore.name}
                                           className="w-8 h-8 object-cover"
                                         />
