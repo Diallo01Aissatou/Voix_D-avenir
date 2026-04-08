@@ -1408,7 +1408,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
                               {(testimonial.adminCreated?.avatar || testimonial.mentee?.photo) ? (
                                 <img
-                                  src={testimonial.adminCreated?.avatar || `https://voix-avenir-backend.onrender.com${testimonial.mentee?.photo}`}
+                                  src={getPhotoUrl(testimonial.adminCreated?.avatar || testimonial.mentee?.photo)!}
                                   alt={testimonial.adminCreated?.name || testimonial.mentee?.name}
                                   className="w-10 h-10 object-cover"
                                   onError={(e) => {
@@ -1882,12 +1882,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           {item.image && (
                             <div className="ml-4">
                               <img
-                                src={`https://voix-avenir-backend.onrender.com${item.image}`}
+                                src={getPhotoUrl(item.image)!}
                                 alt={item.title}
                                 className="w-24 h-24 object-cover rounded-lg mb-2"
                               />
                               <a
-                                href={`https://voix-avenir-backend.onrender.com${item.image}`}
+                                href={getPhotoUrl(item.image)!}
                                 download
                                 className="text-xs text-purple-600 hover:text-purple-800 flex items-center"
                               >
