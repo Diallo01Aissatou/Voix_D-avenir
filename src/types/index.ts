@@ -17,6 +17,9 @@ export interface User {
   startTime?: string;
   endTime?: string;
   level?: string;
+  isApproved?: boolean;
+  verified?: boolean;
+  isMasterAdmin?: boolean;
 }
 
 

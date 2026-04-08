@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, User } from 'lucide-react';
+import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, User as UserIcon } from 'lucide-react';
 import Api from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
+import { User } from '../../types';
 
 interface AdminDashboardProps {
   onNavigate: (page: string) => void;
@@ -10,7 +11,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [pendingMentors, setPendingMentors] = useState<any[]>([]);
+  const [pendingMentors, setPendingMentors] = useState<User[]>([]);
   const [rejectReason, setRejectReason] = useState('');
   const [rejectingId, setRejectingId] = useState<string | null>(null);
 
@@ -22,7 +23,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     const fileName = photo.split('/').pop();
     return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
   };
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -122,7 +123,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       const allResponse = await Api.get('/users/admin/all');
       const allUsers = allResponse.data.users || allResponse.data || [];
-      const pending = allUsers.filter((u: any) => u.role === 'mentore' && u.isApproved === false);
+      const pending = allUsers.filter((u: User) => u.role === 'mentore' && u.isApproved === false);
       setPendingMentors(pending);
     } catch (err) {
       console.error('Erreur repli pending mentors:', err);
@@ -761,7 +762,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             ) : (
-              <User className="w-8 h-8 text-white" />
+              <UserIcon className="w-8 h-8 text-white" />
             )}
           </div>
           <div>
@@ -980,7 +981,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                               ✅ Approuver
                             </button>
                             <button
-                              onClick={() => setRejectingId(mentor._id)}
+                              onClick={() => setRejectingId(mentor._id!)}
                               className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-bold text-sm transition-colors"
                             >
                               ❌ Rejeter
@@ -1124,7 +1125,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                 <button
-                                  onClick={() => deleteUser(user._id)}
+                                  onClick={() => deleteUser(user._id!)}
                                   className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors disabled:opacity-50"
                                 >
                                   Supprimer
@@ -1149,7 +1150,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => toggleUserStatus(user._id, user.verified)}
+                                  onClick={() => toggleUserStatus(user._id!, user.verified || false)}
                                   className={`px-3 py-1 rounded text-xs transition-colors disabled:opacity-50 ${user.verified ? 'bg-yellow-600 text-white hover:bg-yellow-700' : 'bg-blue-600 text-white hover:bg-blue-700'
                                     }`}
                                 >
@@ -1580,7 +1581,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                             <div className="flex items-center mb-4">
                               {expert.user?.photo && (
                                 <img
-                                  src={`https://voix-avenir-backend.onrender.com${expert.user.photo}`}
+                                  src={getPhotoUrl(expert.user.photo)!}
                                   alt={expert.user.name}
                                   className="w-16 h-16 rounded-full object-cover mr-4"
                                 />
@@ -2170,7 +2171,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               {admin._id !== currentUser?.id && admin.email !== 'admin@mentora.gn' && (
                                 <button
-                                  onClick={() => deleteUser(admin._id)}
+                                  onClick={() => deleteUser(admin._id!)}
                                   className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors"
                                 >
                                   Supprimer
