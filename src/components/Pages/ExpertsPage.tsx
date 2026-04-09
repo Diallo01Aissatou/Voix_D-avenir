@@ -84,11 +84,18 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
             
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                <div className="h-96 lg:h-[500px] bg-white flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-100">
+                <div className="h-96 lg:h-[500px] bg-white flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-100 relative overflow-hidden">
+                  {/* Background Blur Effect */}
+                  <img 
+                    src={getPhotoUrl(featuredExpert.user?.photo)} 
+                    alt="" 
+                    className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
+                    aria-hidden="true"
+                  />
                   <img
                     src={getPhotoUrl(featuredExpert.user?.photo)}
                     alt={featuredExpert.user?.name}
-                    className="max-w-full max-h-full object-contain"
+                    className="relative z-10 max-w-full max-h-full object-contain"
                     style={{ imageRendering: 'initial' } as any}
                   />
                 </div>
@@ -152,11 +159,18 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {otherExperts.length > 0 ? otherExperts.map((expert) => (
               <div key={expert._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 overflow-hidden group">
-                <div className="h-80 overflow-hidden bg-white flex items-center justify-center border-b border-gray-100">
+                <div className="h-80 overflow-hidden bg-white flex items-center justify-center border-b border-gray-100 relative">
+                  {/* Background Blur Effect */}
+                  <img 
+                    src={getPhotoUrl(expert.user?.photo)} 
+                    alt="" 
+                    className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
+                    aria-hidden="true"
+                  />
                   <img
                     src={getPhotoUrl(expert.user?.photo)}
                     alt={expert.user?.name}
-                    className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                    className="relative z-10 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
                     style={{ imageRendering: 'pixelated' } as any}
                   />
                 </div>
