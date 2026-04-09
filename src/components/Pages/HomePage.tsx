@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Users, MapPin, Award, Heart, Star, Play, TrendingUp, Sparkles, MessageCircle, Send } from 'lucide-react';
-import Api from '../../data/Api';
+import Api, { BASE_URL } from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface HomePageProps {
@@ -21,6 +21,13 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [newsItems, setNewsItems] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const getPhotoUrl = (photo: string | undefined) => {
+    if (!photo) return null;
+    if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+    const fileName = photo.split('/').pop();
+    return `${BASE_URL}/uploads/${fileName}`;
+  };
 
   useEffect(() => {
     loadStats();
@@ -268,14 +275,16 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4 flex-shrink-0">
-                    {testimonial.author?.photo ? (
+                    {getPhotoUrl(testimonial.author?.photo) ? (
                       <img
-                        src={testimonial.author.photo.startsWith('http') ? testimonial.author.photo : `https://voix-avenir-backend.onrender.com/uploads/${testimonial.author.photo.split('/').pop()}`}
+                        src={getPhotoUrl(testimonial.author.photo)!}
                         alt={testimonial.author.name}
                         className="w-12 h-12 object-cover"
                         onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          ((e.target as HTMLImageElement).nextSibling as HTMLElement).style.display = 'flex';
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
                         }}
                       />
                     ) : null}

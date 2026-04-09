@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Award, MapPin, Briefcase, Quote, MessageSquare, ChevronRight } from 'lucide-react';
-import Api from '../../data/Api';
+import Api, { BASE_URL } from '../../data/Api';
 
 interface ExpertsPageProps {
   onNavigate: (page: string) => void;
@@ -16,7 +16,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
     if (!photo) return 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg';
     if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
     const fileName = photo.split('/').pop();
-    return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
+    return `${BASE_URL}/uploads/${fileName}`;
   };
 
   useEffect(() => {
