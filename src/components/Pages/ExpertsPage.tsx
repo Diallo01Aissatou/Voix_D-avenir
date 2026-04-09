@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Award, MapPin, Briefcase, Quote, MessageSquare, Calendar, ChevronRight } from 'lucide-react';
+import { Star, Award, MapPin, Briefcase, Quote, MessageSquare, ChevronRight } from 'lucide-react';
 import Api from '../../data/Api';
 
 interface ExpertsPageProps {
@@ -35,7 +35,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleContact = (expertId: string) => {
+  const handleContact = () => {
     if (contactMessage.trim()) {
       alert('Message envoyé avec succès ! L\'experte vous répondra bientôt.');
       setSelectedExpert(null);
@@ -89,6 +89,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
                     src={getPhotoUrl(featuredExpert.user?.photo)}
                     alt={featuredExpert.user?.name}
                     className="w-full h-full object-cover"
+                    style={{ imageRendering: 'initial' } as any}
                   />
                 </div>
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -116,7 +117,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
                   <div className="mb-6">
                     <h4 className="font-semibold text-gray-800 mb-3">Principales Réalisations</h4>
                     <ul className="space-y-2">
-                      {featuredExpert.achievements?.map((achievement, index) => (
+                      {featuredExpert.achievements?.map((achievement: string, index: number) => (
                         <li key={index} className="flex items-start">
                           <Award className="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-700">{achievement}</span>
@@ -156,6 +157,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
                     src={getPhotoUrl(expert.user?.photo)}
                     alt={expert.user?.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    style={{ imageRendering: 'pixelated' } as any}
                   />
                 </div>
                 
@@ -184,7 +186,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
                   <div className="mb-4">
                     <h4 className="font-semibold text-gray-800 mb-2 text-sm">Réalisations</h4>
                     <ul className="space-y-1">
-                      {expert.achievements?.slice(0, 2).map((achievement, index) => (
+                      {expert.achievements?.slice(0, 2).map((achievement: string, index: number) => (
                         <li key={index} className="flex items-start text-sm">
                           <ChevronRight className="w-4 h-4 text-purple-500 mr-1 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-600">{achievement}</span>
@@ -243,7 +245,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
                 Annuler
               </button>
               <button
-                onClick={() => handleContact(selectedExpert)}
+                onClick={() => handleContact()}
                 disabled={!contactMessage.trim()}
                 className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >

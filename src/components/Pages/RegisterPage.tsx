@@ -52,7 +52,7 @@ const compressImage = (file: File): Promise<File> => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const max = 250; // Format réduit pour la performance
+        const max = 1000; // Augmenté pour éviter le flou sur les grands écrans
         if (width > height && width > max) { height *= max / width; width = max; }
         else if (height > max) { width *= max / height; height = max; }
         canvas.width = width;
@@ -62,7 +62,7 @@ const compressImage = (file: File): Promise<File> => {
         canvas.toBlob((blob) => {
           if (blob) resolve(new File([blob], file.name, { type: 'image/jpeg' }));
           else resolve(file);
-        }, 'image/jpeg', 0.5);
+        }, 'image/jpeg', 0.8); // Qualité augmentée à 0.8
       };
     };
   });
