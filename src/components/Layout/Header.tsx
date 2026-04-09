@@ -120,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                         onNavigate(currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard');
                       }
                     }}
-                    onViewAll={() => onNavigate('notification-demo')}
+                    onViewAll={() => onNavigate('notifications')}
                   />
                   <button
                     onClick={() => {

@@ -18,7 +18,7 @@ import ResourcesPage from './components/Pages/ResourcesPage';
 import FAQPage from './components/Pages/FAQPage';
 import ApplicationForm from './components/Pages/Candidature';
 import Rencontres from './components/Pages/Rencontres';
-import NotificationDemoPage from './components/Pages/NotificationDemoPage';
+import NotificationsPage from './components/Pages/NotificationsPage';
 import VoixAvenirNotificationsDemo from './components/Pages/VoixAvenirNotificationsDemo';
 import ContactPage from './components/Pages/ContactPage';
 import HelpCenterPage from './components/Pages/HelpCenterPage';
@@ -127,8 +127,8 @@ function AppContent() {
         return <PrivacyPolicy onNavigate={handleNavigate} />;
       case 'terms-of-service':
         return <TermsOfService onNavigate={handleNavigate} />;
-      case 'notification-demo':
-        return <NotificationDemoPage onNavigate={handleNavigate} />;
+      case 'notifications':
+        return <NotificationsPage onNavigate={handleNavigate} />;
       case 'voix-avenir-notifications':
         return <VoixAvenirNotificationsDemo />;
       default:

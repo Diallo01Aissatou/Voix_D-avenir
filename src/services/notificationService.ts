@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://voix-avenir-backend.onrender.com/api';
+import Api from '../data/Api';
 
 export interface BackendNotification {
     id: string;
@@ -19,9 +17,7 @@ export interface BackendNotification {
 class NotificationService {
     async getNotifications(): Promise<BackendNotification[]> {
         try {
-            const response = await axios.get(`${API_URL}/mentorship/notifications`, {
-                withCredentials: true
-            });
+            const response = await Api.get('/mentorship/notifications');
             return response.data;
         } catch (error) {
             console.error('Error fetching notifications:', error);
