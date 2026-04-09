@@ -29,94 +29,67 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
         <div className="flex items-center justify-between py-2 lg:py-1">
           {/* Logo */}
           <div
-            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
+            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity lg:flex-1"
             onClick={() => onNavigate('home')}
           >
-            <img
-              src={`${import.meta.env.BASE_URL}logo.png`}
-              alt="Voix D'avenir Logo"
-              className="h-12 md:h-14 w-auto bg-transparent"
-            />
+            <div className="flex items-center justify-center w-full lg:justify-start">
+              <img
+                src={`${import.meta.env.BASE_URL}logo.png`}
+                alt="Voix D'avenir Logo"
+                className="h-10 sm:h-12 md:h-14 w-auto bg-transparent object-contain"
+              />
+            </div>
           </div>
 
           {/* Navigation Desktop */}
           <nav className="hidden md:flex items-center space-x-4 xl:space-x-6">
             <button
               onClick={() => onNavigate('home')}
-              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${currentPage === 'home' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
+              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium border-b-2 transition-all ${currentPage === 'home' ? 'text-purple-600 border-purple-600 pb-1' : 'border-transparent pb-1'
                 }`}
             >
               Accueil
             </button>
             <button
               onClick={() => onNavigate('experts')}
-              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${currentPage === 'experts' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
+              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium border-b-2 transition-all ${currentPage === 'experts' ? 'text-purple-600 border-purple-600 pb-1' : 'border-transparent pb-1'
                 }`}
             >
               Femmes Expertes
             </button>
             <button
               onClick={() => onNavigate('resources')}
-              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${currentPage === 'resources' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
+              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium border-b-2 transition-all ${currentPage === 'resources' ? 'text-purple-600 border-purple-600 pb-1' : 'border-transparent pb-1'
                 }`}
             >
               Ressources
             </button>
             <button
               onClick={() => onNavigate('about')}
-              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${currentPage === 'about' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
+              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium border-b-2 transition-all ${currentPage === 'about' ? 'text-purple-600 border-purple-600 pb-1' : 'border-transparent pb-1'
                 }`}
             >
               À Propos
             </button>
             <button
               onClick={() => onNavigate('contact')}
-              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${currentPage === 'contact' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
+              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium border-b-2 transition-all ${currentPage === 'contact' ? 'text-purple-600 border-purple-600 pb-1' : 'border-transparent pb-1'
                 }`}
             >
               Contact
             </button>
-            {/* <button
-              onClick={() => onNavigate('events')}
-              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${
-                currentPage === 'events' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
-              }`}
-            >
-              Événements
-            </button>
-            <button
-              onClick={() => onNavigate('opportunities')}
-              className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${
-                currentPage === 'opportunities' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
-              }`}
-            >
-              Opportunités 
-            </button> */}
-
-
-            {/* <button onClick={() => onNavigate('rencontre')}
-               className={`text-gray-700 hover:text-purple-600 transition-colors font-medium ${
-                currentPage === 'rencontre' ? 'text-purple-600 border-b-2 border-purple-600 pb-1' : ''
-              }`}> 
-              Rendez-vous</button> */}
-
-
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-end space-x-2 sm:space-x-4 lg:flex-1">
             {currentUser ? (
               <>
-                <div className="hidden md:flex items-center space-x-3">
+                <div className="flex items-center space-x-2 sm:space-x-3">
                   <NotificationSystem
                     userId={(currentUser as any)?._id || currentUser?.id}
                     userRole={currentUser?.role}
                     onNotificationClick={(notification) => {
-                      if (notification.type === 'request') {
-                        onNavigate(currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard');
-                      } else if (notification.type === 'session') {
-                        onNavigate(currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard');
-                      } else if (notification.type === 'message') {
+                      if (notification.type === 'request' || notification.type === 'session' || notification.type === 'message') {
                         onNavigate(currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard');
                       }
                     }}
@@ -128,21 +101,21 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                         currentUser.role === 'mentore' ? 'mentore-dashboard' : 'mentoree-dashboard';
                       onNavigate(dashboardPage);
                     }}
-                    className="hidden md:flex items-center space-x-2 px-4 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors font-medium"
+                    className="hidden sm:flex items-center space-x-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors font-medium text-sm sm:text-base"
                   >
-                    <span>Tableau de bord</span>
+                    <span>Dashboard</span>
                   </button>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="hidden md:flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="hidden sm:flex items-center space-x-2 px-3 py-1.5 sm:px-4 sm:py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm sm:text-base"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Déconnexion</span>
                 </button>
               </>
             ) : (
-              <div className="hidden md:flex items-center space-x-3">
+              <div className="hidden sm:flex items-center space-x-3">
                 <button
                   onClick={() => onNavigate('login')}
                   className="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors font-medium"
@@ -155,7 +128,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
             {/* Menu mobile */}
             <button
               onClick={onMenuToggle}
-              className="lg:hidden p-2 text-gray-600 hover:text-purple-600 transition-colors"
+              className="p-2 text-gray-600 hover:text-purple-600 transition-colors rounded-lg hover:bg-gray-100 md:hidden"
+              aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>

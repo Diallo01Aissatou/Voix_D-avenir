@@ -15,7 +15,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <img
               src={`${import.meta.env.BASE_URL}logo.png`}
               alt="Voix d'Avenir Logo"
-              className="h-40 w-auto object-contain"
+              className="h-24 sm:h-32 md:h-40 w-auto object-contain"
             />
             <p className="text-gray-600 text-sm leading-relaxed">
               Plateforme de mentorat pour connecter les jeunes filles guinéennes

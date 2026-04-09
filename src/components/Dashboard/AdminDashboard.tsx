@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, User as UserIcon } from 'lucide-react';
-import Api from '../../data/Api';
+import Api, { BASE_URL } from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types';
 
@@ -21,7 +21,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     
     // Si c'est un chemin relatif, construire l'URL complète
     const fileName = photo.split('/').pop();
-    return `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
+    return `${BASE_URL}/uploads/${fileName}`;
   };
   const [users, setUsers] = useState<User[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
@@ -1268,9 +1268,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           <div className="flex items-center flex-1 min-w-0">
                             {partner.logo && (
                               <img
-                                src={`https://voix-avenir-backend.onrender.com${partner.logo}`}
+                                src={partner.logo.startsWith('http') ? partner.logo : `${BASE_URL}${partner.logo}`}
                                 alt={partner.name}
                                 className="w-16 h-16 object-contain mr-4 flex-shrink-0"
+                                onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/64?text=Logo'; }}
                               />
                             )}
                             <div className="min-w-0">

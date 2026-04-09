@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Users, MapPin, Award, Heart, Star, Play, TrendingUp, Sparkles, MessageCircle, Send } from 'lucide-react';
+import { ArrowRight, Users, MapPin, Award, Heart, Star, Play, TrendingUp, Sparkles, MessageCircle, Building2 } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -108,75 +108,72 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative mt-1 h-[70vh] bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 text-white overflow-hidden">
+      <section className="relative mt-1 min-h-[85vh] lg:h-[70vh] bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 text-white overflow-hidden flex items-center">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-1000"></div>
+          <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
         </div>
 
-        <div className="relative container mx-auto px-4 py-12 lg:py-12 h-full flex items-center">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">
-            <div className="space-y-4 lg:space-y-6 max-w-xl">
+        <div className="relative container mx-auto px-4 py-12 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full h-full">
+            <div className="space-y-6 lg:space-y-8 max-w-xl mx-auto lg:mx-0 order-2 lg:order-1">
               <div className="space-y-4 text-center lg:text-left">
-                <div className="inline-flex items-center space-x-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Sparkles className="w-5 h-5" />
-                  <span className="text-sm sm:text-base font-medium">Plateforme #1 en Guinée</span>
+                <div className="inline-flex items-center space-x-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white border-opacity-30">
+                  <Sparkles className="w-4 h-4 text-yellow-300" />
+                  <span className="text-xs sm:text-sm font-medium">Plateforme #1 en Guinée</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight">
+                
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight">
                   Connecter les
-                  <span className="block bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-100">
                     Futures Leaders
                   </span>
                   de la Guinée
                 </h1>
 
-                <p className="text-sm sm:text-base lg:text-lg text-purple-100 leading-relaxed">
+                <p className="text-base sm:text-lg text-purple-100 leading-relaxed font-light max-w-lg mx-auto lg:mx-0">
                   Rejoignez une communauté de femmes inspirantes.
-                  Ensemble nous construisons un avenir meilleur.
+                  Ensemble nous construisons un avenir meilleur pour toutes.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                 <button
                   onClick={() => onNavigate('register')}
-                  className="group px-6 sm:px-8 py-3 sm:py-4 bg-white text-purple-900 rounded-xl font-semibold hover:bg-opacity-90 transition-all transform hover:scale-105 flex items-center justify-center space-x-2 shadow-xl text-sm sm:text-base"
+                  className="group px-8 py-3.5 bg-white text-purple-900 rounded-xl font-bold hover:bg-opacity-90 transition-all transform hover:-translate-y-1 flex items-center justify-center space-x-2 shadow-2xl"
                 >
                   <span>Commencer</span>
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => onNavigate('experts')}
-                  className="group px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white rounded-xl font-semibold hover:bg-white hover:text-purple-900 transition-all transform hover:scale-105 flex items-center justify-center space-x-2 text-sm sm:text-base"
+                  className="group px-8 py-3.5 border-2 border-white border-opacity-50 text-white rounded-xl font-bold hover:bg-white hover:text-purple-900 transition-all transform hover:-translate-y-1 flex items-center justify-center space-x-2"
                 >
-                  <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Play className="w-4 h-4" />
                   <span>Femmes Expertes</span>
                 </button>
               </div>
-
-              <div className="grid grid-cols-3 gap-6 pt-8">
-
-
-
-              </div>
             </div>
 
-            <div className="relative">
-              <div className="relative z-10">
-                <img
-                  src={`${import.meta.env.BASE_URL}image2.png`}
-                  alt="Femme leader inspirante"
-                  className="rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
-                />
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-2 shadow-xl">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-                      <Heart className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-800">Bienvenue</p>
-                      <p className="text-sm text-gray-600"></p>
-                    </div>
+            <div className="relative order-1 lg:order-2">
+              <div className="relative z-10 max-w-sm sm:max-w-md mx-auto">
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                  <img
+                    src={`${import.meta.env.BASE_URL}image2.png`}
+                    alt="Femme leader inspirante"
+                    className="relative rounded-2xl shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500 w-full object-cover aspect-[4/3] lg:aspect-auto"
+                  />
+                </div>
+                
+                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-purple-50 flex items-center space-x-3 transform -rotate-3 hover:rotate-0 transition-transform hidden sm:flex">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-inner">
+                    <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-800 text-sm sm:text-base">Bienvenue</p>
+                    <p className="text-xs text-purple-600 font-medium">Rejoignez-nous aujourd'hui</p>
                   </div>
                 </div>
               </div>
@@ -186,75 +183,75 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-8 bg-white">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center group hover:transform hover:scale-110 transition-all duration-300">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors animate-bounce">
-                <Users className="w-8 h-8 text-purple-600" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+            <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-purple-200 transition-colors">
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-800 mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">
                 {isLoading ? (
                   <div className="w-16 h-8 bg-gray-200 rounded animate-pulse mx-auto"></div>
                 ) : (
                   stats.totalUsers.toLocaleString()
                 )}
               </div>
-              <div className="text-gray-600 text-sm">Utilisatrices inscrites</div>
+              <div className="text-gray-500 text-xs sm:text-sm font-medium">Utilisatrices</div>
             </div>
 
-            <div className="text-center group hover:transform hover:scale-110 transition-all duration-300">
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-pink-200 transition-colors animate-bounce delay-100">
-                <MapPin className="w-8 h-8 text-pink-600" />
+            <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-pink-200 transition-colors">
+                <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-pink-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-800 mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">
                 {isLoading ? (
                   <div className="w-8 h-8 bg-gray-200 rounded animate-pulse mx-auto"></div>
                 ) : (
                   stats.citiesCovered
                 )}
               </div>
-              <div className="text-gray-600 text-sm">Villes présentes</div>
+              <div className="text-gray-500 text-xs sm:text-sm font-medium">Villes</div>
             </div>
 
-            <div className="text-center group hover:transform hover:scale-110 transition-all duration-300">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors animate-bounce delay-200">
-                <Award className="w-8 h-8 text-green-600" />
+            <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-green-200 transition-colors">
+                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-800 mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">
                 {isLoading ? (
                   <div className="w-12 h-8 bg-gray-200 rounded animate-pulse mx-auto"></div>
                 ) : (
                   stats.partnerships
                 )}
               </div>
-              <div className="text-gray-600 text-sm">Partenariats</div>
+              <div className="text-gray-500 text-xs sm:text-sm font-medium">Partenariats</div>
             </div>
 
-            <div className="text-center group hover:transform hover:scale-110 transition-all duration-300">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-yellow-200 transition-colors animate-bounce delay-300">
-                <TrendingUp className="w-8 h-8 text-yellow-600" />
+            <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-yellow-200 transition-colors">
+                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-800 mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">
                 {isLoading ? (
                   <div className="w-12 h-8 bg-gray-200 rounded animate-pulse mx-auto"></div>
                 ) : (
                   `${stats.satisfactionRate}%`
                 )}
               </div>
-              <div className="text-gray-600 text-sm">Taux de satisfaction</div>
+              <div className="text-gray-500 text-xs sm:text-sm font-medium">Satisfaction</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-4 bg-gradient-to-r from-purple-50 to-pink-50">
+      <section className="py-16 bg-gradient-to-r from-purple-50 to-pink-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Témoignages Inspirants</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Découvrez les histoires de réussite de notre communauté de mentorées et mentores
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Témoignages Inspirants</h2>
+            <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto px-4">
+              Découvrez les histoires de réussite de notre communauté de mentorées et mentores.
             </p>
           </div>
 
@@ -323,12 +320,12 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
 
       {/* How It Works Section */}
-      <section className="py-10 bg-white">
+      <section className="py-16 bg-white overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Comment Fonctionne le Mentorat ?</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Un processus simple et efficace pour connecter les futures leaders avec des femmes expertes
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Comment ça marche ?</h2>
+            <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto px-4">
+              Un processus simple et efficace pour connecter les futures leaders avec des femmes expertes en Guinée.
             </p>
           </div>
 
@@ -444,7 +441,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     <div className="w-24 h-24 mb-4 flex items-center justify-center bg-gray-50 rounded-xl p-3 shadow-sm group-hover:shadow-md transition-shadow">
                       {isImageLogo ? (
                         <img
-                          src={partner.logo.startsWith('/uploads') ? `https://voix-avenir-backend.onrender.com${partner.logo}` : partner.logo}
+                          src={partner.logo.startsWith('/uploads') ? `${BASE_URL}${partner.logo}` : partner.logo}
                           alt={partner.name}
                           className="w-20 h-20 object-contain group-hover:scale-110 transition-transform"
                           onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -453,8 +450,8 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                           }}
                         />
                       ) : null}
-                      <div className={`text-4xl flex items-center justify-center group-hover:scale-110 transition-transform ${isImageLogo ? 'hidden' : ''}`}>
-                        {partner.logo || '🏢'}
+                      <div className={`text-4xl flex items-center justify-center group-hover:scale-110 transition-transform text-purple-600 ${isImageLogo ? 'hidden' : ''}`}>
+                        <Building2 className="w-12 h-12" />
                       </div>
                     </div>
                     <h4 className="text-sm font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors text-center px-2">
