@@ -434,7 +434,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           {partners.length > 0 ? (
             <div className="flex flex-wrap justify-center -mx-4 items-start">
               {partners.map((partner, index) => {
-                const isImageLogo = partner.logo && (partner.logo.startsWith('/uploads') || partner.logo.startsWith('http'));
+                const isImageLogo = partner.logo && (partner.logo.startsWith('/uploads') || partner.logo.startsWith('http') || partner.logo.startsWith('data:'));
 
                 const partnerContent = (
                   <div className="flex flex-col items-center">

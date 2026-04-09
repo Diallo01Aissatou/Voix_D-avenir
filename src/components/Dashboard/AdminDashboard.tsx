@@ -1268,7 +1268,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           <div className="flex items-center flex-1 min-w-0">
                             {partner.logo && (
                               <img
-                                src={partner.logo.startsWith('http') ? partner.logo : `${BASE_URL}${partner.logo}`}
+                                src={(partner.logo.startsWith('http') || partner.logo.startsWith('data:')) ? partner.logo : `${BASE_URL}${partner.logo}`}
                                 alt={partner.name}
                                 className="w-16 h-16 object-contain mr-4 flex-shrink-0"
                                 onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/64?text=Logo'; }}
