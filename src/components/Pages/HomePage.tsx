@@ -108,14 +108,14 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative mt-1 min-h-[85vh] lg:h-[70vh] bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 text-white overflow-hidden flex items-center">
+      <section className="relative mt-1 min-h-[70vh] lg:h-[60vh] bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 text-white overflow-hidden flex items-center">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
           <div className="absolute bottom-20 right-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
         </div>
 
-        <div className="relative container mx-auto px-4 py-12 h-full">
+        <div className="relative container mx-auto px-4 py-8 h-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full h-full">
             <div className="space-y-6 lg:space-y-8 max-w-xl mx-auto lg:mx-0 order-2 lg:order-1">
               <div className="space-y-4 text-center lg:text-left">
@@ -157,7 +157,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             </div>
 
             <div className="relative order-1 lg:order-2">
-              <div className="relative z-10 max-w-sm sm:max-w-md mx-auto">
+              <div className="relative z-10 max-w-sm sm:max-w-lg lg:max-w-xl mx-auto">
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                   <img
