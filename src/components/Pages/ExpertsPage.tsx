@@ -84,11 +84,11 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
             
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                <div className="w-full">
+                <div className="h-96 lg:h-[500px] bg-white flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-100">
                   <img
                     src={getPhotoUrl(featuredExpert.user?.photo)}
                     alt={featuredExpert.user?.name}
-                    className="w-full h-auto block"
+                    className="max-w-full max-h-full object-contain"
                     style={{ imageRendering: 'initial' } as any}
                   />
                 </div>
@@ -152,11 +152,11 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {otherExperts.length > 0 ? otherExperts.map((expert) => (
               <div key={expert._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 overflow-hidden group">
-                <div className="w-full">
+                <div className="h-80 overflow-hidden bg-white flex items-center justify-center border-b border-gray-100">
                   <img
                     src={getPhotoUrl(expert.user?.photo)}
                     alt={expert.user?.name}
-                    className="w-full h-auto block group-hover:scale-105 transition-transform duration-500"
+                    className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
                     style={{ imageRendering: 'pixelated' } as any}
                   />
                 </div>
@@ -194,6 +194,15 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
                       ))}
                     </ul>
                   </div>
+
+                  {expert.quote && (
+                    <blockquote className="border-l-4 border-purple-500 pl-4 mb-4">
+                      <Quote className="w-4 h-4 text-purple-500 mb-1" />
+                      <p className="text-sm italic text-gray-700">
+                        "{expert.quote}"
+                      </p>
+                    </blockquote>
+                  )}
 
 
                 </div>
