@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, Twitter, Instagram, Linkedin, MessageSquare, Info } from 'lucide-react';
+import Api from '../../data/Api';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
 );
+
 
 interface ContactPageProps {
     onNavigate: (page: string) => void;
@@ -18,26 +20,39 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (error) setError(null);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setError(null);
 
-        // Simuler un envoi
-        setTimeout(() => {
+        try {
+            const response = await Api.post('/contact', formData);
+            
+            if (response.data.success) {
+                setSubmitted(true);
+                setFormData({ name: '', email: '', subject: '', message: '' });
+                
+                // Réinitialiser le message de succès après 8 secondes
+                setTimeout(() => setSubmitted(false), 8000);
+            } else {
+                setError(response.data.message || "Une erreur est survenue lors de l'envoi.");
+            }
+        } catch (err: any) {
+            console.error("Erreur envoi contact:", err);
+            setError(err.response?.data?.message || "Impossible d'envoyer votre message pour le moment. Veuillez réessayer plus tard.");
+        } finally {
             setIsSubmitting(false);
-            setSubmitted(true);
-            setFormData({ name: '', email: '', subject: '', message: '' });
-
-            // Réinitialiser le message de succès après 5 secondes
-            setTimeout(() => setSubmitted(false), 5000);
-        }, 1500);
+        }
     };
+
 
     return (
         <div className="min-h-screen bg-white">
@@ -160,7 +175,13 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                                 </div>
                             ) : (
                                 <form onSubmit={handleSubmit} className="space-y-6">
+                                    {error && (
+                                        <div className="p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm animate-shake">
+                                            {error}
+                                        </div>
+                                    )}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                                         <div>
                                             <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">Nom complet</label>
                                             <input
