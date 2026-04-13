@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, User as UserIcon } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
+import { RESOURCE_CATEGORIES } from '../../data/categories';
 import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types';
 
@@ -1662,14 +1663,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                       className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     >
                       <option value="">Sélectionner une catégorie *</option>
-                      <option value="Orientation">Orientation</option>
-                      <option value="Education">Education</option>
-                      <option value="Opportunités">Opportunités</option>
-                      <option value="Inspiration">Inspiration</option>
-                      <option value="Développement personnel">Développement personnel</option>
-                      <option value="Technologie">Technologie</option>
-                      <option value="Guides pratiques">Guides pratiques</option>
-                      <option value="Autre">Autre</option>
+                      {RESOURCE_CATEGORIES.map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
                     </select>
                     <select
                       value={newResource.type}
@@ -1739,13 +1735,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
                     <option value="">Toutes les catégories</option>
-                    <option value="Orientation">Orientation</option>
-                    <option value="Education">Education</option>
-                    <option value="Opportunités">Opportunités</option>
-                    <option value="Inspiration">Inspiration</option>
-                    <option value="Développement personnel">Développement personnel</option>
-                    <option value="Technologie">Technologie</option>
-                    <option value="Guides pratiques">Guides pratiques</option>
+                    {RESOURCE_CATEGORIES.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
                   </select>
                 </div>
 

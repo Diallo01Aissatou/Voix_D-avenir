@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Download, Play, BookOpen, Eye, X } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
+import { RESOURCE_CATEGORIES } from '../../data/categories';
 
 interface ResourcesPageProps {
   onNavigate: (page: string) => void;
@@ -28,12 +29,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
   }, []);
 
   useEffect(() => {
-    const allCategories = [
-      'Tous', 'Leadership', 'Entrepreneuriat', 'Technologie', 'Santé', 'Éducation', 'Finance',
-      'Développement Personnel', 'Communication', 'Gestion de Projet', 'Marketing', 'Ressources Humaines',
-      'Innovation', 'Networking', 'Équilibre Vie-Travail', 'Confiance en Soi', 'Négociation',
-      'Prise de Parole', 'Gestion du Stress', 'Carrière', 'Autre'
-    ];
+    const allCategories = ['Tous', ...RESOURCE_CATEGORIES];
 
     if (resources.length > 0) {
       const dynamicCategories = [...new Set(resources.map(r => r.category).filter(Boolean))];
