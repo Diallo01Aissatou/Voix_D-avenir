@@ -167,11 +167,11 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   />
                 </div>
                 
-                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white rounded-xl p-2 sm:p-3 shadow-2xl border border-purple-50 flex items-center space-x-2 transform -rotate-3 hover:rotate-0 transition-transform hidden sm:flex">
+                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white rounded-xl px-2 py-1.5 sm:px-3 sm:py-2 shadow-2xl border border-purple-50 flex items-center space-x-1.5 transform -rotate-3 hover:rotate-0 transition-transform hidden sm:flex">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-inner">
                     <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
-                  <div>
+                  <div className="leading-tight">
                     <p className="font-bold text-gray-800 text-xs sm:text-sm">Bienvenue</p>
                     <p className="text-[10px] sm:text-xs text-purple-600 font-medium">Rejoignez-nous aujourd'hui</p>
                   </div>
