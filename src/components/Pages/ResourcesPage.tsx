@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Download, Play, BookOpen, Eye, X } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
-import { RESOURCE_CATEGORIES } from '../../data/categories';
 
 interface ResourcesPageProps {
   onNavigate: (page: string) => void;
@@ -29,7 +28,12 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
   }, []);
 
   useEffect(() => {
-    const allCategories = ['Tous', ...RESOURCE_CATEGORIES];
+    const allCategories = [
+      'Tous', 'Leadership', 'Entrepreneuriat', 'Technologie', 'Santé', 'Éducation', 'Finance',
+      'Développement Personnel', 'Communication', 'Gestion de Projet', 'Marketing', 'Ressources Humaines',
+      'Innovation', 'Networking', 'Équilibre Vie-Travail', 'Confiance en Soi', 'Négociation',
+      'Prise de Parole', 'Gestion du Stress', 'Carrière', 'Autre'
+    ];
 
     if (resources.length > 0) {
       const dynamicCategories = [...new Set(resources.map(r => r.category).filter(Boolean))];
@@ -218,26 +222,26 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {filteredResources.map((resource) => (
-              <div key={resource._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(resource.type)}`}>
+              <div key={resource._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow group">
+                <div className="p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${getTypeColor(resource.type)}`}>
                       {resource.type}
                     </span>
-                    <span className="text-xs text-gray-500 flex items-center">
-                      <Eye className="w-3 h-3 mr-1" /> {resource.downloadCount || 0}
+                    <span className="text-[10px] text-gray-400 flex items-center">
+                      <Eye className="w-2.5 h-2.5 mr-1" /> {resource.downloadCount || 0}
                     </span>
                   </div>
-                  <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 h-10">{resource.title}</h3>
-                  <p className="text-xs text-gray-600 mb-4 line-clamp-2 h-8">{resource.description}</p>
+                  <h3 className="font-bold text-gray-800 mb-1 line-clamp-2 text-xs h-8 leading-tight">{resource.title}</h3>
+                  <p className="text-[10px] text-gray-500 mb-3 line-clamp-2 h-6 leading-normal">{resource.description}</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleResourceAction(resource)}
-                      className="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-medium hover:bg-purple-700 transition-colors flex items-center justify-center"
+                      className="flex-1 py-1.5 bg-purple-600 text-white rounded-lg text-[10px] font-medium hover:bg-purple-700 transition-colors flex items-center justify-center group-hover:bg-purple-700"
                     >
-                      {resource.type === 'video' ? <Play className="w-3 h-3 mr-1" /> : <Download className="w-3 h-3 mr-1" />}
+                      {resource.type === 'video' ? <Play className="w-2.5 h-2.5 mr-1" /> : <Download className="w-2.5 h-2.5 mr-1" />}
                       {resource.type === 'video' ? 'Voir' : 'Télécharger'}
                     </button>
                   </div>
