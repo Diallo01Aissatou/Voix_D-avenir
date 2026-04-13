@@ -411,7 +411,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                   disabled={isSubmitting}
                   className={`w-full py-3 rounded-lg font-bold transition-all ${
                     isSubmitting 
-                      ? 'bg-gray-300 text-gray-500 cursor-not-out' 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                       : 'bg-purple-600 text-white hover:bg-purple-700'
                   }`}
                 >

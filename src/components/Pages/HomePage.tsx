@@ -125,11 +125,11 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 </div>
                 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight">
-                  Connecter les
+                  Connecter les{' '}
                   <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-100">
                     Futures Leaders
                   </span>
-                  de la Guinée
+                  {' '}de la Guinée
                 </h1>
 
                 <p className="text-base sm:text-lg text-purple-100 leading-relaxed font-light max-w-lg mx-auto lg:mx-0">
