@@ -19,6 +19,8 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
     title: '', description: '', category: '', type: 'pdf',
     fileUrl: '', resourceFile: null
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [categories, setCategories] = useState(['Tous']);
   const types = ['Tous', 'Article', 'Vidéo', 'Guide'];
@@ -100,9 +102,34 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
 
   const submitResource = async () => {
     if (!shareResource.title || !shareResource.category || !shareResource.resourceFile) {
-      alert('Veuillez remplir tous les champs obligatoires.');
+      alert('Veuillez remplir tous les champs obligatoires (Titre, Catégorie et Fichier).');
       return;
     }
+
+    // Vérifier la taille du fichier (500MB max)
+    const maxSize = 500 * 1024 * 1024;
+    if (shareResource.resourceFile.size > maxSize) {
+      alert(`Le fichier est trop volumineux (${Math.round(shareResource.resourceFile.size / (1024 * 1024))}MB). La taille maximum autorisée est de 500MB.`);
+      return;
+    }
+
+    // Validation des types de fichiers cohérente avec l'admin
+    const allowedTypesForExt = {
+      'pdf': ['application/pdf'],
+      'video': ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-msvideo', 'video/mpeg'],
+      'guide': ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+    };
+
+    const fileType = shareResource.resourceFile.type;
+    const resourceType = shareResource.type;
+
+    if (allowedTypesForExt[resourceType] && !allowedTypesForExt[resourceType].includes(fileType)) {
+      alert(`Format de fichier non compatible pour le type "${resourceType}".`);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setUploadProgress(0);
 
     try {
       const formData = new FormData();
@@ -113,16 +140,33 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       formData.append('resourceFile', shareResource.resourceFile);
 
       await Api.post('/resources', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+          setUploadProgress(percentCompleted);
+        }
       });
 
       setShareResource({ title: '', description: '', category: '', type: 'pdf', fileUrl: '', resourceFile: null });
       setShowShareModal(false);
       loadResources();
-      alert('Ressource soumise avec succès !');
+      alert('Ressource soumise avec succès ! Elle sera visible après validation.');
     } catch (error: any) {
-      console.error('Erreur soumission:', error);
-      alert(error.response?.data?.message || 'Erreur lors de la soumission');
+      console.error('Erreur détaillée de soumission:', error);
+      
+      let errorMessage = 'Erreur lors de la soumission';
+      if (error.response) {
+        errorMessage = error.response.data?.message || `Erreur serveur (${error.response.status})`;
+      } else if (error.request) {
+        errorMessage = 'Le serveur ne répond pas. Votre connexion est peut-être trop lente pour envoyer ce fichier.';
+      } else {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(0);
     }
   };
 
@@ -312,12 +356,14 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                 <input
                   type="text"
                   placeholder="Titre *"
-                  className="w-full px-4 py-2 border rounded-lg"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border rounded-lg disabled:bg-gray-50"
                   value={shareResource.title}
                   onChange={e => setShareResource({ ...shareResource, title: e.target.value })}
                 />
                 <select
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-4 py-2 border rounded-lg disabled:bg-gray-50"
+                  disabled={isSubmitting}
                   value={shareResource.category}
                   onChange={e => setShareResource({ ...shareResource, category: e.target.value })}
                 >
@@ -325,7 +371,8 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                   {categories.filter(c => c !== 'Tous').map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
                 <select
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-4 py-2 border rounded-lg disabled:bg-gray-50"
+                  disabled={isSubmitting}
                   value={shareResource.type}
                   onChange={e => setShareResource({ ...shareResource, type: e.target.value })}
                 >
@@ -335,20 +382,43 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                 </select>
                 <textarea
                   placeholder="Description"
-                  className="w-full px-4 py-2 border rounded-lg h-24"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border rounded-lg h-24 disabled:bg-gray-50"
                   value={shareResource.description}
                   onChange={e => setShareResource({ ...shareResource, description: e.target.value })}
                 ></textarea>
                 <input
                   type="file"
-                  className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                  disabled={isSubmitting}
+                  className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50"
                   onChange={e => setShareResource({ ...shareResource, resourceFile: e.target.files?.[0] || null })}
                 />
+
+                {isSubmitting && (
+                  <div className="space-y-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-purple-600 h-2.5 rounded-full transition-all duration-300" 
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Téléchargement...</span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                  </div>
+                )}
+
                 <button
                   onClick={submitResource}
-                  className="w-full py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700"
+                  disabled={isSubmitting}
+                  className={`w-full py-3 rounded-lg font-bold transition-all ${
+                    isSubmitting 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-out' 
+                      : 'bg-purple-600 text-white hover:bg-purple-700'
+                  }`}
                 >
-                  Soumettre
+                  {isSubmitting ? 'Envoi en cours...' : 'Soumettre'}
                 </button>
               </div>
             </div>
