@@ -29,10 +29,8 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
 
   useEffect(() => {
     const allCategories = [
-      'Tous', 'Leadership', 'Entrepreneuriat', 'Technologie', 'Santé', 'Éducation', 'Finance',
-      'Développement Personnel', 'Communication', 'Gestion de Projet', 'Marketing', 'Ressources Humaines',
-      'Innovation', 'Networking', 'Équilibre Vie-Travail', 'Confiance en Soi', 'Négociation',
-      'Prise de Parole', 'Gestion du Stress', 'Carrière', 'Autre'
+      'Tous', 'Orientation', 'Education', 'Opportunités', 'Inspiration', 
+      'Développement personnel', 'Technologie', 'Guides pratiques', 'Autre'
     ];
 
     if (resources.length > 0) {
