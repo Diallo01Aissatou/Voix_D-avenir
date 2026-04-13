@@ -167,13 +167,13 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   />
                 </div>
                 
-                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-purple-50 flex items-center space-x-3 transform -rotate-3 hover:rotate-0 transition-transform hidden sm:flex">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-inner">
-                    <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white rounded-xl p-2 sm:p-3 shadow-2xl border border-purple-50 flex items-center space-x-2 transform -rotate-3 hover:rotate-0 transition-transform hidden sm:flex">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-inner">
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800 text-sm sm:text-base">Bienvenue</p>
-                    <p className="text-xs text-purple-600 font-medium">Rejoignez-nous aujourd'hui</p>
+                    <p className="font-bold text-gray-800 text-xs sm:text-sm">Bienvenue</p>
+                    <p className="text-[10px] sm:text-xs text-purple-600 font-medium">Rejoignez-nous aujourd'hui</p>
                   </div>
                 </div>
               </div>
