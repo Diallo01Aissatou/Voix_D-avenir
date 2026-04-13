@@ -90,14 +90,11 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       return;
     }
 
-    try {
-      await Api.put(`/resources/download/${resource._id}`);
-    } catch (error) {
-      console.error('Erreur compteur de téléchargement');
-    }
-
-    const fileUrl = resource.fileUrl.startsWith('http') ? resource.fileUrl : `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}`;
-    window.open(fileUrl, '_blank');
+    // L'URL du backend pour le téléchargement forcé
+    const downloadUrl = `${BASE_URL}/api/resources/download-file/${resource._id}`;
+    
+    // Déclencher le téléchargement
+    window.location.href = downloadUrl;
   };
 
   const submitResource = async () => {
