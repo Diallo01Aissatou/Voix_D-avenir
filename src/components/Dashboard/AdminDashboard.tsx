@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, User as UserIcon } from 'lucide-react';
+import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, Download, User as UserIcon } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types';
@@ -86,12 +86,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     if (activeTab === 'events') {
       loadEvents();
     }
-    if (activeTab === 'resources') {
-      loadResources();
-    }
-    if (activeTab === 'experts') {
-      loadMentores();
-    }
+
+
   }, [activeTab]);
 
   useEffect(() => {
@@ -229,7 +225,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const loadResources = async () => {
     try {
       const response = await Api.get('/resources');
-      setAdminResources(response.data);
+      setAdminResources(response.data || []);
     } catch (error) {
       setAdminResources([]);
     }
@@ -1750,34 +1746,45 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6">
-                  {adminResources.filter(r =>
-                    (!resourceCategoryFilter || r.category === resourceCategoryFilter) &&
-                    (!resourceSearch || r.title.toLowerCase().includes(resourceSearch.toLowerCase()) || r.description.toLowerCase().includes(resourceSearch.toLowerCase()))
-                  ).length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                      <p>Aucune ressource pour le moment</p>
-                    </div>
-                  ) : (
-                    adminResources.map((resource) => (
-                      <div key={resource._id} className="bg-white rounded-xl p-6 shadow-lg">
+                  {(() => {
+                    const filtered = adminResources.filter(r => 
+                      r && typeof r === 'object' && 
+                      (!resourceCategoryFilter || r.category === resourceCategoryFilter) &&
+                      (!resourceSearch || 
+                        (r.title && typeof r.title === 'string' && r.title.toLowerCase().includes(resourceSearch.toLowerCase())) || 
+                        (r.description && typeof r.description === 'string' && r.description.toLowerCase().includes(resourceSearch.toLowerCase())))
+                    );
+
+                    if (filtered.length === 0) {
+                      return (
+                        <div className="text-center py-12 text-gray-500">
+                          <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                          <p>Aucune ressource pour le moment</p>
+                        </div>
+                      );
+                    }
+
+                    return filtered.map((resource) => (
+                      <div key={resource._id || Math.random()} className="bg-white rounded-xl p-6 shadow-lg">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center mb-2">
                               <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium mr-2">
-                                {resource.type === 'pdf' ? 'ARTICLE' : resource.type?.toUpperCase()}
+                                {resource.type === 'pdf' ? 'ARTICLE' : (typeof resource.type === 'string' ? resource.type.toUpperCase() : 'RESSOURCE')}
                               </span>
                               <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                                {resource.category}
+                                {resource.category || 'Général'}
                               </span>
                             </div>
-                            <h4 className="font-bold text-gray-800 text-lg mb-2">{resource.title}</h4>
-                            <p className="text-gray-600 mb-4">{resource.description}</p>
+                            <h4 className="font-bold text-gray-800 text-lg mb-2">{resource.title || 'Sans titre'}</h4>
+                            <p className="text-gray-600 mb-4">{resource.description || 'Pas de description'}</p>
                             {resource.fileUrl && (
                               <div className="mt-2 text-sm">
                                 <a 
                                   href={`${BASE_URL}/api/resources/download-file/${resource._id}`} 
                                   className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                 >
                                   <Download className="w-4 h-4 mr-1" />
                                   {resource.type === 'video' ? 'Voir/Télécharger la vidéo' : 'Télécharger la ressource'}
@@ -1785,12 +1792,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                               </div>
                             )}
                           </div>
-                          {resource.image && (
+                          {resource.image && typeof resource.image === 'string' && (
                             <div className="ml-4">
                               <img
-                                src={`${BASE_URL}${resource.image}`}
-                                alt={resource.title}
+                                src={resource.image.startsWith('http') ? resource.image : `${BASE_URL}${resource.image}`}
+                                alt={resource.title || 'Ressource'}
                                 className="w-24 h-24 object-cover rounded-lg"
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
                               />
                             </div>
                           )}
@@ -1810,8 +1818,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           </button>
                         </div>
                       </div>
-                    ))
-                  )}
+                    ));
+                  })()}
                 </div>
               </div>
             )}
