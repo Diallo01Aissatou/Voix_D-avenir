@@ -63,12 +63,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'users') {
-      loadUsers();
-    }
-    if (activeTab === 'approvals') {
-      loadPendingMentors();
-    }
+    if (activeTab === 'users') loadUsers();
+    if (activeTab === 'approvals') loadPendingMentors();
     if (activeTab === 'testimonials') {
       loadTestimonials();
       loadMentees();
@@ -76,24 +72,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     if (activeTab === 'experts') {
       loadExperts();
       loadAvailableMentores();
-    }
-    if (activeTab === 'news') {
-      loadNews();
-    }
-    if (activeTab === 'resources') {
-      loadResources();
-    }
-    if (activeTab === 'events') {
-      loadEvents();
-    }
-
-
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'experts') {
       loadMentores();
     }
+    if (activeTab === 'news') loadNews();
+    if (activeTab === 'resources') loadResources();
+    if (activeTab === 'events') loadEvents();
+    if (activeTab === 'requests') loadRequests();
   }, [activeTab]);
 
   // Recharger les stats après certaines actions
@@ -416,7 +400,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         role: 'mentoree',
         message: newTestimonial.message,
         rating: newTestimonial.rating,
-        avatar: selectedMentee?.photo ? `https://voix-avenir-backend.onrender.com${selectedMentee.photo}` : 'https://via.placeholder.com/50'
+        avatar: selectedMentee?.photo ? `${BASE_URL}${selectedMentee.photo}` : 'https://via.placeholder.com/50'
       });
       setNewTestimonial({ menteeId: '', message: '', rating: 5 });
       loadTestimonials();
@@ -813,10 +797,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         {/* Navigation */}
         <div className="bg-white rounded-xl shadow-lg mb-8">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+            <nav className="flex space-x-8 px-6 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'overview'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'overview'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
@@ -826,13 +810,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               </button>
               <button
                 onClick={() => setActiveTab('approvals')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors flex items-center ${ activeTab === 'approvals'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors flex items-center whitespace-nowrap ${ activeTab === 'approvals'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <UserCheck className="w-4 h-4 inline mr-2" />
-                Approbation Mentores
+                Approbation
                 {pendingMentors.length > 0 && (
                   <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {pendingMentors.length}
@@ -841,17 +825,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               </button>
               <button
                 onClick={() => setActiveTab('users')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'users'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'users'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
               >
                 <Users className="w-4 h-4 inline mr-2" />
-                Gestion Utilisateurs
+                Utilisateurs
+              </button>
+              <button
+                onClick={() => setActiveTab('requests')}
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'requests'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+              >
+                <MessageSquare className="w-4 h-4 inline mr-2" />
+                Demandes
               </button>
               <button
                 onClick={() => setActiveTab('partners')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'partners'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'partners'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
@@ -861,28 +855,58 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               </button>
               <button
                 onClick={() => setActiveTab('experts')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'experts'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'experts'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
               >
                 <Users className="w-4 h-4 inline mr-2" />
-                Femmes Expertes
+                Expertes
               </button>
               <button
                 onClick={() => setActiveTab('resources')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'resources'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'resources'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
               >
-                <MessageSquare className="w-4 h-4 inline mr-2" />
+                <BookOpen className="w-4 h-4 inline mr-2" />
                 Ressources
+              </button>
+              <button
+                onClick={() => setActiveTab('news')}
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'news'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+              >
+                <BookOpen className="w-4 h-4 inline mr-2" />
+                Actualités
+              </button>
+              <button
+                onClick={() => setActiveTab('events')}
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'events'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+              >
+                <Calendar className="w-4 h-4 inline mr-2" />
+                Événements
+              </button>
+              <button
+                onClick={() => setActiveTab('testimonials')}
+                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'testimonials'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+              >
+                <Star className="w-4 h-4 inline mr-2" />
+                Témoignages
               </button>
               {(currentUser?.email === 'admin@mentora.gn' || currentUser?.isMasterAdmin) && (
                 <button
                   onClick={() => setActiveTab('admins')}
-                  className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'admins'
+                  className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'admins'
                     ? 'border-purple-500 text-purple-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                     }`}
@@ -891,7 +915,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   Admins
                 </button>
               )}
-
             </nav>
           </div>
 
@@ -1337,7 +1360,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                       <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                                         {mentee.photo ? (
                                           <img
-                                            src={`https://voix-avenir-backend.onrender.com${mentee.photo}`}
+                                            src={`${BASE_URL}${mentee.photo}`}
                                             alt={mentee.name}
                                             className="w-8 h-8 object-cover"
                                           />
