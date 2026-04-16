@@ -211,12 +211,22 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">{resource.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full">{resource.category}</span>
-                      <button
-                        onClick={() => handleResourceAction(resource)}
-                        className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors"
-                      >
-                        {resource.type === 'video' ? <Play className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleResourceAction(resource)}
+                          className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors"
+                          title={resource.type === 'video' ? 'Voir' : 'Lire'}
+                        >
+                          {resource.type === 'video' ? <Play className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); downloadFile(resource); }}
+                          className="p-2 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors"
+                          title="Télécharger"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -278,10 +288,24 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleResourceAction(resource)}
-                      className="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-medium hover:bg-purple-700 transition-colors flex items-center justify-center"
+                      className="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-medium hover:bg-purple-700 transition-colors flex items-center justify-center shadow-sm"
                     >
-                      {resource.type === 'video' ? <Play className="w-3 h-3 mr-1" /> : <Download className="w-3 h-3 mr-1" />}
-                      {resource.type === 'video' ? 'Voir' : 'Télécharger'}
+                      {resource.type === 'video' ? (
+                        <>
+                          <Play className="w-3 h-3 mr-1.5" /> Voir
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="w-3 h-3 mr-1.5" /> Lire
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); downloadFile(resource); }}
+                      className="px-3 py-2 bg-purple-50 text-purple-600 border border-purple-100 rounded-lg text-xs font-medium hover:bg-purple-100 transition-colors flex items-center justify-center"
+                      title="Télécharger"
+                    >
+                      <Download className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -332,10 +356,22 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                     className="w-full h-[60vh] rounded-lg border"
                   />
                 )}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-between items-center">
+                  <div>
+                    {selectedResource.type !== 'video' && (
+                      <a 
+                        href={selectedResource.fileUrl.startsWith('http') ? selectedResource.fileUrl : `${BASE_URL}${selectedResource.fileUrl.startsWith('/') ? '' : '/'}${selectedResource.fileUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-600 text-sm font-medium hover:underline flex items-center"
+                      >
+                        <Eye className="w-4 h-4 mr-1.5" /> Ouvrir dans un nouvel onglet pour imprimer
+                      </a>
+                    )}
+                  </div>
                   <button
                     onClick={() => downloadFile(selectedResource)}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center"
+                    className="px-6 py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all shadow-md flex items-center"
                   >
                     <Download className="w-4 h-4 mr-2" /> Télécharger
                   </button>
