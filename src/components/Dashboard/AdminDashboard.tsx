@@ -797,10 +797,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         {/* Navigation */}
         <div className="bg-white rounded-xl shadow-lg mb-8">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6 overflow-x-auto no-scrollbar">
+            <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'overview'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'overview'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
@@ -810,13 +810,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               </button>
               <button
                 onClick={() => setActiveTab('approvals')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors flex items-center whitespace-nowrap ${ activeTab === 'approvals'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors flex items-center ${ activeTab === 'approvals'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <UserCheck className="w-4 h-4 inline mr-2" />
-                Approbation
+                Approbation Mentores
                 {pendingMentors.length > 0 && (
                   <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {pendingMentors.length}
@@ -825,27 +825,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               </button>
               <button
                 onClick={() => setActiveTab('users')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'users'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'users'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
               >
                 <Users className="w-4 h-4 inline mr-2" />
-                Utilisateurs
-              </button>
-              <button
-                onClick={() => setActiveTab('requests')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'requests'
-                  ? 'border-purple-500 text-purple-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-              >
-                <MessageSquare className="w-4 h-4 inline mr-2" />
-                Demandes
+                Gestion Utilisateurs
               </button>
               <button
                 onClick={() => setActiveTab('partners')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'partners'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'partners'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
@@ -855,17 +845,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
               </button>
               <button
                 onClick={() => setActiveTab('experts')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'experts'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'experts'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
               >
                 <Users className="w-4 h-4 inline mr-2" />
-                Expertes
+                Femmes Expertes
               </button>
               <button
                 onClick={() => setActiveTab('resources')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'resources'
+                className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'resources'
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
@@ -873,40 +863,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <BookOpen className="w-4 h-4 inline mr-2" />
                 Ressources
               </button>
-              <button
-                onClick={() => setActiveTab('news')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'news'
-                  ? 'border-purple-500 text-purple-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-              >
-                <BookOpen className="w-4 h-4 inline mr-2" />
-                Actualités
-              </button>
-              <button
-                onClick={() => setActiveTab('events')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'events'
-                  ? 'border-purple-500 text-purple-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-              >
-                <Calendar className="w-4 h-4 inline mr-2" />
-                Événements
-              </button>
-              <button
-                onClick={() => setActiveTab('testimonials')}
-                className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'testimonials'
-                  ? 'border-purple-500 text-purple-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-              >
-                <Star className="w-4 h-4 inline mr-2" />
-                Témoignages
-              </button>
               {(currentUser?.email === 'admin@mentora.gn' || currentUser?.isMasterAdmin) && (
                 <button
                   onClick={() => setActiveTab('admins')}
-                  className={`py-4 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${activeTab === 'admins'
+                  className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'admins'
                     ? 'border-purple-500 text-purple-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                     }`}
