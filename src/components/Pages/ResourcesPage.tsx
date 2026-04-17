@@ -76,9 +76,39 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
   });
 
   const handleResourceAction = (resource: any) => {
-    if (resource.type === 'video' || resource.type === 'pdf') {
+    // Normaliser le type pour gérer les accents et la casse (ex: Vidéo -> video)
+    const normalizedType = (resource.type || '')
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, ""); // Supprime les accents
+
+    if (normalizedType === 'video') {
+      // Pour les vidéos, on garde le lecteur intégré (la modal)
       setSelectedResource(resource);
       setShowViewer(true);
+    } else if (['pdf', 'guide', 'article'].includes(normalizedType)) {
+      // POUR LES DOCUMENTS : Ouvrir dans un NOUVEL ONGLET
+      // C'est la méthode la plus fiable pour que le navigateur utilise son lecteur PDF natif
+      if (!resource.fileUrl) {
+        alert('Aucun fichier disponible.');
+        return;
+      }
+      
+      const extension = normalizedType === 'video' ? 'mp4' : 'pdf';
+      const virtualName = `lecture.${extension}`;
+      
+      let viewUrl = '';
+      if (resource.fileUrl.startsWith('http')) {
+        viewUrl = resource.fileUrl;
+      } else if (resource.fileUrl.includes('/serve-file/')) {
+        // Nouveau système GridFS avec extension virtuelle anti-cache
+        viewUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/${virtualName}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      } else {
+        // Ancien système (fichiers uploadés localement) : pas d'extension virtuelle car c'est un chemin de dossier
+        viewUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      }
+      
+      window.open(viewUrl, '_blank');
     } else {
       downloadFile(resource);
     }
@@ -90,8 +120,15 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       return;
     }
 
-    // L'URL du backend pour le téléchargement forcé
-    const downloadUrl = `${BASE_URL}/api/resources/download-file/${resource._id}`;
+    let downloadUrl = '';
+    
+    // Si l'URL utilise déjà le nouveau système GridFS
+    if (resource.fileUrl.includes('/serve-file/')) {
+      downloadUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}?download=true&resourceId=${resource._id}`;
+    } else {
+      // Ancien système, on force le téléchargement avec ?download=true
+      downloadUrl = `${BASE_URL}/api/resources/download-file/${resource._id}?download=true`;
+    }
     
     // Déclencher le téléchargement
     window.location.href = downloadUrl;
@@ -174,6 +211,39 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       case 'video': return 'bg-blue-100 text-blue-700';
       case 'guide': return 'bg-green-100 text-green-700';
       default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const renderViewerContent = () => {
+    if (!selectedResource) return null;
+
+    const normalizedType = (selectedResource.type || '')
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    const src = selectedResource.fileUrl.startsWith('http') 
+      ? selectedResource.fileUrl 
+      : `${BASE_URL}${selectedResource.fileUrl.startsWith('/') ? '' : '/'}${selectedResource.fileUrl}`;
+
+    if (normalizedType === 'video') {
+      return (
+        <div className="aspect-video">
+          <video
+            controls
+            autoPlay
+            className="w-full h-full rounded-lg bg-black"
+            src={src}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <iframe
+          src={src}
+          className="w-full h-[60vh] rounded-lg border"
+        />
+      );
     }
   };
 
@@ -342,20 +412,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                 <button onClick={() => setShowViewer(false)} className="p-2 hover:bg-gray-100 rounded-full"><X className="w-6 h-6" /></button>
               </div>
               <div className="p-4">
-                {selectedResource.type === 'video' ? (
-                  <div className="aspect-video">
-                    <video
-                      controls
-                      className="w-full h-full rounded-lg bg-black"
-                      src={selectedResource.fileUrl.startsWith('http') ? selectedResource.fileUrl : `${BASE_URL}${selectedResource.fileUrl.startsWith('/') ? '' : '/'}${selectedResource.fileUrl}`}
-                    />
-                  </div>
-                ) : (
-                  <iframe
-                    src={selectedResource.fileUrl.startsWith('http') ? selectedResource.fileUrl : `${BASE_URL}${selectedResource.fileUrl.startsWith('/') ? '' : '/'}${selectedResource.fileUrl}`}
-                    className="w-full h-[60vh] rounded-lg border"
-                  />
-                )}
+                {renderViewerContent()}
                 <div className="mt-4 flex justify-between items-center">
                   <div>
                     {selectedResource.type !== 'video' && (

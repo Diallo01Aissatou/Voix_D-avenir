@@ -1762,15 +1762,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                             <h4 className="font-bold text-gray-800 text-lg mb-2">{resource.title || 'Sans titre'}</h4>
                             <p className="text-gray-600 mb-4">{resource.description || 'Pas de description'}</p>
                             {resource.fileUrl && (
-                              <div className="mt-2 text-sm">
+                              <div className="mt-2 flex gap-4 text-sm">
                                 <a 
-                                  href={`${BASE_URL}/api/resources/download-file/${resource._id}`} 
+                                  href={resource.fileUrl.includes('/serve-file/') ? `${BASE_URL}${resource.fileUrl}/lecture.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}` : `${BASE_URL}/api/resources/download-file/${resource._id}`} 
                                   className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
                                   target="_blank"
                                   rel="noopener noreferrer"
+                                  title="Ouvrir dans le navigateur"
+                                >
+                                  <Eye className="w-4 h-4 mr-1" />
+                                  {resource.type === 'video' ? 'Voir la vidéo' : 'Lire la ressource'}
+                                </a>
+                                <a 
+                                  href={resource.fileUrl.includes('/serve-file/') ? `${BASE_URL}${resource.fileUrl}/téléchargement.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}&download=true` : `${BASE_URL}/api/resources/download-file/${resource._id}?download=true`} 
+                                  className="inline-flex items-center text-gray-600 hover:text-gray-800 font-medium"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Télécharger sur l'ordinateur"
                                 >
                                   <Download className="w-4 h-4 mr-1" />
-                                  {resource.type === 'video' ? 'Voir/Télécharger la vidéo' : 'Télécharger la ressource'}
+                                  Télécharger
                                 </a>
                               </div>
                             )}
