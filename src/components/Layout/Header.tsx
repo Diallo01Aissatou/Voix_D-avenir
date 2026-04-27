@@ -185,7 +185,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
               >
                 Contact
               </button>
-              <button
+              {/* Les sections suivantes sont masquées temporairement et seront ajoutées dans les perspectives futures */}
+              {/* <button
                 onClick={() => {
                   onNavigate('events');
                   onMenuToggle();
@@ -202,7 +203,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                 className="text-left px-2 py-2 text-gray-700 hover:text-purple-600 transition-colors"
               >
                 Opportunités
-              </button>
+              </button> */}
 
               {currentUser ? (
                 <>

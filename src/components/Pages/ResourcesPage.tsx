@@ -31,7 +31,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
 
   useEffect(() => {
     const allCategories = [
-      'Tous', 'Orientation', 'Education', 'Opportunités', 'Inspiration', 
+      'Tous', 'Orientation', 'Education', 'Inspiration', 
       'Développement personnel', 'Technologie', 'Guides pratiques', 'Autre'
     ];
 
@@ -83,12 +83,18 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       .replace(/[\u0300-\u036f]/g, ""); // Supprime les accents
 
     if (normalizedType === 'video') {
-      // Pour les vidéos, on garde le lecteur intégré (la modal)
+      // Pour les vidéos, incrémenter localement les vues
+      setResources(prev => prev.map(r => 
+        r._id === resource._id ? { ...r, views: (r.views || 0) + 1 } : r
+      ));
       setSelectedResource(resource);
       setShowViewer(true);
     } else if (['pdf', 'guide', 'article'].includes(normalizedType)) {
-      // POUR LES DOCUMENTS : Ouvrir dans un NOUVEL ONGLET
-      // C'est la méthode la plus fiable pour que le navigateur utilise son lecteur PDF natif
+      // Incrémenter localement les vues
+      setResources(prev => prev.map(r => 
+        r._id === resource._id ? { ...r, views: (r.views || 0) + 1 } : r
+      ));
+      
       if (!resource.fileUrl) {
         alert('Aucun fichier disponible.');
         return;
@@ -100,11 +106,12 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       let viewUrl = '';
       if (resource.fileUrl.startsWith('http')) {
         viewUrl = resource.fileUrl;
-      } else if (resource.fileUrl.includes('/serve-file/')) {
-        // Nouveau système GridFS avec extension virtuelle anti-cache
-        viewUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/${virtualName}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      } else if (resource.fileUrl.includes('/serve-file/') || resource.fileUrl.includes('/api/files/')) {
+        // Pour les routes GridFS, on ajoute le nom virtuel pour aider le navigateur à détecter le type
+        const baseUrl = resource.fileUrl.startsWith('/') ? BASE_URL : `${BASE_URL}/`;
+        viewUrl = `${baseUrl}${resource.fileUrl}/${virtualName}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
       } else {
-        // Ancien système (fichiers uploadés localement) : pas d'extension virtuelle car c'est un chemin de dossier
+        // Anciens liens /uploads/
         viewUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
       }
       
@@ -120,17 +127,19 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       return;
     }
 
+    // Mise à jour instantanée du compteur local de téléchargements
+    setResources(prev => prev.map(r => 
+      r._id === resource._id ? { ...r, downloadCount: (r.downloadCount || 0) + 1 } : r
+    ));
+
     let downloadUrl = '';
     
-    // Si l'URL utilise déjà le nouveau système GridFS
     if (resource.fileUrl.includes('/serve-file/')) {
       downloadUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}?download=true&resourceId=${resource._id}`;
     } else {
-      // Ancien système, on force le téléchargement avec ?download=true
       downloadUrl = `${BASE_URL}/api/resources/download-file/${resource._id}?download=true`;
     }
     
-    // Déclencher le téléchargement
     window.location.href = downloadUrl;
   };
 
@@ -349,9 +358,12 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(resource.type)}`}>
                       {resource.type}
                     </span>
-                    <span className="text-xs text-gray-500 flex items-center">
-                      <Eye className="w-3 h-3 mr-1" /> {resource.downloadCount || 0}
-                    </span>
+                      <span className="text-xs text-gray-500 flex items-center" title="Téléchargements">
+                        <Download className="w-3 h-3 mr-1" /> {resource.downloadCount || 0}
+                      </span>
+                      <span className="text-xs text-gray-500 flex items-center ml-2" title="Vues">
+                        <Eye className="w-3 h-3 mr-1" /> {resource.views || 0}
+                      </span>
                   </div>
                   <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 h-10">{resource.title}</h3>
                   <p className="text-xs text-gray-600 mb-4 line-clamp-2 h-8">{resource.description}</p>

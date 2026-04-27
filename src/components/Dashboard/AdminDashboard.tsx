@@ -17,9 +17,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const getPhotoUrl = (photo: string | undefined) => {
     if (!photo) return null;
-    if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+    if (photo.startsWith('http') || photo.startsWith('data:') || photo.startsWith('/api/')) return photo.startsWith('/') ? `${BASE_URL}${photo}` : photo;
     
-    // Si c'est un chemin relatif, construire l'URL complète
+    // Si c'est un chemin relatif (/uploads/...), construire l'URL complète
     const fileName = photo.split('/').pop();
     return `${BASE_URL}/uploads/${fileName}`;
   };
@@ -1764,7 +1764,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                             {resource.fileUrl && (
                               <div className="mt-2 flex gap-4 text-sm">
                                 <a 
-                                  href={resource.fileUrl.includes('/serve-file/') ? `${BASE_URL}${resource.fileUrl}/lecture.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}` : `${BASE_URL}/api/resources/download-file/${resource._id}`} 
+                                  href={ (resource.fileUrl.includes('/serve-file/') || resource.fileUrl.includes('/api/files/')) ? `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/lecture.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}` : `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}` } 
                                   className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -1774,7 +1774,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                   {resource.type === 'video' ? 'Voir la vidéo' : 'Lire la ressource'}
                                 </a>
                                 <a 
-                                  href={resource.fileUrl.includes('/serve-file/') ? `${BASE_URL}${resource.fileUrl}/téléchargement.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}&download=true` : `${BASE_URL}/api/resources/download-file/${resource._id}?download=true`} 
+                                  href={ (resource.fileUrl.includes('/serve-file/') || resource.fileUrl.includes('/api/files/')) ? `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/téléchargement.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}&download=true` : `${BASE_URL}/api/resources/download-file/${resource._id}?download=true` } 
                                   className="inline-flex items-center text-gray-600 hover:text-gray-800 font-medium"
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -1812,279 +1812,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           </button>
                         </div>
                       </div>
-                    ));
-                  })()}
+                    ))
+                  )}
                 </div>
               </div>
             )}
 
-            {activeTab === 'news' && (
+            {/* Sections masquées temporairement (Perspectives Futures) */}
+            {/* {activeTab === 'news' && (
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Gestion des Actualités</h3>
-
-                <div className="bg-gray-50 rounded-xl p-6 mb-6">
-                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Ajouter une nouvelle actualité</h4>
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Titre de l'actualité"
-                      value={newNews.title}
-                      onChange={(e) => setNewNews({ ...newNews, title: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-                    <textarea
-                      placeholder="Résumé de l'actualité"
-                      rows={3}
-                      value={newNews.summary}
-                      onChange={(e) => setNewNews({ ...newNews, summary: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    ></textarea>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          setNewNews({ ...newNews, imageFile: file });
-                        }
-                      }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-                  <button
-                    onClick={addNews}
-                    disabled={isLoading}
-                    className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                  >
-                    {isLoading ? 'Ajout...' : 'Ajouter l\'actualité'}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 gap-6">
-                  {news.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                      <p>Aucune actualité pour le moment</p>
-                    </div>
-                  ) : (
-                    news.map((item) => (
-                      <div key={item._id} className="bg-white rounded-xl p-6 shadow-lg">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="font-bold text-gray-800 text-lg mb-2">{item.title}</h4>
-                            <p className="text-gray-600 mb-4">{item.summary}</p>
-                            <p className="text-sm text-gray-400">
-                              {new Date(item.createdAt).toLocaleDateString('fr-FR')}
-                            </p>
-                          </div>
-                          {item.image && (
-                            <div className="ml-4">
-                              <img
-                                src={getPhotoUrl(item.image)!}
-                                alt={item.title}
-                                className="w-24 h-24 object-cover rounded-lg mb-2"
-                              />
-                              <a
-                                href={getPhotoUrl(item.image)!}
-                                download
-                                className="text-xs text-purple-600 hover:text-purple-800 flex items-center"
-                              >
-                                📥 Télécharger
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                        <div className="mt-4 flex justify-end">
-                          <button
-                            onClick={() => deleteNews(item._id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
+                <p className="text-gray-500 italic">Cette section sera disponible prochainement.</p>
               </div>
-            )}
+            )} */}
 
-            {activeTab === 'events' && (
+            {/* {activeTab === 'events' && (
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Gestion des Événements</h3>
-
-                <div className="bg-gray-50 rounded-xl p-6 mb-6">
-                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Ajouter un nouvel événement</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Titre de l'événement"
-                      value={newEvent.title || ''}
-                      onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Date et heure *</label>
-                      <input
-                        type="datetime-local"
-                        value={newEvent.date || ''}
-                        onChange={(e) => {
-                          setNewEvent({ ...newEvent, date: e.target.value });
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 w-full"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Type d'événement</label>
-                      <select
-                        value={newEvent.type || 'workshop'}
-                        onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 w-full"
-                      >
-                        <option value="workshop">Atelier</option>
-                        <option value="webinar">Webinaire</option>
-                        <option value="conference">Conférence</option>
-                        <option value="networking">Networking</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Statut de l'événement</label>
-                      <select
-                        value={newEvent.status || 'upcoming'}
-                        onChange={(e) => {
-                          const status = e.target.value;
-                          let date = newEvent.date;
-
-                          // Auto-ajuster la date selon le statut
-                          if (status === 'past' && (!date || new Date(date) >= new Date())) {
-                            // Définir une date passée par défaut
-                            const pastDate = new Date();
-                            pastDate.setMonth(pastDate.getMonth() - 1);
-                            date = pastDate.toISOString().slice(0, 16);
-                          } else if (status === 'upcoming' && (!date || new Date(date) < new Date())) {
-                            // Définir une date future par défaut
-                            const futureDate = new Date();
-                            futureDate.setMonth(futureDate.getMonth() + 1);
-                            date = futureDate.toISOString().slice(0, 16);
-                          }
-
-                          setNewEvent({ ...newEvent, status, date });
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 w-full"
-                      >
-                        <option value="upcoming">À venir</option>
-                        <option value="past">Passé</option>
-                      </select>
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Lieu (optionnel)"
-                      value={newEvent.location || ''}
-                      onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Document/Vidéo (optionnel)</label>
-                      <input
-                        type="file"
-                        accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.avi,.mov,.wmv"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setNewEvent({ ...newEvent, resourceFile: file });
-                          }
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 w-full"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">PDF, DOC, PPT, MP4, AVI, MOV, WMV (upload manuel requis)</p>
-                    </div>
-                    <textarea
-                      placeholder="Description de l'événement"
-                      rows={3}
-                      value={newEvent.description || ''}
-                      onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                      className="col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    ></textarea>
-                  </div>
-                  <button
-                    onClick={addEvent}
-                    disabled={isLoading}
-                    className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                  >
-                    {isLoading ? 'Ajout...' : 'Ajouter l\'événement'}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 gap-6">
-                  {events.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <Settings className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                      <p>Aucun événement pour le moment</p>
-                    </div>
-                  ) : (
-                    events.map((event) => (
-                      <div key={event._id} className="bg-white rounded-xl p-6 shadow-lg">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-bold text-gray-800 text-lg">{event.title}</h4>
-                              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${event.type === 'workshop' ? 'bg-green-100 text-green-700' :
-                                event.type === 'webinar' ? 'bg-blue-100 text-blue-700' :
-                                  event.type === 'conference' ? 'bg-purple-100 text-purple-700' :
-                                    event.type === 'networking' ? 'bg-orange-100 text-orange-700' :
-                                      'bg-gray-100 text-gray-700'
-                                }`}>
-                                {event.type === 'workshop' ? 'Atelier' :
-                                  event.type === 'webinar' ? 'Webinaire' :
-                                    event.type === 'conference' ? 'Conférence' :
-                                      event.type === 'networking' ? 'Networking' :
-                                        event.type || 'Événement'}
-                              </span>
-                              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${new Date(event.date) >= new Date() ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                {new Date(event.date) >= new Date() ? 'À venir' : 'Passé'}
-                              </span>
-                            </div>
-                            <p className="text-gray-600 mb-2">{event.description}</p>
-                            <div className="text-sm text-gray-500 space-y-1">
-                              <p>📅 {new Date(event.date).toLocaleDateString('fr-FR')} à {new Date(event.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</p>
-                              {event.location && <p>📍 {event.location}</p>}
-                            </div>
-
-                          </div>
-                          {(event.documents?.length > 0 || event.videos?.length > 0) && (
-                            <div className="ml-4">
-                              <div className="text-sm text-gray-600 space-y-1">
-                                {event.documents?.length > 0 && (
-                                  <div className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">
-                                    📄 {event.documents.length} document(s)
-                                  </div>
-                                )}
-                                {event.videos?.length > 0 && (
-                                  <div className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">
-                                    🎥 {event.videos.length} vidéo(s)
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className="mt-4 flex justify-end">
-                          <button
-                            onClick={() => deleteEvent(event._id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
+                <p className="text-gray-500 italic">Cette section sera disponible prochainement.</p>
               </div>
-            )}
+            )} */}
 
             {activeTab === 'admins' && (currentUser?.email === 'admin@mentora.gn' || currentUser?.isMasterAdmin) && (
               <div>

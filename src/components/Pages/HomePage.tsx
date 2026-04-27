@@ -33,8 +33,8 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     loadStats();
     loadTestimonials();
     loadPartners();
-    loadNews();
-    loadEvents();
+    // loadNews(); // Masqué temporairement
+    // loadEvents(); // Masqué temporairement
   }, []);
 
 
