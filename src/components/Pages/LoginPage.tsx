@@ -40,7 +40,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
           }
         }
       } else {
-        setError('Email ou mot de passe incorrect');
+        setError("L'email ou le mot de passe est incorrect. Ces informations n'existent");
       }
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue lors de la connexion');
