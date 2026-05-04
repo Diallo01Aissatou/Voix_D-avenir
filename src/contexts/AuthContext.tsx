@@ -83,7 +83,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, role: string): Promise<boolean> => {
     try {
-      setIsLoading(true);
       const data = await UserServices.login({ email, password, role });
 
       if (data && data.user && data.token) {
@@ -96,14 +95,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
       throw new Error(error.response?.data?.message || "Une erreur est survenue lors de la connexion");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const register = async (userData: Partial<User> | FormData): Promise<boolean> => {
     try {
-      setIsLoading(true);
       const data = await UserServices.aregistre(userData);
 
       if (data && data.user && data.token) {
@@ -116,8 +112,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error("Erreur d'inscription :", error);
       return false;
-    } finally {
-      setIsLoading(false);
     }
   };
 
