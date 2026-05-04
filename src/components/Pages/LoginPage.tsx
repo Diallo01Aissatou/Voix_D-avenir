@@ -148,7 +148,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                     <span>Connexion...</span>
                   </div>
                 ) : (
-                  'Se connecter'
+                  'Se connecter (V2)'
                 )}
               </button>
 
