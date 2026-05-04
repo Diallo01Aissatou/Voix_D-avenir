@@ -72,7 +72,11 @@ function AppContent() {
     }
   }, [currentUser, currentPage]);
 
-  if (isLoading) {
+  // Ne pas afficher l'écran de chargement global si on est sur une page d'authentification
+  // Cela permet d'éviter que les erreurs de connexion soient masquées par le splash screen
+  const isAuthPage = ['login', 'register', 'forgot-password', 'reset-password'].includes(currentPage);
+
+  if (isLoading && !isAuthPage) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -137,7 +141,6 @@ function AppContent() {
   };
 
   const isDashboardPage = ['mentoree-dashboard', 'mentore-dashboard', 'admin-dashboard'].includes(currentPage);
-  const isAuthPage = ['login', 'forgot-password', 'reset-password'].includes(currentPage);
   const showHeader = !isAuthPage;
   const showFooter = !isDashboardPage && !isAuthPage;
 
