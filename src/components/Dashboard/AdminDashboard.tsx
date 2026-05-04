@@ -1621,7 +1621,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
             {activeTab === 'resources' && (
               <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-6">Gestion des Ressources</h3>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-gray-800">Gestion des Ressources</h3>
+                  <button
+                    onClick={async () => {
+                      if (window.confirm("Êtes-vous sûr de vouloir supprimer toutes les ressources fantômes de l'ancien système ? Cette action est irréversible et effacera les cartes des fichiers perdus.")) {
+                        try {
+                          const res = await Api.post('/admin/cleanup-resources');
+                          alert(res.data.message);
+                          loadResources(); // Refresh resources
+                        } catch (e: any) {
+                          alert("Erreur lors du nettoyage: " + (e.response?.data?.message || e.message));
+                        }
+                      }
+                    }}
+                    className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-bold flex items-center border border-red-300 shadow-sm"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" /> Nettoyer les fichiers perdus
+                  </button>
+                </div>
 
                 <div id="resource-form" className="bg-gray-50 rounded-xl p-6 mb-6 border-2 border-purple-100">
                   <h4 className="text-lg font-semibold text-gray-800 mb-4">
@@ -1758,31 +1776,49 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                               <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
                                 {resource.category || 'Général'}
                               </span>
+                              {resource.fileUrl && !resource.fileUrl.includes('/api/files/') && !resource.fileUrl.includes('/serve-file/') && !resource.fileUrl.startsWith('http') && (
+                                <span className="ml-2 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold border border-red-300">
+                                  ⚠️ FICHIER PERDU (Ancien Système)
+                                </span>
+                              )}
                             </div>
                             <h4 className="font-bold text-gray-800 text-lg mb-2">{resource.title || 'Sans titre'}</h4>
                             <p className="text-gray-600 mb-4">{resource.description || 'Pas de description'}</p>
                             {resource.fileUrl && (
                               <div className="mt-2 flex gap-4 text-sm">
-                                <a 
-                                  href={ (resource.fileUrl.includes('/serve-file/') || resource.fileUrl.includes('/api/files/')) ? `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/lecture.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}` : `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}` } 
-                                  className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="Ouvrir dans le navigateur"
-                                >
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  {resource.type === 'video' ? 'Voir la vidéo' : 'Lire la ressource'}
-                                </a>
-                                <a 
-                                  href={ (resource.fileUrl.includes('/serve-file/') || resource.fileUrl.includes('/api/files/')) ? `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/téléchargement.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}&download=true` : `${BASE_URL}/api/resources/download-file/${resource._id}?download=true` } 
-                                  className="inline-flex items-center text-gray-600 hover:text-gray-800 font-medium"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="Télécharger sur l'ordinateur"
-                                >
-                                  <Download className="w-4 h-4 mr-1" />
-                                  Télécharger
-                                </a>
+                                {(!resource.fileUrl.includes('/api/files/') && !resource.fileUrl.includes('/serve-file/') && !resource.fileUrl.startsWith('http')) ? (
+                                  <>
+                                    <button 
+                                      onClick={() => alert('Cette ressource a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez supprimer cette ressource et la recréer.')}
+                                      className="inline-flex items-center text-red-600 font-medium"
+                                    >
+                                      <Eye className="w-4 h-4 mr-1" /> Lien mort
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <a 
+                                      href={`${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/lecture.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}`} 
+                                      className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      title="Ouvrir dans le navigateur"
+                                    >
+                                      <Eye className="w-4 h-4 mr-1" />
+                                      {resource.type === 'video' ? 'Voir la vidéo' : 'Lire la ressource'}
+                                    </a>
+                                    <a 
+                                      href={`${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}/téléchargement.${(resource.type || '').toLowerCase().includes('vid') ? 'mp4' : 'pdf'}?t=${Date.now()}&download=true`} 
+                                      className="inline-flex items-center text-gray-600 hover:text-gray-800 font-medium"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      title="Télécharger sur l'ordinateur"
+                                    >
+                                      <Download className="w-4 h-4 mr-1" />
+                                      Télécharger
+                                    </a>
+                                  </>
+                                )}
                               </div>
                             )}
                           </div>

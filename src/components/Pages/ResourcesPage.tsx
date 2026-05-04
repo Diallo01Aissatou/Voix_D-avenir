@@ -83,6 +83,10 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       .replace(/[\u0300-\u036f]/g, ""); // Supprime les accents
 
     if (normalizedType === 'video') {
+      if (resource.fileUrl && !resource.fileUrl.includes('/api/files/') && !resource.fileUrl.includes('/serve-file/') && !resource.fileUrl.startsWith('http')) {
+        alert('Cette vidéo a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez demander à un administrateur de la republier.');
+        return;
+      }
       // Pour les vidéos, incrémenter localement les vues
       setResources(prev => prev.map(r => 
         r._id === resource._id ? { ...r, views: (r.views || 0) + 1 } : r
@@ -112,7 +116,8 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
         viewUrl = `${baseUrl}${resource.fileUrl}/${virtualName}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
       } else {
         // Anciens liens /uploads/
-        viewUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+        alert('Cette ressource a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez demander à un administrateur de la republier.');
+        return;
       }
       
       window.open(viewUrl, '_blank');
@@ -136,8 +141,11 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
     
     if (resource.fileUrl.includes('/serve-file/')) {
       downloadUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}?download=true&resourceId=${resource._id}`;
+    } else if (resource.fileUrl.includes('/api/files/')) {
+      downloadUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}?download=true&resourceId=${resource._id}`;
     } else {
-      downloadUrl = `${BASE_URL}/api/resources/download-file/${resource._id}?download=true`;
+      alert('Cette ressource a été téléchargée avec l\'ancien système non-permanent et ne peut plus être téléchargée. Veuillez demander à un administrateur de la republier.');
+      return;
     }
     
     window.location.href = downloadUrl;
