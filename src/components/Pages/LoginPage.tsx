@@ -44,6 +44,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
         setError(errorMsg);
       }
     } catch (err: any) {
+      console.log("DEBUG: Erreur capturée dans LoginPage:", err);
       const errorMsg = err.message || 'Une erreur est survenue lors de la connexion';
       setError(errorMsg);
     } finally {
@@ -72,6 +73,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8">
+            {error && (
+              <div className="mb-6 bg-red-100 border-2 border-red-500 rounded-xl p-4 text-red-800 font-bold animate-bounce text-center">
+                ⚠️ {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
@@ -131,11 +137,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                 </div>
               </div>
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
-                  {error}
-                </div>
-              )}
+
 
               <button
                 type="submit"
