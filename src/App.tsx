@@ -72,22 +72,9 @@ function AppContent() {
     }
   }, [currentUser, currentPage]);
 
-  // Ne pas afficher l'écran de chargement global si on est sur une page d'authentification
-  // Cela permet d'éviter que les erreurs de connexion soient masquées par le splash screen
+  // L'écran de chargement global a été supprimé pour éviter tout conflit avec la page de connexion
+  // et assurer que les messages d'erreur soient toujours visibles.
   const isAuthPage = ['login', 'register', 'forgot-password', 'reset-password'].includes(currentPage);
-
-  if (isLoading && !isAuthPage) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-40 h-40 bg-transparent flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Logo Voix d'Avenir" className="w-32 h-32 object-contain mix-blend-multiply" />
-          </div>
-          <p className="text-gray-600">Chargement de Voix D'avenir...</p>
-        </div>
-      </div>
-    );
-  }
 
   const renderPage = () => {
     switch (currentPage) {
