@@ -17,20 +17,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
   const [error, setError] = useState('');
   const { login } = useAuth();
 
-  // Charger l'erreur depuis le localStorage au montage (survit aux rechargements)
-  React.useEffect(() => {
-    const savedError = localStorage.getItem('login_error');
-    if (savedError) {
-      setError(savedError);
-      localStorage.removeItem('login_error');
-    }
-  }, []);
+  // On n'utilise plus le localStorage pour les erreurs car la page ne se recharge plus
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    localStorage.removeItem('login_error');
 
     try {
       const success = await login(formData.email, formData.password, formData.role);
@@ -51,13 +44,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
       } else {
         const errorMsg = "L'email ou le mot de passe est incorrect ou ne se trouve pas dans la base de données.";
         setError(errorMsg);
-        localStorage.setItem('login_error', errorMsg);
       }
     } catch (err: any) {
       console.log("DEBUG: Erreur capturée dans LoginPage:", err);
       const errorMsg = err.message || 'Une erreur est survenue lors de la connexion';
       setError(errorMsg);
-      localStorage.setItem('login_error', errorMsg);
     } finally {
       setIsLoading(false);
     }

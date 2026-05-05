@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AccueilDashboard from './AccueilDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
@@ -59,18 +60,8 @@ function AppContent() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Redirection après connexion
-  React.useEffect(() => {
-    if (currentUser && (currentPage === 'login' || currentPage === 'register')) {
-      if (currentUser.role === 'admin') {
-        setCurrentPage('admin-dashboard');
-      } else if (currentUser.role === 'mentore') {
-        setCurrentPage('mentore-dashboard');
-      } else {
-        setCurrentPage('mentoree-dashboard');
-      }
-    }
-  }, [currentUser, currentPage]);
+
+
 
   // L'écran de chargement global a été supprimé pour éviter tout conflit avec la page de connexion
   // et assurer que les messages d'erreur soient toujours visibles.
@@ -153,11 +144,7 @@ function AppContent() {
 }
 
 function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
+  return <AccueilDashboard />;
 }
 
 export default App;

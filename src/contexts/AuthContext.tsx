@@ -91,8 +91,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('mentora_user', JSON.stringify(data.user));
         return true;
       }
+      // Réponse inattendue sans token : on nettoie par sécurité
+      setCurrentUser(null);
+      localStorage.removeItem('mentora_user');
+      localStorage.removeItem('mentora_token');
       return false;
     } catch (error: any) {
+      // Échec de connexion (mauvais identifiants, erreur serveur, etc.)
+      // On vide toute ancienne session pour éviter une redirection parasite
+      setCurrentUser(null);
+      localStorage.removeItem('mentora_user');
+      localStorage.removeItem('mentora_token');
       console.error('Erreur de connexion:', error);
       throw new Error(error.response?.data?.message || "Une erreur est survenue lors de la connexion");
     }
