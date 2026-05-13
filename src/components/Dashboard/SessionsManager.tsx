@@ -3,12 +3,44 @@ import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Plus } from '
 import Api from '../../data/Api'; // Importation du service Api
 
 // Fonction utilitaire pour corriger les URLs des photos
+let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
   
   const fileName = photo.split('/').pop();
-  return `${BASE_URL}/uploads/${fileName}`;
+  return `${BASE_URL}/uploads/${fileName}?v=${photoVersion}`;
+};
+
+// Composant pour l'image de profil avec fallback
+const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  if (!src || error) {
+    return (
+      <div className={`${className} bg-purple-100 flex items-center justify-center`}>
+        <User className="w-8 h-8 text-purple-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${className} relative overflow-hidden flex items-center justify-center`}>
+      {loading && (
+        <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+          <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        className={`${className} object-cover w-full h-full`} 
+        onLoad={() => setLoading(false)}
+        onError={() => { setError(true); setLoading(false); }} 
+      />
+    </div>
+  );
 };
 
 interface SessionsManagerProps {
@@ -95,20 +127,12 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
   const SessionCard = ({ session }: { session: any }) => (
     <div className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
       <div className="flex items-start space-x-4">
-        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 border border-purple-200">
-          {getPhotoUrl(session.mentore?.photo) ? (
-            <img 
-              src={getPhotoUrl(session.mentore.photo)!} 
-              alt={session.mentore.name} 
-              className="w-16 h-16 rounded-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '';
-                (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-8 h-8"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-              }}
-            />
-          ) : (
-            <User className="w-8 h-8 text-purple-600" />
-          )}
+        <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border border-purple-200">
+          <ProfileImage 
+            src={getPhotoUrl(session.mentore?.photo)} 
+            alt={session.mentore?.name || 'Mentor'} 
+            className="w-16 h-16"
+          />
         </div>
         
         <div className="flex-1">

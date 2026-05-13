@@ -3,12 +3,44 @@ import { X, User, Search } from 'lucide-react';
 import { User as UserType } from '../../types';
 import Api, { BASE_URL } from '../../data/Api';
 
+let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
   
   const fileName = photo.split('/').pop();
-  return `${BASE_URL}/uploads/${fileName}`;
+  return `${BASE_URL}/uploads/${fileName}?v=${photoVersion}`;
+};
+
+// Composant pour l'image de profil avec fallback
+const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  if (!src || error) {
+    return (
+      <div className={`${className} bg-purple-100 flex items-center justify-center`}>
+        <User className="w-6 h-6 text-purple-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${className} relative overflow-hidden flex items-center justify-center`}>
+      {loading && (
+        <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+          <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        className={`${className} object-cover w-full h-full`} 
+        onLoad={() => setLoading(false)}
+        onError={() => { setError(true); setLoading(false); }} 
+      />
+    </div>
+  );
 };
 
 interface MentorshipRequestFormProps {
@@ -189,20 +221,12 @@ const MentorshipRequestForm: React.FC<MentorshipRequestFormProps> = ({
                         onClick={() => setSelectedMentore(mentore)}
                       >
                         <div className="flex items-start space-x-3">
-                          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
-                            {getPhotoUrl(mentore.photo) ? (
-                              <img 
-                                src={getPhotoUrl(mentore.photo)!} 
-                                alt={mentore.name} 
-                                className="w-12 h-12 rounded-full object-cover"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = '';
-                                  (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-                                }}
-                              />
-                            ) : (
-                              <User className="w-6 h-6 text-purple-600" />
-                            )}
+                          <div className="w-12 h-12 rounded-full overflow-hidden border border-purple-200">
+                            <ProfileImage 
+                              src={getPhotoUrl(mentore.photo)} 
+                              alt={mentore.name} 
+                              className="w-12 h-12"
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-gray-900 truncate">{mentore.name}</h3>
@@ -234,20 +258,12 @@ const MentorshipRequestForm: React.FC<MentorshipRequestFormProps> = ({
                   {/* Selected Mentore Info */}
                   <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
-                        {getPhotoUrl(selectedMentore.photo) ? (
-                          <img 
-                            src={getPhotoUrl(selectedMentore.photo)!} 
-                            alt={selectedMentore.name} 
-                            className="w-12 h-12 rounded-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '';
-                              (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-                            }}
-                          />
-                        ) : (
-                          <User className="w-6 h-6 text-purple-600" />
-                        )}
+                      <div className="w-12 h-12 rounded-full overflow-hidden border border-purple-200">
+                        <ProfileImage 
+                          src={getPhotoUrl(selectedMentore.photo)} 
+                          alt={selectedMentore.name} 
+                          className="w-12 h-12"
+                        />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">{selectedMentore.name}</h3>

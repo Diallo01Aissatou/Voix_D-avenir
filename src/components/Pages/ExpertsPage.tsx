@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Award, MapPin, Briefcase, Quote, MessageSquare, ChevronRight } from 'lucide-react';
+import { Star, Award, MapPin, Briefcase, Quote, MessageSquare, ChevronRight, User } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
 
 interface ExpertsPageProps {
@@ -12,11 +12,43 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
   const [experts, setExperts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  let photoVersion = Date.now();
   const getPhotoUrl = (photo: string | undefined) => {
     if (!photo) return 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg';
-    if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+    if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
     const fileName = photo.split('/').pop();
-    return `${BASE_URL}/uploads/${fileName}`;
+    return `${BASE_URL}/uploads/${fileName}?v=${photoVersion}`;
+  };
+
+  // Composant pour l'image de profil avec fallback
+  const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    if (!src || error) {
+      return (
+        <div className={`${className} bg-purple-100 flex items-center justify-center`}>
+          <User className="w-12 h-12 text-purple-600" />
+        </div>
+      );
+    }
+
+    return (
+      <div className={`${className} relative overflow-hidden flex items-center justify-center`}>
+        {loading && (
+          <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+        <img 
+          src={src} 
+          alt={alt} 
+          className={`${className} object-cover w-full h-full`} 
+          onLoad={() => setLoading(false)}
+          onError={() => { setError(true); setLoading(false); }} 
+        />
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -85,18 +117,10 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 <div className="h-96 lg:h-[500px] bg-white flex items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-100 relative overflow-hidden">
-                  {/* Background Blur Effect */}
-                  <img 
-                    src={getPhotoUrl(featuredExpert.user?.photo)} 
-                    alt="" 
-                    className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
-                    aria-hidden="true"
-                  />
-                  <img
+                  <ProfileImage
                     src={getPhotoUrl(featuredExpert.user?.photo)}
                     alt={featuredExpert.user?.name}
-                    className="relative z-10 max-w-full max-h-full object-contain"
-                    style={{ imageRendering: 'initial' } as any}
+                    className="w-full h-full"
                   />
                 </div>
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -160,18 +184,10 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
             {otherExperts.length > 0 ? otherExperts.map((expert) => (
               <div key={expert._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 overflow-hidden group">
                 <div className="h-80 overflow-hidden bg-white flex items-center justify-center border-b border-gray-100 relative">
-                  {/* Background Blur Effect */}
-                  <img 
-                    src={getPhotoUrl(expert.user?.photo)} 
-                    alt="" 
-                    className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110"
-                    aria-hidden="true"
-                  />
-                  <img
+                  <ProfileImage
                     src={getPhotoUrl(expert.user?.photo)}
                     alt={expert.user?.name}
-                    className="relative z-10 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                    style={{ imageRendering: 'pixelated' } as any}
+                    className="w-full h-full"
                   />
                 </div>
                 

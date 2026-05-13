@@ -1,16 +1,48 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Search, User, Plus, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import Api from '../../data/Api'; // Importation du service Api
+import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
 // import { useSocket } from '../../hooks/useSocket';
 
 // Fonction utilitaire pour corriger les URLs des photos
+let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
   
   const fileName = photo.split('/').pop();
-  return `${BASE_URL}/uploads/${fileName}`;
+  return `${BASE_URL}/uploads/${fileName}?v=${photoVersion}`;
+};
+
+// Composant pour l'image de profil avec fallback
+const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  if (!src || error) {
+    return (
+      <div className={`${className} bg-purple-100 flex items-center justify-center`}>
+        <User className="w-5 h-5 text-purple-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${className} relative overflow-hidden flex items-center justify-center`}>
+      {loading && (
+        <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+          <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        className={`${className} object-cover w-full h-full`} 
+        onLoad={() => setLoading(false)}
+        onError={() => { setError(true); setLoading(false); }} 
+      />
+    </div>
+  );
 };
 
 interface Conversation {
@@ -193,20 +225,12 @@ const MessageriePage: React.FC = () => {
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
-                {getPhotoUrl(userProfile?.photo) ? (
-                  <img 
-                    src={getPhotoUrl(userProfile.photo)!} 
-                    alt={userProfile?.name} 
-                    className="w-10 h-10 rounded-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '';
-                      (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-                    }}
-                  />
-                ) : (
-                  <User className="w-5 h-5 text-purple-600" />
-                )}
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-purple-200">
+                <ProfileImage 
+                  src={getPhotoUrl(userProfile?.photo)} 
+                  alt={userProfile?.name || 'Profil'} 
+                  className="w-10 h-10"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-gray-800">Messages</h1>
@@ -252,20 +276,12 @@ const MessageriePage: React.FC = () => {
                     className="p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50"
                   >
                     <div className="flex items-start space-x-3">
-                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
-                        {getPhotoUrl(user.photo) ? (
-                          <img 
-                            src={getPhotoUrl(user.photo)!} 
-                            alt={user.name} 
-                            className="w-12 h-12 rounded-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '';
-                              (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-                            }}
-                          />
-                        ) : (
-                          <User className="w-6 h-6 text-purple-600" />
-                        )}
+                      <div className="w-12 h-12 rounded-full overflow-hidden border border-purple-200">
+                        <ProfileImage 
+                          src={getPhotoUrl(user.photo)} 
+                          alt={user.name} 
+                          className="w-12 h-12"
+                        />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-gray-900">{user.name}</h4>
@@ -288,20 +304,12 @@ const MessageriePage: React.FC = () => {
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
-                    {getPhotoUrl(conversation.user.photo) ? (
-                      <img 
-                        src={getPhotoUrl(conversation.user.photo)!} 
-                        alt={conversation.user.name} 
-                        className="w-12 h-12 rounded-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '';
-                          (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-                        }}
-                      />
-                    ) : (
-                      <User className="w-6 h-6 text-purple-600" />
-                    )}
+                  <div className="w-12 h-12 rounded-full overflow-hidden border border-purple-200">
+                    <ProfileImage 
+                      src={getPhotoUrl(conversation.user.photo)} 
+                      alt={conversation.user.name} 
+                      className="w-12 h-12"
+                    />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -328,20 +336,12 @@ const MessageriePage: React.FC = () => {
           <>
             <div className="bg-white border-b border-gray-200 p-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
-                  {selectedUser && getPhotoUrl(selectedUser.photo) ? (
-                    <img 
-                      src={getPhotoUrl(selectedUser.photo)!} 
-                      alt={selectedUser.name} 
-                      className="w-10 h-10 rounded-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '';
-                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-                      }}
-                    />
-                  ) : (
-                    <User className="w-5 h-5 text-purple-600" />
-                  )}
+                <div className="w-10 h-10 rounded-full overflow-hidden border border-purple-200">
+                  <ProfileImage 
+                    src={getPhotoUrl(selectedUser.photo)} 
+                    alt={selectedUser.name || 'Destinataire'} 
+                    className="w-10 h-10"
+                  />
                 </div>
                 <div>
                   <h2 className="font-semibold text-gray-900">{selectedUser?.name}</h2>
