@@ -7,12 +7,10 @@ import Api from '../../data/Api'; // Importation du service Api
 // Fonction utilitaire pour corriger les URLs des photos
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  let url = photo;
-  if (!photo.startsWith('http')) {
-    const fileName = photo.split('/').pop();
-    url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
-  }
-  return url.replace('http://', 'https://');
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+  
+  const fileName = photo.split('/').pop();
+  return `${BASE_URL}/uploads/${fileName}`;
 };
 
 interface Conversation {
@@ -195,11 +193,19 @@ const MessageriePage: React.FC = () => {
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
                 {getPhotoUrl(userProfile?.photo) ? (
-                  <img src={getPhotoUrl(userProfile.photo)!} alt={userProfile?.name} className="w-10 h-10 rounded-full object-cover" />
+                  <img 
+                    src={getPhotoUrl(userProfile.photo)!} 
+                    alt={userProfile?.name} 
+                    className="w-10 h-10 rounded-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '';
+                      (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+                    }}
+                  />
                 ) : (
-                  <User className="w-5 h-5 text-white" />
+                  <User className="w-5 h-5 text-purple-600" />
                 )}
               </div>
               <div>
@@ -246,11 +252,19 @@ const MessageriePage: React.FC = () => {
                     className="p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50"
                   >
                     <div className="flex items-start space-x-3">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
                         {getPhotoUrl(user.photo) ? (
-                          <img src={getPhotoUrl(user.photo)!} alt={user.name} className="w-12 h-12 rounded-full object-cover" />
+                          <img 
+                            src={getPhotoUrl(user.photo)!} 
+                            alt={user.name} 
+                            className="w-12 h-12 rounded-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '';
+                              (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+                            }}
+                          />
                         ) : (
-                          <User className="w-6 h-6 text-white" />
+                          <User className="w-6 h-6 text-purple-600" />
                         )}
                       </div>
                       <div className="flex-1">
@@ -274,11 +288,19 @@ const MessageriePage: React.FC = () => {
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
                     {getPhotoUrl(conversation.user.photo) ? (
-                      <img src={getPhotoUrl(conversation.user.photo)!} alt={conversation.user.name} className="w-12 h-12 rounded-full object-cover" />
+                      <img 
+                        src={getPhotoUrl(conversation.user.photo)!} 
+                        alt={conversation.user.name} 
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '';
+                          (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+                        }}
+                      />
                     ) : (
-                      <User className="w-6 h-6 text-white" />
+                      <User className="w-6 h-6 text-purple-600" />
                     )}
                   </div>
                   <div className="flex-1">
@@ -306,11 +328,19 @@ const MessageriePage: React.FC = () => {
           <>
             <div className="bg-white border-b border-gray-200 p-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
                   {selectedUser && getPhotoUrl(selectedUser.photo) ? (
-                    <img src={getPhotoUrl(selectedUser.photo)!} alt={selectedUser.name} className="w-10 h-10 rounded-full object-cover" />
+                    <img 
+                      src={getPhotoUrl(selectedUser.photo)!} 
+                      alt={selectedUser.name} 
+                      className="w-10 h-10 rounded-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '';
+                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+                      }}
+                    />
                   ) : (
-                    <User className="w-5 h-5 text-white" />
+                    <User className="w-5 h-5 text-purple-600" />
                   )}
                 </div>
                 <div>

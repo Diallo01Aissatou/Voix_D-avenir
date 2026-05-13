@@ -26,12 +26,10 @@ interface MyMentorshipRequestsProps {
 // Fonction utilitaire pour corriger les URLs des photos
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  let url = photo;
-  if (!photo.startsWith('http')) {
-    const fileName = photo.split('/').pop();
-    url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
-  }
-  return url.replace('http://', 'https://');
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+  
+  const fileName = photo.split('/').pop();
+  return `${BASE_URL}/uploads/${fileName}`;
 };
 
 const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat }) => {
@@ -105,11 +103,19 @@ const MyMentorshipRequests: React.FC<MyMentorshipRequestsProps> = ({ onStartChat
             <div key={request._id} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
                     {getPhotoUrl(request.mentore.photo) ? (
-                      <img src={getPhotoUrl(request.mentore.photo)!} alt={request.mentore.name} className="w-12 h-12 rounded-full object-cover" />
+                      <img 
+                        src={getPhotoUrl(request.mentore.photo)!} 
+                        alt={request.mentore.name} 
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '';
+                          (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+                        }}
+                      />
                     ) : (
-                      <User className="w-6 h-6 text-white" />
+                      <User className="w-6 h-6 text-purple-600" />
                     )}
                   </div>
                   <div>

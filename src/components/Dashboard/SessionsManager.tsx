@@ -5,12 +5,10 @@ import Api from '../../data/Api'; // Importation du service Api
 // Fonction utilitaire pour corriger les URLs des photos
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
-  let url = photo;
-  if (!photo.startsWith('http')) {
-    const fileName = photo.split('/').pop();
-    url = `https://voix-avenir-backend.onrender.com/uploads/${fileName}`;
-  }
-  return url.replace('http://', 'https://');
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+  
+  const fileName = photo.split('/').pop();
+  return `${BASE_URL}/uploads/${fileName}`;
 };
 
 interface SessionsManagerProps {
@@ -97,11 +95,19 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
   const SessionCard = ({ session }: { session: any }) => (
     <div className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
       <div className="flex items-start space-x-4">
-        <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 border border-purple-200">
           {getPhotoUrl(session.mentore?.photo) ? (
-            <img src={getPhotoUrl(session.mentore.photo)!} alt={session.mentore.name} className="w-16 h-16 rounded-full object-cover" />
+            <img 
+              src={getPhotoUrl(session.mentore.photo)!} 
+              alt={session.mentore.name} 
+              className="w-16 h-16 rounded-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '';
+                (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-8 h-8"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+              }}
+            />
           ) : (
-            <User className="w-8 h-8 text-white" />
+            <User className="w-8 h-8 text-purple-600" />
           )}
         </div>
         

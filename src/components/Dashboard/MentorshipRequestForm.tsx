@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Search } from 'lucide-react';
 import { User as UserType } from '../../types';
-import Api from '../../data/Api';
+import Api, { BASE_URL } from '../../data/Api';
+
+const getPhotoUrl = (photo: string | undefined) => {
+  if (!photo) return null;
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+  
+  const fileName = photo.split('/').pop();
+  return `${BASE_URL}/uploads/${fileName}`;
+};
 
 interface MentorshipRequestFormProps {
   isOpen: boolean;
@@ -181,11 +189,19 @@ const MentorshipRequestForm: React.FC<MentorshipRequestFormProps> = ({
                         onClick={() => setSelectedMentore(mentore)}
                       >
                         <div className="flex items-start space-x-3">
-                          <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
-                            {mentore.photo ? (
-                              <img src={mentore.photo} alt={mentore.name} className="w-12 h-12 rounded-full object-cover" />
+                          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
+                            {getPhotoUrl(mentore.photo) ? (
+                              <img 
+                                src={getPhotoUrl(mentore.photo)!} 
+                                alt={mentore.name} 
+                                className="w-12 h-12 rounded-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '';
+                                  (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+                                }}
+                              />
                             ) : (
-                              <User className="w-6 h-6 text-white" />
+                              <User className="w-6 h-6 text-purple-600" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -218,11 +234,19 @@ const MentorshipRequestForm: React.FC<MentorshipRequestFormProps> = ({
                   {/* Selected Mentore Info */}
                   <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden">
-                        {selectedMentore.photo ? (
-                          <img src={selectedMentore.photo} alt={selectedMentore.name} className="w-12 h-12 rounded-full object-cover" />
+                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden border border-purple-200">
+                        {getPhotoUrl(selectedMentore.photo) ? (
+                          <img 
+                            src={getPhotoUrl(selectedMentore.photo)!} 
+                            alt={selectedMentore.name} 
+                            className="w-12 h-12 rounded-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '';
+                              (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-purple-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-6 h-6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+                            }}
+                          />
                         ) : (
-                          <User className="w-6 h-6 text-white" />
+                          <User className="w-6 h-6 text-purple-600" />
                         )}
                       </div>
                       <div>
