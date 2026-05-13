@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import AccueilDashboard from './AccueilDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
@@ -144,7 +143,11 @@ function AppContent() {
 }
 
 function App() {
-  return <AccueilDashboard />;
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
 }
 
 export default App;
