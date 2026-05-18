@@ -306,8 +306,8 @@ const MessageriePage: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 rounded-full overflow-hidden border border-purple-200">
                     <ProfileImage 
-                      src={getPhotoUrl(conversation.user.photo)} 
-                      alt={conversation.user.name} 
+                      src={getPhotoUrl(conversation.user?.photo)} 
+                      alt={conversation.user?.name || 'Utilisateur'} 
                       className="w-12 h-12"
                     />
                   </div>
@@ -338,8 +338,8 @@ const MessageriePage: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-purple-200">
                   <ProfileImage 
-                    src={getPhotoUrl(selectedUser.photo)} 
-                    alt={selectedUser.name || 'Destinataire'} 
+                    src={getPhotoUrl(selectedUser?.photo)} 
+                    alt={selectedUser?.name || 'Destinataire'} 
                     className="w-10 h-10"
                   />
                 </div>

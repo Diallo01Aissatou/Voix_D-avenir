@@ -57,14 +57,14 @@ const getPhotoUrl = (photo: string | undefined) => {
 };
 
 // Composant pour l'image de profil avec fallback
-const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | null, alt: string, className: string, iconSize?: number }) => {
+const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   if (!src || error) {
     return (
       <div className={`${className} bg-purple-100 flex items-center justify-center`}>
-        <User className={`w-${iconSize} h-${iconSize} text-purple-600`} />
+        <User className="w-1/2 h-1/2 text-purple-600" />
       </div>
     );
   }
@@ -174,7 +174,6 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
                 src={getPhotoUrl(currentUser?.photo)} 
                 alt={currentUser?.name || 'Profil'} 
                 className="w-16 h-16"
-                iconSize={8}
               />
             </div>
             <div>
@@ -311,7 +310,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }: { sessions:
       {sessions.map(s => (
         <div key={s._id} className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center hover:bg-white transition-colors">
           <div className="flex items-center space-x-3">
-             <ProfileImage src={getPhotoUrl(s.mentoree?.photo)} alt={s.mentoree?.name || ''} className="w-12 h-12 rounded-full border-2 border-purple-100" iconSize={6} />
+             <ProfileImage src={getPhotoUrl(s.mentoree?.photo)} alt={s.mentoree?.name || ''} className="w-12 h-12 rounded-full border-2 border-purple-100" />
              <div><p className="font-bold">{s.mentoree?.name}</p><p className="text-sm text-purple-600">{s.topic}</p><p className="text-xs text-gray-500">{new Date(s.scheduledDate).toLocaleDateString()} à {s.scheduledTime}</p></div>
           </div>
           <div className="flex space-x-2">

@@ -118,8 +118,8 @@ function AppContent() {
   };
 
   const isDashboardPage = ['mentoree-dashboard', 'mentore-dashboard', 'admin-dashboard'].includes(currentPage);
-  const showHeader = !isAuthPage;
-  const showFooter = !isDashboardPage && !isAuthPage;
+  const showHeader = !['login', 'forgot-password', 'reset-password'].includes(currentPage);
+  const showFooter = !isDashboardPage && !['login', 'forgot-password', 'reset-password'].includes(currentPage);
 
   return (
     <div className={`min-h-screen ${isAuthPage ? '' : 'bg-gray-50'}`}>

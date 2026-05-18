@@ -1849,7 +1849,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                         </div>
                       </div>
                     ))
-                  )}
+                  })()}
                 </div>
               </div>
             )}

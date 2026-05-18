@@ -63,14 +63,14 @@ const getPhotoUrl = (photo: string | undefined) => {
 };
 
 // Composant pour l'image de profil avec fallback
-const ProfileImage = ({ src, alt, className, iconSize = 8 }: { src: string | null, alt: string, className: string, iconSize?: number }) => {
+const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   if (!src || error) {
     return (
       <div className={`${className} bg-purple-100 flex items-center justify-center`}>
-        <UserIcon className={`w-${iconSize} h-${iconSize} text-purple-600`} />
+        <UserIcon className="w-1/2 h-1/2 text-purple-600" />
       </div>
     );
   }
@@ -235,7 +235,6 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                 src={getPhotoUrl(userProfile?.photo || currentUser?.photo)} 
                 alt={userProfile?.name || currentUser?.name || 'Profil'} 
                 className="w-16 h-16"
-                iconSize={8}
               />
             </div>
             <div>
@@ -335,7 +334,6 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                               src={getPhotoUrl(m.photo)} 
                               alt={m.name} 
                               className="w-12 h-12 rounded-full border-2 border-white/50" 
-                              iconSize={6}
                             />
                             <div>
                                <p className="font-bold text-sm">{m.name}</p> 
@@ -372,7 +370,6 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                           src={getPhotoUrl(m.photo)} 
                           alt={m.name} 
                           className="w-20 h-20 rounded-2xl flex-shrink-0" 
-                          iconSize={10}
                         />
                         <div className="flex-1">
                           <div className="flex justify-between items-start">
@@ -472,7 +469,6 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                           src={getPhotoUrl(userProfile?.photo)} 
                           alt={userProfile?.name || 'Profil'} 
                           className="w-32 h-32 rounded-3xl shadow-xl ring-4 ring-purple-50" 
-                          iconSize={12}
                         />
                         <div className="flex-1 text-center md:text-left">
                            <h3 className="text-3xl font-black text-gray-800 mb-1">{userProfile?.name}</h3>
