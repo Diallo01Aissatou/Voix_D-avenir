@@ -54,6 +54,12 @@ const compressImage = (file: File): Promise<File> => {
 let photoVersion = Date.now(); // Version globale stable par session
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
+  
+  // Nettoyage des URL Base64 corrompues par le backend
+  if (photo.includes('data:image')) {
+    return photo.substring(photo.indexOf('data:image'));
+  }
+  
   if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
   
   // Utiliser l'URL de l'API dynamiquement au lieu de la coder en dur

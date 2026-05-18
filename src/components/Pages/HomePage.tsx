@@ -22,11 +22,19 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const photoVersion = Date.now();
   const getPhotoUrl = (photo: string | undefined) => {
     if (!photo) return null;
+    
+    // Correction pour les chaînes Base64 corrompues par le backend
+    if (photo.includes('data:image')) {
+      return photo.substring(photo.indexOf('data:image'));
+    }
+    
     if (photo.startsWith('http') || photo.startsWith('data:')) return photo;
+    
     const fileName = photo.split('/').pop();
-    return `${BASE_URL}/uploads/${fileName}`;
+    return `${BASE_URL}/uploads/${fileName}?v=${photoVersion}`;
   };
 
   useEffect(() => {

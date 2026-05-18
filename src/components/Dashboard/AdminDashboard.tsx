@@ -17,11 +17,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const getPhotoUrl = (photo: string | undefined) => {
     if (!photo) return null;
-    if (photo.startsWith('http') || photo.startsWith('data:') || photo.startsWith('/api/')) return photo.startsWith('/') ? `${BASE_URL}${photo}` : photo;
     
-    // Si c'est un chemin relatif (/uploads/...), construire l'URL complète
-    const fileName = photo.split('/').pop();
-    return `${BASE_URL}/uploads/${fileName}`;
+    // Correction pour les chaînes Base64 corrompues par le backend
+    if (photo.includes('data:image')) {
+      return photo.substring(photo.indexOf('data:image'));
+    }
+    
+    if (photo.startsWith('http') || photo.startsWith('data:') || photo.startsWith('/api/')) return photo.startsWith('/') ? `${BASE_URL}${photo}` : photo;
+    return `${BASE_URL}/uploads/${photo.split('/').pop()}`;
   };
   const [users, setUsers] = useState<User[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
