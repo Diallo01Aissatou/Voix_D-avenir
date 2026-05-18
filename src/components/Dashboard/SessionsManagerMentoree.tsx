@@ -3,6 +3,46 @@ import { Clock, User, Video, CheckCircle, XCircle, RefreshCw } from 'lucide-reac
 import Api from '../../data/Api'; // Importation du service Api
 import { Session } from '../../types';
 
+let photoVersion = Date.now();
+const getPhotoUrl = (photo: string | undefined) => {
+  if (!photo) return null;
+  if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
+  
+  // Remplacer l'URL en dur par la constante BASE_URL qui existe dans Api
+  const fileName = photo.split('/').pop();
+  return `https://voix-avenir-backend.onrender.com/uploads/${fileName}?v=${photoVersion}`;
+};
+
+const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  if (!src || error) {
+    return (
+      <div className={`${className} bg-purple-100 flex items-center justify-center`}>
+        <User className="w-1/2 h-1/2 text-purple-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${className} relative overflow-hidden flex items-center justify-center`}>
+      {loading && (
+        <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+          <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        className={`${className} object-cover w-full h-full`} 
+        onLoad={() => setLoading(false)}
+        onError={() => { setError(true); setLoading(false); }} 
+      />
+    </div>
+  );
+};
+
 interface SessionsManagerMentoreeProps {
   sessions: Session[];
   onRefresh: () => void;
@@ -82,11 +122,7 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
           <div key={`${session._id}-${index}`} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden">
-                  {session.mentore?.photo ? (
-                    <img src={session.mentore.photo.startsWith('http') ? session.mentore.photo : `https://voix-avenir-backend.onrender.com${session.mentore.photo}`} alt={session.mentore.name} className="w-12 h-12 rounded-full object-cover" />
-                  ) : <User className="w-6 h-6 text-purple-600" />}
-                </div>
+                <ProfileImage src={getPhotoUrl(session.mentore?.photo)} alt={session.mentore?.name || ''} className="w-12 h-12 rounded-full border-2 border-purple-100 flex-shrink-0" />
                 <div>
                   <h4 className="font-bold text-gray-800">{session.mentore?.name}</h4>
                   <p className="text-sm text-purple-600">{session.topic}</p>

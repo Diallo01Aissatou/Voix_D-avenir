@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
-import Api from '../../data/Api'; // Importation du service Api
+import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
 
 // Fonction utilitaire pour corriger les URLs des photos
 let photoVersion = Date.now();
