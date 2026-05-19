@@ -68,16 +68,16 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
   useEffect(() => {
     loadRequests();
 
-    // Actualisation automatique toutes les 15 secondes
+    // Actualisation automatique toutes les 15 secondes (sans spinner)
     const interval = setInterval(() => {
-      loadRequests();
+      loadRequests(false);
     }, 15000);
 
     return () => clearInterval(interval);
   }, [userRole]);
 
-  const loadRequests = async () => {
-    setLoading(true);
+  const loadRequests = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const endpoint = userRole === 'mentore' ? 'received' : 'sent';
       const response = await Api.get(`/mentorship/${endpoint}`);
@@ -87,7 +87,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
     } catch (error) {
       console.error('Erreur chargement demandes:', error);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -151,7 +151,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
           </p>
         </div>
         <button
-          onClick={loadRequests}
+          onClick={() => loadRequests(true)}
           disabled={loading}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center"
         >
