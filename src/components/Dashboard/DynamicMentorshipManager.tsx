@@ -104,7 +104,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
     if (showLoading) setLoading(true);
     try {
       const endpoint = userRole === 'mentore' ? 'received' : 'sent';
-      const response = await Api.get(`/mentorship/${endpoint}`);
+      const response = await Api.get(`/mentorship/${endpoint}?t=${Date.now()}`);
 
       setRequests(response.data || []);
       setLastUpdate(new Date());
