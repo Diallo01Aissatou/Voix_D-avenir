@@ -25,6 +25,13 @@ const getPhotoUrl = (photo: string | undefined) => {
     return `${url}${url.includes('?') ? '&' : '?'}v=${photoVersion}`;
   }
   
+  // Si la chaîne est très longue, c'est du base64 brut sans le préfixe
+  if (photo.length > 200) {
+    if (!photo.startsWith('data:')) {
+      return `data:image/jpeg;base64,${photo}`;
+    }
+  }
+
   // Chemin relatif (GridFS: /api/files/ID ou /uploads/filename)
   // BASE_URL = https://voix-avenir-backend.onrender.com (sans /api)
   if (photo.startsWith('/')) {
