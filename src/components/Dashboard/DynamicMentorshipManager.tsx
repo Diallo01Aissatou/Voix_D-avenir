@@ -12,8 +12,20 @@ const getPhotoUrl = (photo: string | undefined) => {
     return photo.substring(photo.indexOf('data:image'));
   }
   
-  if (photo.startsWith('http') || photo.startsWith('data:')) return photo + (photo.startsWith('http') ? `?v=${photoVersion}` : '');
+  // Si c'est du Base64 propre, le retourner tel quel
+  if (photo.startsWith('data:')) return photo;
   
+  // Si c'est une URL complète
+  if (photo.startsWith('http')) {
+    // Corriger http -> https si le site est en https (proxy Render)
+    let url = photo;
+    if (window.location.protocol === 'https:' && url.startsWith('http://')) {
+      url = url.replace('http://', 'https://');
+    }
+    return `${url}${url.includes('?') ? '&' : '?'}v=${photoVersion}`;
+  }
+  
+  // Sinon, construire l'URL à partir de BASE_URL
   const baseUrlClean = BASE_URL.replace(/\/api$/, '');
   const fileName = photo.split('/').pop();
   return `${baseUrlClean}/uploads/${fileName}?v=${photoVersion}`;
