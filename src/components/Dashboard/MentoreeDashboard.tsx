@@ -73,10 +73,15 @@ const getPhotoUrl = (photo: string | undefined) => {
     return `${url}${url.includes('?') ? '&' : '?'}v=${photoVersion}`;
   }
   
-  // Utiliser l'URL de l'API dynamiquement au lieu de la coder en dur
-  const baseUrlClean = BASE_URL.replace(/\/api$/, '');
+  // Chemin relatif (GridFS: /api/files/ID ou /uploads/filename)
+  // BASE_URL = https://voix-avenir-backend.onrender.com (sans /api)
+  if (photo.startsWith('/')) {
+    return `${BASE_URL}${photo}?v=${photoVersion}`;
+  }
+
+  // Nom de fichier simple → dossier uploads
   const fileName = photo.split('/').pop();
-  return `${baseUrlClean}/uploads/${fileName}?v=${photoVersion}`;
+  return `${BASE_URL}/uploads/${fileName}?v=${photoVersion}`;
 };
 
 // Composant pour l'image de profil avec fallback
