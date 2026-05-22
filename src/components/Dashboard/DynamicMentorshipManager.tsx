@@ -7,18 +7,29 @@ let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
   if (!photo) return null;
   
-  // Correction pour les chaînes Base64 corrompues par le backend
-  if (photo.includes('data:image')) {
-    return photo.substring(photo.indexOf('data:image'));
+  // Nettoyage et assainissement s'il s'agit d'une chaîne base64 ou URL
+  let cleanPhoto = photo.trim();
+  
+  // Correction pour les chaînes Base64 enveloppées de guillemets doubles
+  if (cleanPhoto.startsWith('"') && cleanPhoto.endsWith('"')) {
+    cleanPhoto = cleanPhoto.slice(1, -1);
   }
   
-  // Si c'est du Base64 propre, le retourner tel quel
-  if (photo.startsWith('data:')) return photo;
+  // Correction pour les chaînes Base64 corrompues par le backend
+  if (cleanPhoto.includes('data:image')) {
+    const index = cleanPhoto.indexOf('data:image');
+    return cleanPhoto.substring(index).replace(/[\s\r\n"\\]/g, '');
+  }
+  
+  // Si c'est du Base64 propre, le retourner tel quel sans espaces ou retours chariot
+  if (cleanPhoto.startsWith('data:')) {
+    return cleanPhoto.replace(/[\s\r\n"\\]/g, '');
+  }
   
   // Si c'est une URL complète
-  if (photo.startsWith('http')) {
+  if (cleanPhoto.startsWith('http')) {
     // Corriger http -> https si le site est en https (proxy Render)
-    let url = photo;
+    let url = cleanPhoto;
     if (window.location.protocol === 'https:' && url.startsWith('http://')) {
       url = url.replace('http://', 'https://');
     }
@@ -26,20 +37,20 @@ const getPhotoUrl = (photo: string | undefined) => {
   }
   
   // Si la chaîne est très longue, c'est du base64 brut sans le préfixe
-  if (photo.length > 200) {
-    if (!photo.startsWith('data:')) {
-      return `data:image/jpeg;base64,${photo}`;
+  if (cleanPhoto.length > 200) {
+    if (!cleanPhoto.startsWith('data:')) {
+      return `data:image/jpeg;base64,${cleanPhoto.replace(/[\s\r\n"\\]/g, '')}`;
     }
   }
 
   // Chemin relatif (GridFS: /api/files/ID ou /uploads/filename)
   // BASE_URL = https://voix-avenir-backend.onrender.com (sans /api)
-  if (photo.startsWith('/')) {
-    return `${BASE_URL}${photo}?v=${photoVersion}`;
+  if (cleanPhoto.startsWith('/')) {
+    return `${BASE_URL}${cleanPhoto}?v=${photoVersion}`;
   }
   
   // Nom de fichier simple → dossier uploads
-  const fileName = photo.split('/').pop();
+  const fileName = cleanPhoto.split('/').pop();
   return `${BASE_URL}/uploads/${fileName}?v=${photoVersion}`;
 };
 
@@ -47,6 +58,12 @@ const getPhotoUrl = (photo: string | undefined) => {
 const ProfileImage = ({ src, alt, className }: { src: string | null, alt: string, className: string }) => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Réinitialiser les états d'erreur et de chargement si la source change
+  useEffect(() => {
+    setError(false);
+    setLoading(true);
+  }, [src]);
 
   if (!src || error) {
     return (
@@ -213,24 +230,32 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
                       <p className="text-purple-600 text-sm font-medium">{otherUser?.profession}</p>
 
                       <div className="mt-2 space-y-1 text-sm text-gray-600">
-                        <p><strong>Ville:</strong> {otherUser?.city}</p>
+                        {otherUser?.city && otherUser.city.trim() !== '' && (
+                          <p><strong>Ville:</strong> {otherUser.city}</p>
+                        )}
                         {userRole === 'mentore' && (
                           <>
-                            <p><strong>Âge:</strong> {otherUser?.age} ans</p>
-                            <p><strong>Niveau:</strong> {otherUser?.level}</p>
-                            <p><strong>Centres d'intérêt:</strong> {otherUser?.interests?.join(', ')}</p>
+                            {otherUser?.age && (
+                              <p><strong>Âge:</strong> {otherUser.age} ans</p>
+                            )}
+                            {otherUser?.level && otherUser.level.trim() !== '' && (
+                              <p><strong>Niveau:</strong> {otherUser.level}</p>
+                            )}
+                            {otherUser?.interests && otherUser.interests.filter((i: string) => i && i.trim() !== '').length > 0 && (
+                              <p><strong>Centres d'intérêt:</strong> {otherUser.interests.filter((i: string) => i && i.trim() !== '').join(', ')}</p>
+                            )}
                           </>
                         )}
                         {userRole === 'mentoree' && (
                           <>
-                            {otherUser?.expertise && (
-                              <p><strong>Expertise:</strong> {otherUser.expertise.join(', ')}</p>
+                            {otherUser?.expertise && otherUser.expertise.filter((e: string) => e && e.trim() !== '').length > 0 && (
+                              <p><strong>Expertise:</strong> {otherUser.expertise.filter((e: string) => e && e.trim() !== '').join(', ')}</p>
                             )}
 
-                            {otherUser?.availableDays && otherUser.availableDays.length > 0 && (
-                              <p><strong>Disponible:</strong> {otherUser.availableDays.join(', ')}</p>
+                            {otherUser?.availableDays && otherUser.availableDays.filter((d: string) => d && d.trim() !== '').length > 0 && (
+                              <p><strong>Disponible:</strong> {otherUser.availableDays.filter((d: string) => d && d.trim() !== '').join(', ')}</p>
                             )}
-                            {otherUser?.startTime && otherUser?.endTime && (
+                            {otherUser?.startTime && otherUser?.endTime && otherUser.startTime.trim() !== '' && otherUser.endTime.trim() !== '' && (
                               <p><strong>Horaires:</strong> {otherUser.startTime} - {otherUser.endTime}</p>
                             )}
                           </>
