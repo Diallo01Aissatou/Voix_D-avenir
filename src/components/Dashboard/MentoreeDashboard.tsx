@@ -161,12 +161,21 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
   const [isUpdating, setIsUpdating] = useState(false);
 
 
+  // Charger les données statiques une seule fois au montage
   useEffect(() => {
-    loadMentors();
     loadFiltersData();
     loadUserProfile();
     loadMySessions();
     loadStats();
+  }, []);
+
+  // Recharger uniquement les mentors quand les filtres de recherche changent
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadMentors();
+    }, 500); // Debounce de 500ms pour éviter de spammer l'API
+
+    return () => clearTimeout(delayDebounceFn);
   }, [searchFilters]);
 
   const loadMentors = async () => {
