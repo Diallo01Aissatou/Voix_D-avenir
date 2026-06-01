@@ -42,12 +42,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
           }
         }
       } else {
-        const errorMsg = "L'email ou le mot de passe est incorrect ou ne se trouve pas dans la base de données.";
-        setError(errorMsg);
+        setError("L'email ou le mot de passe est incorrect.");
       }
     } catch (err: any) {
       console.log("DEBUG: Erreur capturée dans LoginPage:", err);
-      const errorMsg = err.message || 'Une erreur est survenue lors de la connexion';
+      let errorMsg = err.message || 'Une erreur est survenue lors de la connexion';
+      
+      if (errorMsg.toLowerCase().includes('not found') || errorMsg.toLowerCase().includes('introuvable') || errorMsg.toLowerCase().includes('n\'existe pas')) {
+        errorMsg = "Cet email n'existe pas dans la base de données.";
+      } else if (errorMsg.toLowerCase().includes('password') || errorMsg.toLowerCase().includes('mot de passe') || errorMsg.toLowerCase().includes('incorrect')) {
+        errorMsg = "L'email ou le mot de passe est incorrect.";
+      }
+      
       setError(errorMsg);
     } finally {
       setIsLoading(false);
@@ -152,7 +158,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                     <span>Connexion...</span>
                   </div>
                 ) : (
-                  'Se connecter (V2)'
+                  'Se connecter'
                 )}
               </button>
 
