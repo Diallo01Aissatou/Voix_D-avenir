@@ -750,7 +750,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Administrateur</h1>
-            <p className="text-gray-600">Bienvenue <span className="text-purple-600 font-bold">{currentUser?.name}</span></p>
+            <p className="text-gray-600">Bienvenue <span className="text-purple-600 font-bold">{currentUser?.name?.replace('Admin2', 'Admin')}</span></p>
           </div>
         </div>
 
