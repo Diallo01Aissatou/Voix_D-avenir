@@ -116,12 +116,12 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative mt-1 min-h-[70vh] lg:h-[60vh] bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 text-white overflow-hidden flex items-center">
+      <section className="relative mt-1 min-h-[70vh] lg:h-[60vh] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900 via-purple-900 to-pink-900 text-white overflow-hidden flex items-center">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] rounded-full bg-purple-600/30 blur-[120px] mix-blend-screen animate-pulse"></div>
-          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-pink-600/20 blur-[100px] mix-blend-screen animate-pulse delay-700"></div>
-          <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-indigo-600/20 blur-[120px] mix-blend-screen animate-pulse delay-1000"></div>
+          <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] rounded-full bg-purple-500/30 blur-[120px] mix-blend-screen animate-pulse"></div>
+          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-pink-500/20 blur-[100px] mix-blend-screen animate-pulse delay-700"></div>
+          <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-indigo-500/20 blur-[120px] mix-blend-screen animate-pulse delay-1000"></div>
         </div>
 
         {/* Grid Pattern Overlay */}
@@ -131,20 +131,22 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full h-full">
             <div className="space-y-6 lg:space-y-8 max-w-xl mx-auto lg:mx-0 order-2 lg:order-1">
               <div className="space-y-4 text-center lg:text-left">
-                <div className="inline-flex items-center space-x-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white border-opacity-30">
+                {/* Badge Modernisé */}
+                <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md rounded-full px-4 py-1.5 border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
                   <Sparkles className="w-4 h-4 text-yellow-300" />
-                  <span className="text-xs sm:text-sm font-medium">Plateforme #1 en Guinée</span>
+                  <span className="text-xs sm:text-sm font-medium tracking-wide">Plateforme #1 en Guinée</span>
                 </div>
                 
+                {/* Texte Modernisé */}
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight">
                   Connecter les{' '}
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-100">
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 drop-shadow-md">
                     Futures Leaders
                   </span>
                   {' '}de la Guinée
                 </h1>
 
-                <p className="text-base sm:text-lg text-purple-100 leading-relaxed font-light max-w-lg mx-auto lg:mx-0">
+                <p className="text-base sm:text-lg text-purple-100/90 leading-relaxed font-light max-w-lg mx-auto lg:mx-0">
                   Rejoignez une communauté de femmes inspirantes.
                   Ensemble nous construisons un avenir meilleur pour toutes.
                 </p>
@@ -153,14 +155,14 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                 <button
                   onClick={() => onNavigate('register')}
-                  className="group px-8 py-3.5 bg-white text-purple-900 rounded-xl font-bold hover:bg-opacity-90 transition-all transform hover:-translate-y-1 flex items-center justify-center space-x-2 shadow-2xl"
+                  className="group relative overflow-hidden px-8 py-3.5 bg-gradient-to-r from-white to-purple-50 text-purple-900 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-2"
                 >
-                  <span>Commencer</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span className="relative z-10">Commencer</span>
+                  <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => onNavigate('experts')}
-                  className="group px-8 py-3.5 border-2 border-white border-opacity-50 text-white rounded-xl font-bold hover:bg-white hover:text-purple-900 transition-all transform hover:-translate-y-1 flex items-center justify-center space-x-2"
+                  className="group px-8 py-3.5 border-2 border-white/30 bg-white/5 backdrop-blur-sm text-white rounded-xl font-bold hover:bg-white hover:text-purple-900 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-2"
                 >
                   <Play className="w-4 h-4" />
                   <span>Femmes Expertes</span>
@@ -171,21 +173,22 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             <div className="relative order-1 lg:order-2">
               <div className="relative z-10 max-w-sm sm:max-w-lg lg:max-w-xl mx-auto">
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
                   <img
                     src={`${import.meta.env.BASE_URL}image2.png`}
                     alt="Femme leader inspirante"
-                    className="relative rounded-2xl shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500 w-full object-cover aspect-[4/3] lg:aspect-auto"
+                    className="relative rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 transform rotate-2 hover:rotate-0 transition-all duration-500 w-full object-cover aspect-[4/3] lg:aspect-auto"
                   />
                 </div>
                 
-                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-purple-50 flex items-center space-x-3 transform -rotate-3 hover:rotate-0 transition-transform hidden sm:flex">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-inner">
+                {/* Carte Flottante Modernisée */}
+                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white/10 backdrop-blur-xl rounded-2xl p-3 sm:p-4 shadow-2xl border border-white/20 flex items-center space-x-3 transform -rotate-3 hover:rotate-0 transition-all duration-300 hidden sm:flex hover:scale-105 z-20">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center shadow-inner">
                     <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800 text-sm sm:text-base">Bienvenue</p>
-                    <p className="text-xs text-purple-600 font-medium">Rejoignez-nous aujourd'hui</p>
+                    <p className="font-bold text-white text-sm sm:text-base tracking-wide">Bienvenue</p>
+                    <p className="text-xs text-purple-200 font-medium">Rejoignez-nous aujourd'hui</p>
                   </div>
                 </div>
               </div>
