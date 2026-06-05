@@ -116,72 +116,114 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative mt-1 min-h-[70vh] lg:h-[60vh] bg-gradient-to-br from-purple-900 via-purple-800 to-pink-800 text-white overflow-hidden flex items-center">
-        <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
+      <section className="relative mt-1 pt-20 pb-32 lg:pt-32 lg:pb-40 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900 via-purple-900 to-black text-white overflow-hidden flex items-center min-h-[85vh]">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] rounded-full bg-purple-600/30 blur-[120px] mix-blend-screen animate-pulse"></div>
+          <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-pink-600/20 blur-[100px] mix-blend-screen animate-pulse delay-700"></div>
+          <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-indigo-600/20 blur-[120px] mix-blend-screen animate-pulse delay-1000"></div>
         </div>
 
-        <div className="relative container mx-auto px-4 py-8 h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full h-full">
-            <div className="space-y-6 lg:space-y-8 max-w-xl mx-auto lg:mx-0 order-2 lg:order-1">
-              <div className="space-y-4 text-center lg:text-left">
-                <div className="inline-flex items-center space-x-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white border-opacity-30">
-                  <Sparkles className="w-4 h-4 text-yellow-300" />
-                  <span className="text-xs sm:text-sm font-medium">Plateforme #1 en Guinée</span>
+        {/* Grid Pattern Overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0wIDM5LjVoNDBWMHptMzkuNSAwVjBIMHoiIHN0cm9rZT0icmdiYSgyNTUsIDI1NSLCAyNTUsIDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')] opacity-30" style={{ maskImage: 'linear-gradient(to bottom, white, transparent)' }}></div>
+
+        <div className="relative container mx-auto px-6 h-full z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center w-full h-full">
+            <div className="space-y-8 lg:col-span-7 order-2 lg:order-1 pt-10 lg:pt-0">
+              <div className="space-y-6 text-center lg:text-left">
+                {/* Badge */}
+                <div className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-2 border border-white/10 hover:bg-white/10 transition-colors duration-300">
+                  <div className="bg-yellow-400/20 p-1.5 rounded-full">
+                    <Sparkles className="w-4 h-4 text-yellow-300" />
+                  </div>
+                  <span className="text-sm font-medium tracking-wide text-purple-100">Plateforme #1 en Guinée</span>
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight">
-                  Connecter les{' '}
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-100">
+                {/* Heading */}
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight">
+                  <span className="block text-white mb-2">Connecter les</span>
+                  <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-100 to-pink-300 pb-2">
                     Futures Leaders
+                    <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-300/50" viewBox="0 0 100 10" preserveAspectRatio="none">
+                      <path d="M0 5 Q 50 10 100 5" fill="transparent" stroke="currentColor" strokeWidth="2" />
+                    </svg>
                   </span>
-                  {' '}de la Guinée
+                  <span className="block text-white mt-2">de la Guinée</span>
                 </h1>
 
-                <p className="text-base sm:text-lg text-purple-100 leading-relaxed font-light max-w-lg mx-auto lg:mx-0">
+                <p className="text-lg sm:text-xl text-purple-200/80 leading-relaxed font-light max-w-2xl mx-auto lg:mx-0">
                   Rejoignez une communauté de femmes inspirantes.
                   Ensemble nous construisons un avenir meilleur pour toutes.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
                 <button
                   onClick={() => onNavigate('register')}
-                  className="group px-8 py-3.5 bg-white text-purple-900 rounded-xl font-bold hover:bg-opacity-90 transition-all transform hover:-translate-y-1 flex items-center justify-center space-x-2 shadow-2xl"
+                  className="group relative px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-300 text-purple-950 rounded-2xl font-bold hover:shadow-[0_0_30px_rgba(250,204,21,0.4)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-3 overflow-hidden"
                 >
-                  <span>Commencer</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                  <span className="relative">Commencer</span>
+                  <ArrowRight className="relative w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => onNavigate('experts')}
-                  className="group px-8 py-3.5 border-2 border-white border-opacity-50 text-white rounded-xl font-bold hover:bg-white hover:text-purple-900 transition-all transform hover:-translate-y-1 flex items-center justify-center space-x-2"
+                  className="group px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 text-white rounded-2xl font-bold hover:bg-white/10 hover:border-white/20 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-3"
                 >
-                  <Play className="w-4 h-4" />
+                  <div className="bg-white/10 p-2 rounded-full group-hover:bg-white/20 transition-colors">
+                    <Play className="w-4 h-4 fill-current" />
+                  </div>
                   <span>Femmes Expertes</span>
                 </button>
               </div>
+
+              {/* Trust Indicators */}
+              <div className="pt-8 flex items-center justify-center lg:justify-start space-x-6">
+                <div className="flex -space-x-4">
+                  <div className="w-10 h-10 rounded-full border-2 border-purple-900 bg-purple-500 flex items-center justify-center text-xs font-bold shadow-lg">M</div>
+                  <div className="w-10 h-10 rounded-full border-2 border-purple-900 bg-pink-500 flex items-center justify-center text-xs font-bold shadow-lg">A</div>
+                  <div className="w-10 h-10 rounded-full border-2 border-purple-900 bg-yellow-500 flex items-center justify-center text-xs font-bold text-black shadow-lg">F</div>
+                  <div className="w-10 h-10 rounded-full border-2 border-purple-900 bg-white flex items-center justify-center text-xs font-bold text-purple-900 shadow-lg">+1k</div>
+                </div>
+                <div className="text-sm text-purple-200 text-left">
+                  <span className="font-bold text-white">1000+</span> femmes<br/>nous font confiance
+                </div>
+              </div>
             </div>
 
-            <div className="relative order-1 lg:order-2">
-              <div className="relative z-10 max-w-sm sm:max-w-lg lg:max-w-xl mx-auto">
+            {/* Image/Visual Section */}
+            <div className="relative lg:col-span-5 order-1 lg:order-2">
+              <div className="relative z-10 w-full max-w-lg mx-auto">
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                  <img
-                    src={`${import.meta.env.BASE_URL}image2.png`}
-                    alt="Femme leader inspirante"
-                    className="relative rounded-2xl shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500 w-full object-cover aspect-[4/3] lg:aspect-auto"
-                  />
+                  <div className="absolute -inset-4 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 rounded-3xl blur-2xl opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-2 transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <img
+                      src={`${import.meta.env.BASE_URL}image2.png`}
+                      alt="Femme leader inspirante"
+                      className="rounded-2xl w-full object-cover aspect-[4/5] lg:aspect-[3/4]"
+                    />
+                  </div>
                 </div>
                 
-                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-purple-50 flex items-center space-x-3 transform -rotate-3 hover:rotate-0 transition-transform hidden sm:flex">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-inner">
-                    <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                {/* Floating Card 1 */}
+                <div className="absolute -bottom-8 -left-8 sm:-left-12 bg-white/10 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-white/20 flex items-center space-x-4 transform -rotate-3 hover:rotate-0 transition-all duration-300 hidden sm:flex hover:scale-105 z-20">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center shadow-inner">
+                    <Heart className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800 text-sm sm:text-base">Bienvenue</p>
-                    <p className="text-xs text-purple-600 font-medium">Rejoignez-nous aujourd'hui</p>
+                    <p className="font-bold text-white text-base">Bienvenue</p>
+                    <p className="text-sm text-purple-200">Rejoignez-nous aujourd'hui</p>
+                  </div>
+                </div>
+
+                {/* Floating Card 2 */}
+                <div className="absolute top-12 -right-8 bg-white/10 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-white/20 flex items-center space-x-3 transform rotate-6 hover:rotate-0 transition-all duration-300 hidden md:flex hover:scale-105 z-20">
+                   <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center shadow-inner">
+                    <Star className="w-5 h-5 text-purple-900 fill-current" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-white text-sm">Top Mentores</p>
                   </div>
                 </div>
               </div>
