@@ -167,6 +167,15 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
     loadStats();
   }, []);
 
+  // Écouter l'événement du bouton "Bavarder" pour naviguer vers la messagerie
+  useEffect(() => {
+    const handleSwitchToMessaging = () => {
+      setActiveTab('messagerie');
+    };
+    window.addEventListener('switchToMessaging', handleSwitchToMessaging);
+    return () => window.removeEventListener('switchToMessaging', handleSwitchToMessaging);
+  }, []);
+
   // Recharger uniquement les mentors quand les filtres de recherche changent
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

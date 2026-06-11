@@ -121,6 +121,10 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
     };
 
     window.addEventListener('mentorshipUpdate', handleMentorshipUpdate as EventListener);
+
+    const handleSwitchToMessaging = () => setActiveTab('messaging');
+    window.addEventListener('switchToMessaging', handleSwitchToMessaging);
+
     const interval = setInterval(() => {
       loadSessions();
       loadStats();
@@ -129,6 +133,7 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
     return () => {
       clearInterval(interval);
       window.removeEventListener('mentorshipUpdate', handleMentorshipUpdate as EventListener);
+      window.removeEventListener('switchToMessaging', handleSwitchToMessaging);
     };
   }, []);
 
