@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
 import ProfessionalNotification, { NotificationType } from '../UI/ProfessionalNotification';
 import Api from '../../data/Api';
+import { toast } from 'react-hot-toast';
 
 interface Notification {
   id: string;
@@ -89,6 +90,33 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
         const dateB = new Date(b.data?.createdAt || 0).getTime();
         return dateB - dateA;
       });
+
+      // Afficher un toast pour les nouvelles notifications non lues
+      const localToastedDb = JSON.parse(localStorage.getItem(`toasted_notifs_${userId}`) || '{}');
+      let hasNewToasts = false;
+
+      allNotifications.forEach(n => {
+        if (!n.read && !localToastedDb[n.id]) {
+          toast(
+            (t) => (
+              <div className="flex flex-col cursor-pointer" onClick={() => { toast.dismiss(t.id); handleNotificationClick(n); }}>
+                <span className="font-bold text-sm text-purple-700">{n.title}</span>
+                <span className="text-xs text-gray-600 mt-1">{n.message}</span>
+              </div>
+            ),
+            {
+              duration: 5000,
+              icon: n.type === 'request' ? '📝' : n.type === 'message' ? '💬' : '🔔',
+            }
+          );
+          localToastedDb[n.id] = true;
+          hasNewToasts = true;
+        }
+      });
+
+      if (hasNewToasts) {
+        localStorage.setItem(`toasted_notifs_${userId}`, JSON.stringify(localToastedDb));
+      }
 
       setNotifications(allNotifications);
       setUnreadCount(allNotifications.filter(n => !n.read).length);
