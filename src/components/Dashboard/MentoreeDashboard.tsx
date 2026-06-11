@@ -4,12 +4,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { User } from '../../types/index';
 import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api et de la base URL
 import MessageriePage from './MessageriePage';
-import NotificationSystem from './NotificationSystem';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
 import SimpleMentorship from './SimpleMentorship';
 import MentorshipRequestForm from './MentorshipRequestForm';
 import SessionsManagerMentoree from './SessionsManagerMentoree';
-import SessionNotifications from './SessionNotifications';
 import TestimonialManager from './TestimonialManager';
 
 // Fonction utilitaire pour convertir un fichier en Base64
@@ -297,10 +295,7 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
               <p className="text-gray-600 font-medium">Bienvenue, <span className="text-purple-600">{currentUser?.name}</span></p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <NotificationSystem userId={currentUser?._id || ''} userRole="mentoree" />
-            <SessionNotifications userId={currentUser?._id || ''} />
-          </div>
+
         </div>
 
         {/* Stats Cards */}

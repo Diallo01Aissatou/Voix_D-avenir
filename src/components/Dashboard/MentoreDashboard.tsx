@@ -3,7 +3,6 @@ import { Calendar, MessageSquare, User, Clock, CheckCircle, XCircle, Camera } fr
 import { useAuth } from '../../contexts/AuthContext';
 import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
 import MessageriePage from './MessageriePage';
-import NotificationSystem from './NotificationSystem';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
  
 // Fonction utilitaire pour convertir un fichier en Base64
@@ -186,15 +185,6 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
               <p className="text-gray-600">Bienvenue, <span className="text-purple-600 font-bold">{currentUser?.name}</span></p>
             </div>
           </div>
-          <NotificationSystem
-            userId={(currentUser?._id || currentUser?.id || '') as string}
-            userRole={(currentUser?.role || '') as string}
-            onNotificationClick={(n) => {
-              if (n.type === 'request') setActiveTab('requests');
-              else if (n.type === 'session') setActiveTab('sessions');
-              else if (n.type === 'message') setActiveTab('messaging');
-            }}
-          />
         </div>
 
         {/* Stats Cards */}
