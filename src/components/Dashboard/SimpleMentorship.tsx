@@ -3,7 +3,7 @@ import { Send, Check, X, MessageCircle, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Api from '../../data/Api';
 
-const SimpleMentorship = ({ onOpenChat }: { onOpenChat?: () => void }) => {
+const SimpleMentorship = () => {
   const { currentUser } = useAuth();
   const [requests, setRequests] = useState([]);
   const [mentores, setMentores] = useState([]);
@@ -161,7 +161,11 @@ const SimpleMentorship = ({ onOpenChat }: { onOpenChat?: () => void }) => {
             {request.status === 'accepted' && (
               <button
                 onClick={() => {
-                  if (onOpenChat) onOpenChat();
+                  const otherUser = currentUser?.role === 'mentore' ? request.mentoree : request.mentore;
+                  const messageEvent = new CustomEvent('switchToMessaging', {
+                    detail: { userId: otherUser?._id || otherUser?.id }
+                  });
+                  window.dispatchEvent(messageEvent);
                 }}
                 className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
               >

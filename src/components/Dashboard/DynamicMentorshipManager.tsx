@@ -314,9 +314,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
                         )}
                         <button
                           onClick={() => {
-                            if (otherUser?._id || otherUser?.id) {
-                              onNavigateToMessaging(otherUser._id || otherUser.id);
-                            }
+                            onNavigateToMessaging(otherUser?._id || otherUser?.id || '');
                           }}
                           className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center"
                         >
