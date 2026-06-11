@@ -21,13 +21,9 @@ const IntelligentChatbot: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
-            text: "Bonjour ! Je suis l'assistant intelligent de Voix D'avenir. Je suis là pour t'écouter, te conseiller et t'accompagner dans ton parcours. Comment te sens-tu aujourd'hui ?",
+            text: "Bonjour ! Comment puis-je t'aider aujourd'hui ?",
             sender: 'bot',
-            timestamp: new Date(),
-            suggestions: [
-                "C'est quoi Voix D'avenir ?",
-                "Comment trouver une mentore ?",
-            ]
+            timestamp: new Date()
         }
     ]);
 
