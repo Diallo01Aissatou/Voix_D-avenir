@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Paperclip, Flag, X, Download, Image, FileText } from 'lucide-react';
 import Api from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 import ChatDebug from './ChatDebug';
 import './ChatStyles.css';
 
@@ -72,7 +73,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName, onC
       loadMessages();
     } catch (error) {
       console.error('Erreur envoi message:', error);
-      alert('Erreur lors de l\'envoi du message');
+      toast.error('Erreur lors de l\'envoi du message');
     } finally {
       setIsLoading(false);
     }
@@ -90,12 +91,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName, onC
     if (file) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
       if (!allowedTypes.includes(file.type)) {
-        alert('Type de fichier non autorisé. Seuls les images et PDF sont acceptés.');
+        toast.error('Type de fichier non autorisé. Seuls les images et PDF sont acceptés.');
         return;
       }
       
       if (file.size > 10 * 1024 * 1024) {
-        alert('Le fichier est trop volumineux. Taille maximum : 10MB');
+        toast.error('Le fichier est trop volumineux. Taille maximum : 10MB');
         return;
       }
       
@@ -105,7 +106,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName, onC
 
   const reportMessage = async (messageId: string) => {
     if (!reportReason.trim()) {
-      alert('Veuillez indiquer la raison du signalement');
+      toast.error('Veuillez indiquer la raison du signalement');
       return;
     }
 
@@ -114,12 +115,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName, onC
         messageId,
         reason: reportReason
       });
-      alert('Message signalé avec succès');
+      toast.success('Message signalé avec succès');
       setShowReportModal(false);
       setReportReason('');
     } catch (error) {
       console.error('Erreur signalement:', error);
-      alert('Erreur lors du signalement');
+      toast.error('Erreur lors du signalement');
     }
   };
 

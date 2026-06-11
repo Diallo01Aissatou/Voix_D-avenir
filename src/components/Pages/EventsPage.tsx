@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, Users, Star, ChevronRight, Play, Search } from 'lucide-react';
 import Api from '../../data/Api';
+import { toast } from 'react-hot-toast';
 
 interface EventsPageProps {
   onNavigate: (page: string) => void;
@@ -59,7 +60,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ onNavigate }) => {
   };
 
   const handleRegister = (eventId: string) => {
-    alert('Inscription confirmée ! Vous recevrez un email de confirmation.');
+    toast.success('Inscription confirmée ! Vous recevrez un email de confirmation.');
     setSelectedEvent(null);
   };
 
@@ -83,10 +84,10 @@ const EventsPage: React.FC<EventsPageProps> = ({ onNavigate }) => {
         )
       );
 
-      alert('Document ajouté avec succès !');
+      toast.success('Document ajouté avec succès !');
       setShowUploadModal(false);
     } catch (error) {
-      alert('Erreur lors de l\'ajout du document');
+      toast.error('Erreur lors de l\'ajout du document');
     }
   };
 
@@ -110,10 +111,10 @@ const EventsPage: React.FC<EventsPageProps> = ({ onNavigate }) => {
         )
       );
 
-      alert('Vidéo ajoutée avec succès !');
+      toast.success('Vidéo ajoutée avec succès !');
       setShowUploadModal(false);
     } catch (error) {
-      alert('Erreur lors de l\'ajout de la vidéo');
+      toast.error('Erreur lors de l\'ajout de la vidéo');
     }
   };
 

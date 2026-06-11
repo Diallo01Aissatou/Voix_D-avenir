@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface SimpleModalProps {
   isOpen: boolean;
@@ -54,16 +55,16 @@ const SimpleModal: React.FC<SimpleModalProps> = ({ isOpen, onClose, onSuccess })
       });
 
       if (response.ok) {
-        alert('Demande envoyée!');
+        toast.success('Demande envoyée !');
         onSuccess();
         onClose();
         setSelectedMentore('');
         setMessage('');
       } else {
-        alert('Erreur');
+        toast.error('Erreur');
       }
     } catch (error) {
-      alert('Erreur réseau');
+      toast.error('Erreur réseau');
     }
     setLoading(false);
   };

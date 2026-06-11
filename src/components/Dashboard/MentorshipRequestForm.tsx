@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, User, Search } from 'lucide-react';
 import { User as UserType } from '../../types';
 import Api, { BASE_URL } from '../../data/Api';
+import { toast } from 'react-hot-toast';
 
 let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
@@ -121,7 +122,7 @@ const MentorshipRequestForm: React.FC<MentorshipRequestFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMentore || !message.trim()) {
-      alert('Veuillez sélectionner une mentore et saisir un message');
+      toast.error('Veuillez sélectionner une mentore et saisir un message');
       return;
     }
 
@@ -136,14 +137,14 @@ const MentorshipRequestForm: React.FC<MentorshipRequestFormProps> = ({
 
       console.log('Demande envoyée avec succès:', response.data);
 
-      alert('Demande envoyée avec succès !');
+      toast.success('Demande envoyée avec succès !');
       onSuccess();
       onClose();
       setMessage('');
       setSelectedMentore(null);
     } catch (error: any) {
       console.error('Erreur envoi demande:', error);
-      alert(`Erreur: ${error.response?.data?.message || error.message || 'Une erreur est survenue'}`);
+      toast.error(`Erreur: ${error.response?.data?.message || error.message || 'Une erreur est survenue'}`);
     } finally {
       setIsLoading(false);
     }

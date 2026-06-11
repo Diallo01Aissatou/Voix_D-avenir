@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, CheckCircle, XCircle, Clock, User, RefreshCw, Calendar } from 'lucide-react';
 import CreateSessionModal from './CreateSessionModal';
 import Api, { BASE_URL } from '../../data/Api';
+import { toast } from 'react-hot-toast';
 
 let photoVersion = Date.now();
 const getPhotoUrl = (photo: string | undefined) => {
@@ -138,7 +139,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
     try {
       await Api.put(`/mentorship/respond/${requestId}`, { status });
 
-      alert(`Demande ${status === 'accepted' ? 'acceptée' : 'rejetée'} avec succès !`);
+      toast.success(`Demande ${status === 'accepted' ? 'acceptée' : 'rejetée'} avec succès !`);
 
       await loadRequests();
 
@@ -149,7 +150,7 @@ const DynamicMentorshipManager: React.FC<DynamicMentorshipManagerProps> = ({
       window.dispatchEvent(updateEvent);
     } catch (error: any) {
       console.error('Erreur réponse:', error);
-      alert(`Erreur: ${error.response?.data?.message || error.message || 'Une erreur est survenue'}`);
+      toast.error(`Erreur: ${error.response?.data?.message || error.message || 'Une erreur est survenue'}`);
     } finally {
       setProcessingRequest(null);
     }

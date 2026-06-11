@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, User, Video, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import Api from '../../data/Api'; // Importation du service Api
+import { toast } from 'react-hot-toast';
 import { Session } from '../../types';
 
 let photoVersion = Date.now();
@@ -88,11 +89,11 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
     try {
       const res = await Api.put(`/sessions/${sessionId}/confirm`);
       if (res.data) {
-        alert('Présence confirmée avec succès !');
+        toast.success('Présence confirmée avec succès !');
         onRefresh();
       }
     } catch (error) {
-      alert('Erreur lors de la confirmation');
+      toast.error('Erreur lors de la confirmation');
     } finally {
       setLoading(false);
       setShowConfirmModal(null);
@@ -105,11 +106,11 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
     try {
       const res = await Api.put(`/sessions/${sessionId}/cancel`);
       if (res.data) {
-        alert('Séance annulée');
+        toast.success('Séance annulée');
         onRefresh();
       }
     } catch (error) {
-      alert('Erreur de connexion');
+      toast.error('Erreur de connexion');
     } finally {
       setLoading(false);
     }

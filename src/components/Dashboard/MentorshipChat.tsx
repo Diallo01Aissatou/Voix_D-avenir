@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, ArrowLeft, Paperclip, Download } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface Message {
   _id: string;
@@ -97,11 +98,11 @@ const MentorshipChat: React.FC<MentorshipChatProps> = ({
         }
       } else {
         const error = await response.json();
-        alert(error.message || 'Erreur lors de l\'envoi du message');
+        toast.error(error.message || 'Erreur lors de l\'envoi du message');
       }
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de l\'envoi du message');
+      toast.error('Erreur lors de l\'envoi du message');
     } finally {
       setSending(false);
     }

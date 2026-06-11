@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
+import { toast } from 'react-hot-toast';
 
 // Fonction utilitaire pour corriger les URLs des photos
 let photoVersion = Date.now();
@@ -105,12 +106,12 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
     try {
       const res = await Api.put(`/mentorship/sessions/${sessionId}/confirm`);
       if (res.data) {
-        alert('Présence confirmée avec succès !');
+        toast.success('Présence confirmée avec succès !');
         onRefresh();
       }
     } catch (error: any) {
       console.error('Erreur confirmation présence:', error);
-      alert(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
+      toast.error(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
     } finally {
       setConfirmingPresence(null);
     }
@@ -121,12 +122,12 @@ const SessionsManager: React.FC<SessionsManagerProps> = ({
     try {
       const res = await Api.put(`/mentorship/sessions/${sessionId}/cancel`);
       if (res.data) {
-        alert('Séance annulée avec succès !');
+        toast.success('Séance annulée avec succès !');
         onRefresh();
       }
     } catch (error: any) {
       console.error('Erreur annulation séance:', error);
-      alert(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
+      toast.error(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
     }
   };
 

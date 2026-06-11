@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, User, Clock, MessageCircle } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface MentorshipRequest {
   _id: string;
@@ -67,13 +68,14 @@ const MentorshipRequests: React.FC = () => {
         ));
         setRespondingTo(null);
         setResponseMessage('');
+        toast.success(`Demande ${status === 'accepted' ? 'acceptée' : 'rejetée'} avec succès !`);
       } else {
         const error = await response.json();
-        alert(error.message || 'Erreur lors de la réponse');
+        toast.error(error.message || 'Erreur lors de la réponse');
       }
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de la réponse');
+      toast.error('Erreur lors de la réponse');
     }
   };
 

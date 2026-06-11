@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Send, User, Star, MapPin } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface Mentore {
   _id: string;
@@ -61,15 +62,15 @@ const MentorshipRequest: React.FC<MentorshipRequestProps> = ({ onClose }) => {
       });
 
       if (response.ok) {
-        alert('Demande envoyée avec succès !');
+        toast.success('Demande envoyée avec succès !');
         onClose();
       } else {
         const error = await response.json();
-        alert(error.message || 'Erreur lors de l\'envoi de la demande');
+        toast.error(error.message || 'Erreur lors de l\'envoi de la demande');
       }
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de l\'envoi de la demande');
+      toast.error('Erreur lors de l\'envoi de la demande');
     } finally {
       setLoading(false);
     }

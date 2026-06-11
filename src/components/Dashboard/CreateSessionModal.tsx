@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import Api from '../../data/Api'; // Importation du service Api
+import { toast } from 'react-hot-toast';
 
 interface CreateSessionModalProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.topic || !formData.scheduledDate) {
-      alert('Veuillez remplir tous les champs obligatoires');
+      toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
@@ -45,12 +46,12 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({
       });
 
       if (res.data) {
-        alert('Séance créée avec succès !');
+        toast.success('Séance créée avec succès !');
         onSuccess();
       }
     } catch (error: any) {
       console.error('Erreur création séance:', error);
-      alert(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
+      toast.error(`Erreur: ${error.response?.data?.message || 'Erreur de connexion'}`);
     } finally {
       setLoading(false);
     }

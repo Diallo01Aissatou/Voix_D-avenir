@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, Download, User as UserIcon } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 import { User } from '../../types';
 
 interface AdminDashboardProps {
@@ -1631,10 +1632,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                       if (window.confirm("Êtes-vous sûr de vouloir supprimer toutes les ressources fantômes de l'ancien système ? Cette action est irréversible et effacera les cartes des fichiers perdus.")) {
                         try {
                           const res = await Api.post('/admin/cleanup-resources');
-                          alert(res.data.message);
+                          toast.success(res.data.message);
                           loadResources(); // Refresh resources
                         } catch (e: any) {
-                          alert("Erreur lors du nettoyage: " + (e.response?.data?.message || e.message));
+                          toast.error("Erreur lors du nettoyage: " + (e.response?.data?.message || e.message));
                         }
                       }
                     }}
@@ -1792,7 +1793,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                 {(!resource.fileUrl.includes('/api/files/') && !resource.fileUrl.includes('/serve-file/') && !resource.fileUrl.startsWith('http')) ? (
                                   <>
                                     <button 
-                                      onClick={() => alert('Cette ressource a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez supprimer cette ressource et la recréer.')}
+                                      onClick={() => toast.error('Cette ressource a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez supprimer cette ressource et la recréer.')}
                                       className="inline-flex items-center text-red-600 font-medium"
                                     >
                                       <Eye className="w-4 h-4 mr-1" /> Lien mort
@@ -1904,16 +1905,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   <button
                     onClick={async () => {
                       if (!newAdmin.name || !newAdmin.email || !newAdmin.password) {
-                        alert('Tous les champs sont obligatoires');
+                        toast.error('Tous les champs sont obligatoires');
                         return;
                       }
                       try {
                         await Api.post('/auth/create-admin', newAdmin);
                         setNewAdmin({ name: '', email: '', password: '' });
                         loadUsers();
-                        alert('Administrateur créé avec succès');
-                      } catch (error) {
-                        alert('Erreur: ' + (error.response?.data?.message || 'Erreur de création'));
+                        toast.success('Administrateur créé avec succès');
+                      } catch (error: any) {
+                        toast.error('Erreur: ' + (error.response?.data?.message || 'Erreur de création'));
                       }
                     }}
                     className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

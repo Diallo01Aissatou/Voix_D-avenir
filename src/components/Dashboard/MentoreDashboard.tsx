@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
 import MessageriePage from './MessageriePage';
 import DynamicMentorshipManager from './DynamicMentorshipManager';
+import { toast } from 'react-hot-toast';
  
 // Fonction utilitaire pour convertir un fichier en Base64
 const fileToBase64 = (file: File): Promise<string> => {
@@ -377,7 +378,7 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
       if (finalUser) { 
         setCurrentUser(finalUser);
         localStorage.setItem('mentora_user', JSON.stringify(finalUser));
-        alert('Profil mis à jour (stockage permanent) !'); 
+        toast.success('Profil mis à jour avec succès !'); 
         setPhotoFile(null);
         setPhotoPreview(null);
         photoVersion = Date.now(); 

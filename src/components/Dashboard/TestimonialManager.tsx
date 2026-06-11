@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Plus, Edit, Trash2, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 
 interface Testimonial {
   _id: string;
@@ -60,7 +61,7 @@ const TestimonialManager: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.content.trim()) {
-      alert('Veuillez saisir votre témoignage');
+      toast.error('Veuillez saisir votre témoignage');
       return;
     }
 
@@ -80,17 +81,17 @@ const TestimonialManager: React.FC = () => {
       });
 
       if (response.ok) {
-        alert(editingTestimonial ? 'Témoignage modifié!' : 'Témoignage ajouté!');
+        toast.success(editingTestimonial ? 'Témoignage modifié !' : 'Témoignage ajouté !');
         setShowModal(false);
         setEditingTestimonial(null);
         setFormData({ content: '', rating: 5 });
         loadMyTestimonials();
       } else {
         const error = await response.json();
-        alert(`Erreur: ${error.message}`);
+        toast.error(`Erreur: ${error.message}`);
       }
     } catch (error) {
-      alert('Erreur de connexion');
+      toast.error('Erreur de connexion');
     } finally {
       setLoading(false);
     }
@@ -115,13 +116,13 @@ const TestimonialManager: React.FC = () => {
       });
 
       if (response.ok) {
-        alert('Témoignage supprimé!');
+        toast.success('Témoignage supprimé !');
         loadMyTestimonials();
       } else {
-        alert('Erreur lors de la suppression');
+        toast.error('Erreur lors de la suppression');
       }
     } catch (error) {
-      alert('Erreur de connexion');
+      toast.error('Erreur de connexion');
     }
   };
 

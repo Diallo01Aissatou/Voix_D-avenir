@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Send, Check, X, MessageCircle, User, Clock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Api from '../../data/Api'; // Importation du service Api
+import { toast } from 'react-hot-toast';
 import DynamicChat from './DynamicChat';
 
 interface MentorshipRequest {
@@ -70,7 +71,7 @@ const MentorshipSystem: React.FC = () => {
     try {
       const res = await Api.post('/mentorship/request', { mentoreId: selectedMentore, message: message });
       if (res.data) {
-        alert('Demande envoyée avec succès!');
+        toast.success('Demande envoyée avec succès !');
         setShowModal(false);
         setSelectedMentore('');
         setMessage('');
@@ -78,7 +79,7 @@ const MentorshipSystem: React.FC = () => {
         loadRequests();
       }
     } catch (error) {
-      alert('Erreur lors de l\'envoi');
+      toast.error('Erreur lors de l\'envoi');
     }
     setLoading(false);
   };

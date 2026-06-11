@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const MessageTest: React.FC = () => {
   const { currentUser } = useAuth();
@@ -58,14 +59,14 @@ const MessageTest: React.FC = () => {
       if (response.ok) {
         setTestMessage('');
         loadConversations();
-        alert('Message envoyé avec succès !');
+        toast.success('Message envoyé avec succès !');
       } else {
         const error = await response.json();
-        alert(`Erreur: ${error.error}`);
+        toast.error(`Erreur: ${error.error}`);
       }
     } catch (error) {
       console.error('Erreur envoi message:', error);
-      alert('Erreur lors de l\'envoi du message');
+      toast.error('Erreur lors de l\'envoi du message');
     }
   };
 

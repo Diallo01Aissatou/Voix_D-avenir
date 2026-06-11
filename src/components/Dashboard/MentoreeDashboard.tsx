@@ -9,6 +9,7 @@ import SimpleMentorship from './SimpleMentorship';
 import MentorshipRequestForm from './MentorshipRequestForm';
 import SessionsManagerMentoree from './SessionsManagerMentoree';
 import TestimonialManager from './TestimonialManager';
+import { toast } from 'react-hot-toast';
 
 // Fonction utilitaire pour convertir un fichier en Base64
 const fileToBase64 = (file: File): Promise<string> => {
@@ -277,10 +278,10 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
       setPhotoPreview(null);
       photoVersion = Date.now();
       await loadUserProfile();
-      alert('Profil mis à jour avec succès (stockage permanent débloqué) !'); 
+      toast.success('Profil mis à jour avec succès !'); 
     } catch (err: any) { 
       console.error(err);
-      alert(err.message || 'Une erreur est survenue lors de la mise à jour.');
+      toast.error(err.message || 'Une erreur est survenue lors de la mise à jour.');
     } finally {
       setIsUpdating(false);
     }
@@ -448,7 +449,7 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
               </div>
             )}
 
-            {activeTab === 'mentorship' && <div className="bg-white rounded-xl p-6 border border-gray-100"><SimpleMentorship onOpenChat={() => setActiveTab('messagerie')} /></div>}
+            {activeTab === 'mentorship' && <div className="bg-white rounded-xl p-6 border border-gray-100"><SimpleMentorship /></div>}
             {activeTab === 'sessions' && <SessionsManagerMentoree sessions={mySessions} onRefresh={loadMySessions} onOpenChat={() => setActiveTab('messagerie')} />}
             {activeTab === 'requests' && <DynamicMentorshipManager userRole="mentoree" onNavigateToMessaging={() => setActiveTab('messagerie')} />}
             {activeTab === 'messagerie' && <div className="h-[600px] border border-gray-100 rounded-xl overflow-hidden shadow-inner"><MessageriePage /></div>}

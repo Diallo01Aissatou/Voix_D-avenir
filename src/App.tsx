@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
+import { Toaster } from 'react-hot-toast';
 import HomePage from './components/Pages/HomePage';
 import AboutPage from './components/Pages/AboutPage';
 import LoginPage from './components/Pages/LoginPage';
@@ -146,6 +147,34 @@ function App() {
   return (
     <AuthProvider>
       <AppContent />
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          className: 'modern-toast',
+          style: {
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontSize: '14px',
+            borderRadius: '12px',
+            background: '#ffffff',
+            color: '#1f2937',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            padding: '12px 24px',
+            border: '1px solid #f3f4f6',
+          },
+          success: {
+            iconTheme: {
+              primary: '#a855f7', // violet
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </AuthProvider>
   );
 }

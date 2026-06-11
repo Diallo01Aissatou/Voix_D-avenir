@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Send, Check, X, MessageCircle, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Api from '../../data/Api';
+import { toast } from 'react-hot-toast';
 
 const SimpleMentorship = () => {
   const { currentUser } = useAuth();
@@ -51,7 +52,7 @@ const SimpleMentorship = () => {
       });
 
       if (response.data) {
-        alert('Demande envoyée!');
+        toast.success('Demande envoyée !');
         setShowModal(false);
         setSelectedMentore('');
         setMessage('');
@@ -59,7 +60,7 @@ const SimpleMentorship = () => {
       }
     } catch (error) {
       console.error('Erreur envoi demande:', error);
-      alert('Erreur lors de l\'envoi');
+      toast.error('Erreur lors de l\'envoi');
     }
     setLoading(false);
   };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Download, Play, BookOpen, Eye, X } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
+import { toast } from 'react-hot-toast';
 
 interface ResourcesPageProps {
   onNavigate: (page: string) => void;
@@ -84,7 +85,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
 
     if (normalizedType === 'video') {
       if (resource.fileUrl && !resource.fileUrl.includes('/api/files/') && !resource.fileUrl.includes('/serve-file/') && !resource.fileUrl.startsWith('http')) {
-        alert('Cette vidéo a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez demander à un administrateur de la republier.');
+        toast.error('Cette vidéo a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez demander à un administrateur de la republier.');
         return;
       }
       // Pour les vidéos, incrémenter localement les vues
@@ -100,7 +101,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       ));
       
       if (!resource.fileUrl) {
-        alert('Aucun fichier disponible.');
+        toast.error('Aucun fichier disponible.');
         return;
       }
       
@@ -116,7 +117,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
         viewUrl = `${baseUrl}${resource.fileUrl}/${virtualName}${resource.fileUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
       } else {
         // Anciens liens /uploads/
-        alert('Cette ressource a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez demander à un administrateur de la republier.');
+        toast.error('Cette ressource a été téléchargée avec l\'ancien système non-permanent et a été perdue suite à une mise à jour du serveur. Veuillez demander à un administrateur de la republier.');
         return;
       }
       
@@ -128,7 +129,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
 
   const downloadFile = async (resource: any) => {
     if (!resource.fileUrl) {
-      alert('Aucun fichier disponible.');
+      toast.error('Aucun fichier disponible.');
       return;
     }
 
@@ -144,7 +145,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
     } else if (resource.fileUrl.includes('/api/files/')) {
       downloadUrl = `${BASE_URL}${resource.fileUrl.startsWith('/') ? '' : '/'}${resource.fileUrl}?download=true&resourceId=${resource._id}`;
     } else {
-      alert('Cette ressource a été téléchargée avec l\'ancien système non-permanent et ne peut plus être téléchargée. Veuillez demander à un administrateur de la republier.');
+      toast.error('Cette ressource a été téléchargée avec l\'ancien système non-permanent et ne peut plus être téléchargée. Veuillez demander à un administrateur de la republier.');
       return;
     }
     
@@ -153,14 +154,14 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
 
   const submitResource = async () => {
     if (!shareResource.title || !shareResource.category || !shareResource.resourceFile) {
-      alert('Veuillez remplir tous les champs obligatoires (Titre, Catégorie et Fichier).');
+      toast.error('Veuillez remplir tous les champs obligatoires (Titre, Catégorie et Fichier).');
       return;
     }
 
     // Vérifier la taille du fichier (500MB max)
     const maxSize = 500 * 1024 * 1024;
     if (shareResource.resourceFile.size > maxSize) {
-      alert(`Le fichier est trop volumineux (${Math.round(shareResource.resourceFile.size / (1024 * 1024))}MB). La taille maximum autorisée est de 500MB.`);
+      toast.error(`Le fichier est trop volumineux (${Math.round(shareResource.resourceFile.size / (1024 * 1024))}MB). La taille maximum autorisée est de 500MB.`);
       return;
     }
 
@@ -175,7 +176,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
     const resourceType = shareResource.type;
 
     if (allowedTypesForExt[resourceType] && !allowedTypesForExt[resourceType].includes(fileType)) {
-      alert(`Format de fichier non compatible pour le type "${resourceType}".`);
+      toast.error(`Format de fichier non compatible pour le type "${resourceType}".`);
       return;
     }
 
@@ -201,7 +202,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
       setShareResource({ title: '', description: '', category: '', type: 'pdf', fileUrl: '', resourceFile: null });
       setShowShareModal(false);
       loadResources();
-      alert('Ressource soumise avec succès ! Elle sera visible après validation.');
+      toast.success('Ressource soumise avec succès ! Elle sera visible après validation.');
     } catch (error: any) {
       console.error('Erreur détaillée de soumission:', error);
       
@@ -214,7 +215,7 @@ const ResourcesPage: React.FC<ResourcesPageProps> = ({ onNavigate }) => {
         errorMessage = error.message;
       }
       
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
       setUploadProgress(0);

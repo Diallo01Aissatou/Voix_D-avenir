@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Award, MapPin, Briefcase, Quote, MessageSquare, ChevronRight, User } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
+import { toast } from 'react-hot-toast';
 
 interface ExpertsPageProps {
   onNavigate: (page: string) => void;
@@ -76,7 +77,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
 
   const handleContact = () => {
     if (contactMessage.trim()) {
-      alert('Message envoyé avec succès ! L\'experte vous répondra bientôt.');
+      toast.success('Message envoyé avec succès ! L\'experte vous répondra bientôt.');
       setSelectedExpert(null);
       setContactMessage('');
     }

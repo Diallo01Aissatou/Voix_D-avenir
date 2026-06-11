@@ -16,6 +16,7 @@ import {
 import { faqService, GroupedFAQs } from '../../services/faqService';
 import { questionService } from '../../services/questionService';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 
 interface FAQPageProps {
   onNavigate: (page: string) => void;
@@ -100,7 +101,7 @@ const FAQPage: React.FC<FAQPageProps> = ({ onNavigate }) => {
       setQuestionData({ text: '', category: 'autre' });
       setTimeout(() => setSubmitSuccess(false), 5000);
     } catch (err: any) {
-      alert(err.message || 'Erreur lors de l\'envoi');
+      toast.error(err.message || 'Erreur lors de l\'envoi');
     } finally {
       setIsSubmitting(false);
     }
