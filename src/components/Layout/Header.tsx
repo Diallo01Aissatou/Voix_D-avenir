@@ -225,9 +225,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
                       handleLogout();
                       onMenuToggle();
                     }}
-                    className="text-left px-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="flex items-center px-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    aria-label="Déconnexion"
+                    title="Déconnexion"
                   >
-                    Déconnexion
+                    <LogOut className="w-5 h-5" />
                   </button>
                 </>
               ) : (

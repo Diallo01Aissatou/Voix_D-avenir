@@ -450,8 +450,8 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
             )}
 
             {activeTab === 'mentorship' && <div className="bg-white rounded-xl p-6 border border-gray-100"><SimpleMentorship /></div>}
-            {activeTab === 'sessions' && <SessionsManagerMentoree sessions={mySessions} onRefresh={loadMySessions} onOpenChat={() => setActiveTab('messagerie')} />}
-            {activeTab === 'requests' && <DynamicMentorshipManager userRole="mentoree" onNavigateToMessaging={() => setActiveTab('messagerie')} />}
+            {activeTab === 'sessions' && <SessionsManagerMentoree sessions={mySessions} onRefresh={loadMySessions} onOpenChat={(userId) => { setActiveTab('messagerie'); setTimeout(() => window.dispatchEvent(new CustomEvent('openConversation', { detail: { userId } })), 100); }} />}
+            {activeTab === 'requests' && <DynamicMentorshipManager userRole="mentoree" onNavigateToMessaging={(userId) => { setActiveTab('messagerie'); setTimeout(() => window.dispatchEvent(new CustomEvent('openConversation', { detail: { userId } })), 100); }} />}
             {activeTab === 'messagerie' && <div className="h-[600px] border border-gray-100 rounded-xl overflow-hidden shadow-inner"><MessageriePage /></div>}
             {activeTab === 'testimonials' && <TestimonialManager />}
             {activeTab === 'profile' && (

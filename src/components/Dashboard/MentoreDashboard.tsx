@@ -278,8 +278,8 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
           </div>
 
           <div className="p-6">
-            {activeTab === 'requests' && <DynamicMentorshipManager userRole="mentore" onNavigateToMessaging={() => setActiveTab('messaging')} />}
-            {activeTab === 'sessions' && <SessionsManagerMentore sessions={sessions} onRefresh={loadSessions} onOpenChat={() => setActiveTab('messaging')} />}
+            {activeTab === 'requests' && <DynamicMentorshipManager userRole="mentore" onNavigateToMessaging={(userId) => { setActiveTab('messaging'); setTimeout(() => window.dispatchEvent(new CustomEvent('openConversation', { detail: { userId } })), 100); }} />}
+            {activeTab === 'sessions' && <SessionsManagerMentore sessions={sessions} onRefresh={loadSessions} onOpenChat={(userId) => { setActiveTab('messaging'); setTimeout(() => window.dispatchEvent(new CustomEvent('openConversation', { detail: { userId } })), 100); }} />}
             {activeTab === 'messaging' && <div className="h-[600px]"><MessageriePage /></div>}
             {activeTab === 'profile' && <ProfileManager currentUser={currentUser} onUpdate={loadStats} />}
           </div>
@@ -289,7 +289,7 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
   );
 };
 
-const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }: { sessions: any[], onRefresh: () => void, onOpenChat: () => void }) => {
+const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }: { sessions: any[], onRefresh: () => void, onOpenChat: (userId: string) => void }) => {
   const [showLinkModal, setShowLinkModal] = useState<string | null>(null);
   const [meetingLink, setMeetingLink] = useState('');
 
@@ -317,7 +317,7 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }: { sessions:
           <div className="flex space-x-2">
             <button onClick={() => { setMeetingLink(s.meetingLink || ''); setShowLinkModal(s._id); }} className="px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-bold">Lien</button>
             <button onClick={() => handleAction(s._id, 'complete')} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-xs font-bold">Terminer</button>
-            <button onClick={() => onOpenChat()} className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold">Chat</button>
+            <button onClick={() => onOpenChat(s.mentoree?._id || s.mentoree?.id)} className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold">Chat</button>
           </div>
         </div>
       ))}
