@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Users, UserCheck, UserX, MessageSquare, BarChart3, Settings, Eye, Trash2, Edit, Star, BookOpen, Calendar, Download, User as UserIcon } from 'lucide-react';
 import Api, { BASE_URL } from '../../data/Api';
 import { useAuth } from '../../contexts/AuthContext';
@@ -156,7 +157,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const addExpert = async () => {
     if (!newExpert.userId || !newExpert.domain) {
-      alert('Veuillez sélectionner une mentore et spécifier son domaine d\'expertise');
+      toast.error('Veuillez sélectionner une mentore et spécifier son domaine d\'expertise');
       return;
     }
 
@@ -174,9 +175,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       setNewExpert({ userId: '', domain: '', achievements: [''], quote: '' });
       loadExperts();
       loadAvailableMentores();
-      alert('Experte ajoutée avec succès');
+      toast.success('Experte ajoutée avec succès');
     } catch (error) {
-      alert(error.response?.data?.message || 'Erreur lors de l\'ajout');
+      toast.error(error.response?.data?.message || 'Erreur lors de l\'ajout');
     } finally {
       setIsLoading(false);
     }
@@ -189,9 +190,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       await Api.delete(`/experts/${expertId}`);
       loadExperts();
-      alert('Experte supprimée avec succès');
+      toast.success('Experte supprimée avec succès');
     } catch (error) {
-      alert('Erreur lors de la suppression');
+      toast.error('Erreur lors de la suppression');
     } finally {
       setIsLoading(false);
     }
@@ -202,9 +203,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       await Api.put(`/experts/featured/${expertId}`);
       loadExperts();
-      alert('Experte définie comme vedette');
+      toast.success('Experte définie comme vedette');
     } catch (error) {
-      alert('Erreur lors de la modification');
+      toast.error('Erreur lors de la modification');
     } finally {
       setIsLoading(false);
     }
@@ -221,19 +222,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const addResource = async () => {
     if (!newResource.title || !newResource.description || !newResource.category) {
-      alert('Veuillez remplir tous les champs obligatoires');
+      toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
     if (!newResource.resourceFile) {
-      alert('Veuillez sélectionner un fichier à uploader');
+      toast.error('Veuillez sélectionner un fichier à uploader');
       return;
     }
 
     // Vérifier la taille du fichier (500MB max)
     const maxSize = 500 * 1024 * 1024; // 500MB
     if (newResource.resourceFile.size > maxSize) {
-      alert(`Le fichier est trop volumineux. Taille maximum: 500MB. Taille actuelle: ${Math.round(newResource.resourceFile.size / (1024 * 1024))}MB`);
+      toast.error(`Le fichier est trop volumineux. Taille maximum: 500MB. Taille actuelle: ${Math.round(newResource.resourceFile.size / (1024 * 1024))}MB`);
       return;
     }
 
@@ -249,7 +250,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     const resourceType = newResource.type;
 
     if (!allowedTypes[resourceType]?.includes(fileType)) {
-      alert(`Type de fichier non compatible. Pour ${resourceType}, utilisez: ${allowedTypes[resourceType]?.join(', ')}`);
+      toast.error(`Type de fichier non compatible. Pour ${resourceType}, utilisez: ${allowedTypes[resourceType]?.join(', ')}`);
       return;
     }
 
@@ -277,7 +278,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
       fileInputs.forEach(input => input.value = '');
       loadResources();
-      alert('Ressource ajoutée avec succès');
+      toast.success('Ressource ajoutée avec succès');
     } catch (error) {
       console.error('Erreur détaillée:', error);
       console.error('Status:', error.response?.status);
@@ -295,7 +296,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         errorMessage = error.message;
       }
 
-      alert(`Erreur: ${errorMessage}`);
+      toast.error(`Erreur: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -348,9 +349,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
       cancelEdit();
       loadResources();
-      alert('Ressource mise à jour avec succès');
+      toast.success('Ressource mise à jour avec succès');
     } catch (error) {
-      alert('Erreur lors de la mise à jour');
+      toast.error('Erreur lors de la mise à jour');
     } finally {
       setIsLoading(false);
     }
@@ -363,9 +364,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       await Api.delete(`/resources/${resourceId}`);
       loadResources();
-      alert('Ressource supprimée avec succès');
+      toast.success('Ressource supprimée avec succès');
     } catch (error) {
-      alert('Erreur lors de la suppression');
+      toast.error('Erreur lors de la suppression');
     } finally {
       setIsLoading(false);
     }
@@ -392,7 +393,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const addTestimonial = async () => {
     if (!newTestimonial.menteeId || !newTestimonial.message.trim()) {
-      alert('Veuillez sélectionner une mentorée et saisir un message');
+      toast.error('Veuillez sélectionner une mentorée et saisir un message');
       return;
     }
 
@@ -408,9 +409,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       });
       setNewTestimonial({ menteeId: '', message: '', rating: 5 });
       loadTestimonials();
-      alert('Témoignage ajouté avec succès');
+      toast.success('Témoignage ajouté avec succès');
     } catch (error) {
-      alert('Erreur lors de l\'ajout');
+      toast.error('Erreur lors de l\'ajout');
     } finally {
       setIsLoading(false);
     }
@@ -423,9 +424,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       await Api.delete(`/testimonials/clear-all`);
       loadTestimonials();
-      alert('Témoignages supprimés avec succès');
+      toast.success('Témoignages supprimés avec succès');
     } catch (error) {
-      alert('Erreur lors de la suppression');
+      toast.error('Erreur lors de la suppression');
     } finally {
       setIsLoading(false);
     }
@@ -453,7 +454,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const addNews = async () => {
     if (!newNews.title.trim() || !newNews.summary.trim()) {
-      alert('Le titre et le résumé sont obligatoires');
+      toast.success('Le titre et le résumé sont obligatoires');
       return;
     }
 
@@ -474,9 +475,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
       setNewNews({ title: '', summary: '', content: '', imageFile: null });
       loadNews();
-      alert('Actualité ajoutée avec succès');
+      toast.success('Actualité ajoutée avec succès');
     } catch (error) {
-      alert('Erreur lors de l\'ajout');
+      toast.error('Erreur lors de l\'ajout');
     } finally {
       setIsLoading(false);
     }
@@ -489,9 +490,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       await Api.delete(`/news/${newsId}`);
       loadNews();
-      alert('Actualité supprimée avec succès');
+      toast.success('Actualité supprimée avec succès');
     } catch (error) {
-      alert('Erreur lors de la suppression');
+      toast.error('Erreur lors de la suppression');
     } finally {
       setIsLoading(false);
     }
@@ -508,7 +509,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const addEvent = async () => {
     if (!newEvent.title?.trim()) {
-      alert('Le titre de l\'événement est obligatoire');
+      toast.success('Le titre de l\'événement est obligatoire');
       return;
     }
 
@@ -532,11 +533,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
       loadEvents();
-      alert('Événement ajouté avec succès');
+      toast.success('Événement ajouté avec succès');
     } catch (error) {
       console.error('Erreur détaillée:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Erreur lors de l\'ajout';
-      alert(`Erreur: ${errorMessage}`);
+      toast.error(`Erreur: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -549,9 +550,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       await Api.delete(`/events/${eventId}`);
       loadEvents();
-      alert('Événement supprimé avec succès');
+      toast.success('Événement supprimé avec succès');
     } catch (error) {
-      alert('Erreur lors de la suppression');
+      toast.error('Erreur lors de la suppression');
     } finally {
       setIsLoading(false);
     }
@@ -636,7 +637,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   const addPartner = async () => {
     if (!newPartner.name.trim()) {
-      alert('Le nom du partenaire est obligatoire');
+      toast.success('Le nom du partenaire est obligatoire');
       return;
     }
 
@@ -659,7 +660,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       setNewPartner({ name: '', logoFile: null, website: '', description: '' });
       loadPartners();
       refreshStats();
-      alert('Partenaire ajouté avec succès');
+      toast.success('Partenaire ajouté avec succès');
     } catch (error) {
       console.error('Erreur détaillée:', error);
       let errorMessage = 'Erreur lors de l\'ajout du partenaire';
@@ -672,7 +673,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         errorMessage = error.message;
       }
 
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -686,9 +687,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       await Api.delete(`/partners/${partnerId}`);
       loadPartners();
       refreshStats();
-      alert('Partenaire supprimé avec succès');
+      toast.success('Partenaire supprimé avec succès');
     } catch (error) {
-      alert('Erreur lors de la suppression');
+      toast.error('Erreur lors de la suppression');
     } finally {
       setIsLoading(false);
     }
@@ -702,9 +703,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       await Api.delete(`/users/admin/${userId}`);
       loadUsers();
       refreshStats();
-      alert('Utilisateur supprimé avec succès');
+      toast.success('Utilisateur supprimé avec succès');
     } catch (error) {
-      alert('Erreur lors de la suppression');
+      toast.error('Erreur lors de la suppression');
     } finally {
       setIsLoading(false);
     }
@@ -722,10 +723,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     try {
       await Api.put(`/users/admin/${userId}`, { verified: !currentStatus });
       refreshStats();
-      alert(`Utilisateur ${!currentStatus ? 'activé' : 'désactivé'} avec succès`);
+      toast.success(`Utilisateur ${!currentStatus ? 'activé' : 'désactivé'} avec succès`);
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de la modification du statut');
+      toast.error('Erreur lors de la modification du statut');
       // Restaurer l'état précédent en cas d'erreur
       setUsers(users.map(user =>
         user._id === userId ? { ...user, verified: currentStatus } : user
@@ -956,8 +957,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                   await Api.put(`/users/admin/approve/${mentor._id}`);
                                   await loadPendingMentors();
                                   await refreshStats();
-                                  alert(`${mentor.name} a été approuvée !`);
-                                } catch (err) { alert('Erreur lors de l\'approbation'); }
+                                  toast.success(`${mentor.name} a été approuvée !`);
+                                } catch (err) { toast.error('Erreur lors de l\'approbation'); }
                               }}
                               className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-bold text-sm transition-colors"
                             >
@@ -1000,9 +1001,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                               setRejectReason('');
                               await loadPendingMentors();
                               await refreshStats();
-                              alert('Mentore rejetée et supprimée avec succès.');
+                              toast.success('Mentore rejetée et supprimée avec succès.');
                             } catch (err: any) {
-                              alert(`Erreur lors du rejet : ${err?.response?.data?.message || err?.message || 'Erreur inconnue'}`);
+                              toast.error(`Erreur lors du rejet : ${err?.response?.data?.message || err?.message || 'Erreur inconnue'}`);
                             }
                           }}
                           className="flex-1 bg-red-500 text-white py-2 rounded-xl font-bold text-sm"
@@ -1115,9 +1116,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                           await Api.put(`/users/admin/approve/${user._id}`);
                                           await loadUsers();
                                           await refreshStats();
-                                          alert('Mentor approuvé');
+                                          toast.success('Mentor approuvé');
                                         } catch (err) {
-                                          alert('Erreur lors de l\'approbation');
+                                          toast.error('Erreur lors de l\'approbation');
                                         }
                                       }
                                     }}
