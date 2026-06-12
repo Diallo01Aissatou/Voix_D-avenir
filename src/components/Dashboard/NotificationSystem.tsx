@@ -207,87 +207,43 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
     setUnreadCount(0);
   };
 
+  const handleBellClick = () => {
+    const unreadNotifs = notifications.filter(n => !n.read);
+    
+    if (unreadNotifs.length === 0) {
+      toast('Aucune nouvelle notification', { icon: '👍' });
+      return;
+    }
+
+    unreadNotifs.forEach(n => {
+      toast(
+        (t) => (
+          <div className="flex flex-col cursor-pointer" onClick={() => { toast.dismiss(t.id); handleNotificationClick(n); }}>
+            <span className="font-bold text-sm text-purple-700">{n.title}</span>
+            <span className="text-xs text-gray-600 mt-1">{n.message}</span>
+          </div>
+        ),
+        {
+          duration: 5000,
+          icon: n.type === 'request' ? '📝' : n.type === 'message' ? '💬' : '🔔',
+        }
+      );
+    });
+  };
+
   return (
     <div className="relative">
       <button
-        onClick={() => setShowDropdown(!showDropdown)}
-        className="relative p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+        onClick={handleBellClick}
+        className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
       >
         <Bell className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
+          <span className="absolute top-1 right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full border-2 border-white">
+            {unreadCount}
           </span>
         )}
       </button>
-
-      {showDropdown && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border z-50 max-h-96 overflow-y-auto">
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-800">Notifications</h3>
-              <div className="flex items-center space-x-2">
-                {notifications.length > 0 && (
-                  <button
-                    onClick={clearAllNotifications}
-                    className="text-xs text-gray-500 hover:text-gray-700"
-                  >
-                    Tout effacer
-                  </button>
-                )}
-                <button
-                  onClick={() => setShowDropdown(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="max-h-64 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">
-                <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">Aucune notification</p>
-              </div>
-            ) : (
-              notifications.map((notification) => (
-                <ProfessionalNotification
-                  key={notification.id}
-                  type={notification.type as NotificationType}
-                  title={notification.title}
-                  message={notification.message}
-                  timestamp={notification.time}
-                  read={notification.read}
-                  onClick={() => handleNotificationClick(notification)}
-                  className="mb-2 border-b-0 last:mb-0"
-                  variant={
-                    notification.data?.status === 'accepted' ? 'success' :
-                      notification.data?.status === 'rejected' ? 'error' :
-                        notification.data?.status === 'pending' ? 'warning' :
-                          'default'
-                  }
-                />
-              ))
-            )}
-          </div>
-
-          {notifications.length > 0 && onViewAll && (
-            <div className="p-3 border-t border-gray-100 text-center">
-              <button
-                onClick={() => {
-                  onViewAll();
-                  setShowDropdown(false);
-                }}
-                className="text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors"
-              >
-                Voir toutes les notifications
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
