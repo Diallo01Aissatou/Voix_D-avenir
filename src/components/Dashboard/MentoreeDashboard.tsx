@@ -288,8 +288,8 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="w-full">
+    <div className="bg-transparent">
+      <div className="w-full pt-4 px-2 md:px-6 pb-2">
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div className="flex items-center space-x-4">
