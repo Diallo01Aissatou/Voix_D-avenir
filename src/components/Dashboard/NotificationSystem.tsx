@@ -67,6 +67,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
   const loadNotifications = async () => {
     try {
       const localReadDb = JSON.parse(localStorage.getItem(`read_notifs_${userId}`) || '{}');
+      const localDeletedDb = JSON.parse(localStorage.getItem(`deleted_notifs_${userId}`) || '{}');
 
       // Charger les notifications de séances et de mentorat
       const [sessionsRes, mentorshipRes] = await Promise.all([
@@ -77,32 +78,36 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
       let allNotifications: Notification[] = [];
 
       if (sessionsRes.data && Array.isArray(sessionsRes.data)) {
-        const sessionNotifs = sessionsRes.data.map((notif: any) => ({
-          id: notif._id,
-          type: 'session' as NotificationType,
-          title: notif.title || getNotificationTitle(notif),
-          message: notif.message,
-          time: formatTime(notif.createdAt),
-          read: notif.read || !!localReadDb[notif._id],
-          data: notif
-        }));
+        const sessionNotifs = sessionsRes.data
+          .filter((notif: any) => !localDeletedDb[notif._id])
+          .map((notif: any) => ({
+            id: notif._id,
+            type: 'session' as NotificationType,
+            title: notif.title || getNotificationTitle(notif),
+            message: notif.message,
+            time: formatTime(notif.createdAt),
+            read: notif.read || !!localReadDb[notif._id],
+            data: notif
+          }));
         allNotifications = [...allNotifications, ...sessionNotifs];
       }
 
       try {
         if (mentorshipRes.data && Array.isArray(mentorshipRes.data)) {
-          const mentorshipNotifs = mentorshipRes.data.map((notif: any) => {
-            const notifId = notif.id || `notif-${notif.data?.requestId || Math.random()}`;
-            return {
-              id: notifId,
-              type: notif.type as NotificationType,
-              title: getNotificationTitle(notif),
-              message: notif.message,
-              time: notif.time || formatTime(notif.createdAt),
-              read: !!localReadDb[notifId],
-              data: notif
-            };
-          });
+          const mentorshipNotifs = mentorshipRes.data
+            .map((notif: any) => {
+              const notifId = notif.id || `notif-${notif.data?.requestId || Math.random()}`;
+              return {
+                id: notifId,
+                type: notif.type as NotificationType,
+                title: getNotificationTitle(notif),
+                message: notif.message,
+                time: notif.time || formatTime(notif.createdAt),
+                read: !!localReadDb[notifId],
+                data: notif
+              };
+            })
+            .filter((notif: any) => !localDeletedDb[notif.id]);
           allNotifications = [...allNotifications, ...mentorshipNotifs];
         }
       } catch (mentorshipError) {

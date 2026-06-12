@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, Calendar, BookOpen, Clock, Reply, CheckCircle, XCircle } from 'lucide-react';
+import { MessageSquare, Calendar, BookOpen, Clock, Reply, CheckCircle, XCircle, X } from 'lucide-react';
 
 export type NotificationType = 'message' | 'reply' | 'session' | 'reminder' | 'resource' | 'request' | 'system';
 
@@ -15,6 +15,7 @@ export interface ProfessionalNotificationProps {
   read?: boolean;
   className?: string;
   variant?: 'default' | 'success' | 'error' | 'warning';
+  onDismiss?: () => void;
 }
 
 const ProfessionalNotification: React.FC<ProfessionalNotificationProps> = ({
@@ -28,6 +29,7 @@ const ProfessionalNotification: React.FC<ProfessionalNotificationProps> = ({
   read = false,
   className = '',
   variant = 'default',
+  onDismiss,
 }) => {
   const getIcon = () => {
     // Variants avec couleurs spécifiques pour Voix d'Avenir
@@ -141,7 +143,20 @@ const ProfessionalNotification: React.FC<ProfessionalNotificationProps> = ({
         </div>
 
         {!read && (
-          <div className="absolute top-4 right-4 w-2 h-2 bg-pink-500 rounded-full animate-pulse"></div>
+          <div className={`absolute top-4 ${onDismiss ? 'right-10' : 'right-4'} w-2 h-2 bg-pink-500 rounded-full animate-pulse`}></div>
+        )}
+
+        {onDismiss && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDismiss();
+            }}
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition-colors"
+            title="Ignorer"
+          >
+            <X className="w-4 h-4" />
+          </button>
         )}
       </div>
     </div>

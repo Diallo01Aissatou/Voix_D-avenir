@@ -17,6 +17,194 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [rejectReason, setRejectReason] = useState('');
   const [rejectingId, setRejectingId] = useState<string | null>(null);
 
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void | Promise<void>;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  const triggerConfirm = (title: string, message: string, onConfirm: () => void | Promise<void>) => {
+    setConfirmConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: async () => {
+        try {
+          await onConfirm();
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        }
+      }
+    });
+  };
+
+  const getPhotoUrl = (photo: string | undefined) => {
+    if (!photo) return null;
+    
+    // Correction pour les chaînes Base64 corrompues par le backend
+    if (photo.includes('data:image')) {
+      return photo.substring(photo.indexOf('data:image'));
+    }
+    
+    if (photo.startsWith('http') || photo.startsWith('data:') || photo.startsWith('/api/')) return photo.startsWith('/') ? `${BASE_URL}${photo}` : photo;
+    return `${BASE_URL}/uploads/${photo.split('/').pop()}`;
+  };
+  const [users, setUsers] = useState<User[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalMentores: 0,
+    totalMentorees: 0,
+    approvedMentores: 0,
+    totalRequests: 0,
+    pendingRequests: 0,
+    acceptedRequests: 0
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [partners, setPartners] = useState([]);
+  const [newPartner, setNewPartner] = useState({ name: '', logoFile: null, website: '', description: '' });
+  const [mentees, setMentees] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [newTestimonial, setNewTestimonial] = useState({ menteeId: '', message: '', rating: 5 });
+  const [experts, setExperts] = useState([]);
+  const [availableMentores, setAvailableMentores] = useState([]);
+  const [newExpert, setNewExpert] = useState({
+    userId: '', domain: '', achievements: [''], quote: ''
+  });
+  const [adminResources, setAdminResources] = useState([]);
+  const [newResource, setNewResource] = useState({
+    title: '', description: '', category: '', type: 'pdf', fileUrl: '', resourceFile: null, imageFile: null
+  });
+  const [editingResource, setEditingResource] = useState<any>(null);
+  const [newAdmin, setNewAdmin] = useState({ name: '', email: '', password: '' });
+  const [resourceCategoryFilter, setResourceCategoryFilter] = useState('');
+  const [resourceSearch, setResourceSearch] = useState('');
+
+  useEffect(() => {
+    loadStats();
+    // Ne charger que les données strictement nécessaires au démarrage (pour les badges rouges du menu par exemple)
+    loadPendingMentors();
+    // Les autres données très lourdes (tous les utilisateurs, partenaires, sessions) 
+    // seront chargées uniquement quand l'administrateur cliquera sur leur onglet.
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'users') loadUsers();
+    if (activeTab === 'approvals') loadPendingMentors();
+    if (activeTab === 'testimonials') {
+      loadTestimonials();
+      loadMentees();
+    }
+    if (activeTab === 'experts') {
+      loadExperts();
+      loadAvailableMentores();
+      loadMentores();
+    }
+    if (activeTab === 'news') loadNews();
+    if (activeTab === 'resources') loadResources();
+    if (activeTab === 'events') loadEvents();
+    if (activeTab === 'requests') loadRequests();
+  }, [activeTab]);
+
+  // Recharger les stats après certaines actions
+  const refreshStats = () => {
+    loadStats();
+    loadPendingMentors();
+  };
+
+  const loadPendingMentors = async () => {
+    // 1. Essayer l'endpoint dédié
+    try {
+      const response = await Api.get('/users/admin/pending');
+      const fromApi = response.data.mentors || [];
+      if (fromApi.length > 0) {
+        setPendingMentors(fromApi);
+        return;
+      }
+    } catch (error) {
+      console.error('Erreur /admin/pending (endpoint peut-être pas encore déployé):', error);
+    }
+
+    // 2. Repli: charger TOUS les utilisateurs et filtrer côté frontend
+    try {
+      const allResponse = await Api.get('/users/admin/all');
+      const allUsers = allResponse.data.users || allResponse.data || [];
+      const pending = allUsers.filter((u: User) => u.role === 'mentore' && u.isApproved === false);
+      setPendingMentors(pending);
+    } catch (err) {
+      console.error('Erreur repli pending mentors:', err);
+      setPendingMentors([]);
+    }
+  };
+
+  const loadExperts = async () => {
+    try {
+      const response = await Api.get('/experts/all');
+      console.log('Expertes chargées:', response.data); // Debug
+      setExperts(response.data);
+    } catch (error) {
+      console.error('Erreur chargement expertes:', error);
+      setExperts([]);
+    }
+  };
+
+  const loadAvailableMentores = async () => {
+    try {
+      // Charger toutes les mentores depuis l'API utilisateurs
+      const usersResponse = await Api.get('/users/admin/all');
+      const allUsers = usersResponse.data.users || usersResponse.data;
+      const allMentores = allUsers.filter(user => user.role === 'mentore');
+
+      // Charger les expertes existantes
+      const expertsResponse = await Api.get('/experts/all');
+      const existingExperts = expertsResponse.data || [];
+      const expertUserIds = existingExperts.map(expert => expert.user?._id || expert.user);
+
+      // Filtrer les mentores qui ne sont pas encore expertes
+      const availableMentores = allMentores.filter(mentore =>
+        !expertUserIds.includes(mentore._id)
+      );
+
+      console.log('Toutes les mentores:', allMentores.length);
+      console.log('Expertes existantes:', expertUserIds.length);
+      console.log('Mentores disponibles:', availableMentores.length);
+
+      setAvailableMentores(availableMentores);
+    } catch (error) {
+      console.error('Erreur chargement mentores disponibles:', error);
+      setAvailableMentores([]);
+    }
+  };
+
+  const addExpert = async () => {
+    if (!newExpert.userId || !newExpert.domain) {
+      toast.error('Veuillez sélectionner une mentore et spécifier son domaine d\'expertise');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const expertData = {
+        userId: newExpert.userId,
+        domain: newExpert.domain,
+        achievements: newExpert.achievements.filter(a => a.trim()),
+        quote: newExpert.quote
+      };
+
+      await Api.post('/experts', expertData);
+
+      setNewExpert({ userId: '', domain: '', achievements: [''], quote: '' });
+      loadExperts();
+  };
+
   const getPhotoUrl = (photo: string | undefined) => {
     if (!photo) return null;
     
@@ -184,18 +372,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const deleteExpert = async (expertId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette experte ?')) return;
-
-    setIsLoading(true);
-    try {
-      await Api.delete(`/experts/${expertId}`);
-      loadExperts();
-      toast.success('Experte supprimée avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsLoading(false);
-    }
+    triggerConfirm(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer cette experte ?',
+      async () => {
+        setIsLoading(true);
+        try {
+          await Api.delete(`/experts/${expertId}`);
+          loadExperts();
+          toast.success('Experte supprimée avec succès');
+        } catch (error) {
+          toast.error('Erreur lors de la suppression');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
   const toggleFeatured = async (expertId: string) => {
@@ -358,18 +550,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const deleteResource = async (resourceId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')) return;
-
-    setIsLoading(true);
-    try {
-      await Api.delete(`/resources/${resourceId}`);
-      loadResources();
-      toast.success('Ressource supprimée avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsLoading(false);
-    }
+    triggerConfirm(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer cette ressource ?',
+      async () => {
+        setIsLoading(true);
+        try {
+          await Api.delete(`/resources/${resourceId}`);
+          loadResources();
+          toast.success('Ressource supprimée avec succès');
+        } catch (error) {
+          toast.error('Erreur lors de la suppression');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
   const loadTestimonials = async () => {
@@ -418,18 +614,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const deleteTestimonial = async (testimonialId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce témoignage ?')) return;
-
-    setIsLoading(true);
-    try {
-      await Api.delete(`/testimonials/clear-all`);
-      loadTestimonials();
-      toast.success('Témoignages supprimés avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsLoading(false);
-    }
+    triggerConfirm(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer ce témoignage ?',
+      async () => {
+        setIsLoading(true);
+        try {
+          await Api.delete(`/testimonials/clear-all`);
+          loadTestimonials();
+          toast.success('Témoignages supprimés avec succès');
+        } catch (error) {
+          toast.error('Erreur lors de la suppression');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
   const [news, setNews] = useState([]);
@@ -484,18 +684,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const deleteNews = async (newsId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette actualité ?')) return;
-
-    setIsLoading(true);
-    try {
-      await Api.delete(`/news/${newsId}`);
-      loadNews();
-      toast.success('Actualité supprimée avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsLoading(false);
-    }
+    triggerConfirm(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer cette actualité ?',
+      async () => {
+        setIsLoading(true);
+        try {
+          await Api.delete(`/news/${newsId}`);
+          loadNews();
+          toast.success('Actualité supprimée avec succès');
+        } catch (error) {
+          toast.error('Erreur lors de la suppression');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
   const loadEvents = async () => {
@@ -544,18 +748,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const deleteEvent = async (eventId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) return;
-
-    setIsLoading(true);
-    try {
-      await Api.delete(`/events/${eventId}`);
-      loadEvents();
-      toast.success('Événement supprimé avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsLoading(false);
-    }
+    triggerConfirm(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer cet événement ?',
+      async () => {
+        setIsLoading(true);
+        try {
+          await Api.delete(`/events/${eventId}`);
+          loadEvents();
+          toast.success('Événement supprimé avec succès');
+        } catch (error) {
+          toast.error('Erreur lors de la suppression');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
 
@@ -680,58 +888,68 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const deletePartner = async (partnerId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce partenaire ?')) return;
-
-    setIsLoading(true);
-    try {
-      await Api.delete(`/partners/${partnerId}`);
-      loadPartners();
-      refreshStats();
-      toast.success('Partenaire supprimé avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsLoading(false);
-    }
+    triggerConfirm(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer ce partenaire ?',
+      async () => {
+        setIsLoading(true);
+        try {
+          await Api.delete(`/partners/${partnerId}`);
+          loadPartners();
+          refreshStats();
+          toast.success('Partenaire supprimé avec succès');
+        } catch (error) {
+          toast.error('Erreur lors de la suppression');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
   const deleteUser = async (userId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return;
-
-    setIsLoading(true);
-    try {
-      await Api.delete(`/users/admin/${userId}`);
-      loadUsers();
-      refreshStats();
-      toast.success('Utilisateur supprimé avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression');
-    } finally {
-      setIsLoading(false);
-    }
+    triggerConfirm(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer cet utilisateur ?',
+      async () => {
+        setIsLoading(true);
+        try {
+          await Api.delete(`/users/admin/${userId}`);
+          loadUsers();
+          refreshStats();
+          toast.success('Utilisateur supprimé avec succès');
+        } catch (error) {
+          toast.error('Erreur lors de la suppression');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
   };
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
-    if (!confirm(`Êtes-vous sûr de vouloir ${!currentStatus ? 'activer' : 'désactiver'} cet utilisateur ?`)) return;
+    triggerConfirm(
+      'Confirmer le changement de statut',
+      `Êtes-vous sûr de vouloir ${!currentStatus ? 'activer' : 'désactiver'} cet utilisateur ?`,
+      async () => {
+        // Mettre à jour localement d'abord
+        const updatedUsers = users.map(user =>
+          user._id === userId ? { ...user, verified: !currentStatus } : user
+        );
+        setUsers(updatedUsers);
 
-    // Mettre à jour localement d'abord
-    const updatedUsers = users.map(user =>
-      user._id === userId ? { ...user, verified: !currentStatus } : user
+        try {
+          await Api.put(`/users/admin/${userId}`, { verified: !currentStatus });
+          refreshStats();
+          toast.success(`Utilisateur ${!currentStatus ? 'activé' : 'désactivé'} avec succès`);
+        } catch (error) {
+          console.error('Erreur:', error);
+          toast.error('Erreur lors de la modification du statut');
+          // Restaurer l'état précédent en cas d'erreur
+          loadUsers();
+        }
+      }
     );
-    setUsers(updatedUsers);
-
-    try {
-      await Api.put(`/users/admin/${userId}`, { verified: !currentStatus });
-      refreshStats();
-      toast.success(`Utilisateur ${!currentStatus ? 'activé' : 'désactivé'} avec succès`);
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de la modification du statut');
-      // Restaurer l'état précédent en cas d'erreur
-      setUsers(users.map(user =>
-        user._id === userId ? { ...user, verified: currentStatus } : user
-      ));
-    }
   };
 
   return (
@@ -952,13 +1170,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                         <div className="p-5 pt-0 space-y-2">
                           <div className="flex space-x-2">
                             <button
-                              onClick={async () => {
-                                try {
-                                  await Api.put(`/users/admin/approve/${mentor._id}`);
-                                  await loadPendingMentors();
-                                  await refreshStats();
-                                  toast.success(`${mentor.name} a été approuvée !`);
-                                } catch (err) { toast.error('Erreur lors de l\'approbation'); }
+                              onClick={() => {
+                                triggerConfirm(
+                                  'Approuver le mentor',
+                                  `Approuver ${mentor.name} en tant que mentor ?`,
+                                  async () => {
+                                    try {
+                                      await Api.put(`/users/admin/approve/${mentor._id}`);
+                                      await loadPendingMentors();
+                                      await refreshStats();
+                                      toast.success(`${mentor.name} a été approuvée !`);
+                                    } catch (err) { toast.error('Erreur lors de l\'approbation'); }
+                                  }
+                                );
                               }}
                               className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-bold text-sm transition-colors"
                             >
@@ -1110,17 +1334,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                 </button>
                                 {user.role === 'mentore' && !user.isApproved && (
                                   <button
-                                    onClick={async () => {
-                                      if (confirm(`Approuver ${user.name} en tant que mentor ?`)) {
-                                        try {
-                                          await Api.put(`/users/admin/approve/${user._id}`);
-                                          await loadUsers();
-                                          await refreshStats();
-                                          toast.success('Mentor approuvé');
-                                        } catch (err) {
-                                          toast.error('Erreur lors de l\'approbation');
+                                    onClick={() => {
+                                      triggerConfirm(
+                                        'Approuver le mentor',
+                                        `Approuver ${user.name} en tant que mentor ?`,
+                                        async () => {
+                                          try {
+                                            await Api.put(`/users/admin/approve/${user._id}`);
+                                            await loadUsers();
+                                            await refreshStats();
+                                            toast.success('Mentor approuvé');
+                                          } catch (err) {
+                                            toast.error('Erreur lors de l\'approbation');
+                                          }
                                         }
-                                      }
+                                      );
                                     }}
                                     className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors disabled:opacity-50"
                                   >
@@ -1623,16 +1851,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-bold text-gray-800">Gestion des Ressources</h3>
                   <button
-                    onClick={async () => {
-                      if (window.confirm("Êtes-vous sûr de vouloir supprimer toutes les ressources fantômes de l'ancien système ? Cette action est irréversible et effacera les cartes des fichiers perdus.")) {
-                        try {
-                          const res = await Api.post('/admin/cleanup-resources');
-                          toast.success(res.data.message);
-                          loadResources(); // Refresh resources
-                        } catch (e: any) {
-                          toast.error("Erreur lors du nettoyage: " + (e.response?.data?.message || e.message));
+                    onClick={() => {
+                      triggerConfirm(
+                        'Nettoyer les fichiers perdus',
+                        "Êtes-vous sûr de vouloir supprimer toutes les ressources fantômes de l'ancien système ? Cette action est irréversible et effacera les cartes des fichiers perdus.",
+                        async () => {
+                          try {
+                            const res = await Api.post('/admin/cleanup-resources');
+                            toast.success(res.data.message);
+                            loadResources(); // Refresh resources
+                          } catch (e: any) {
+                            toast.error("Erreur lors du nettoyage: " + (e.response?.data?.message || e.message));
+                          }
                         }
-                      }
+                      );
                     }}
                     className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-bold flex items-center border border-red-300 shadow-sm"
                   >
@@ -1975,6 +2207,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
           </div>
         </div>
       </div>
+      {confirmConfig.isOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform scale-100 transition-transform">
+            <h4 className="font-bold text-lg mb-2 text-gray-800">{confirmConfig.title}</h4>
+            <p className="text-sm text-gray-500 mb-6">{confirmConfig.message}</p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+                className="flex-1 border-2 border-gray-100 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmConfig.onConfirm}
+                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl font-bold text-sm shadow-md transition-colors"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
