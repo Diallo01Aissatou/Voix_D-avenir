@@ -203,6 +203,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
       setNewExpert({ userId: '', domain: '', achievements: [''], quote: '' });
       loadExperts();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getPhotoUrl = (photo: string | undefined) => {
