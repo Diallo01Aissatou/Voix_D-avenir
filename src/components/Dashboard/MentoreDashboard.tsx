@@ -175,8 +175,8 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 shadow-md">

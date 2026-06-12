@@ -953,8 +953,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full">
         <div className="mb-8 flex items-center space-x-4">
           <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
             {getPhotoUrl(currentUser?.photo) ? (
