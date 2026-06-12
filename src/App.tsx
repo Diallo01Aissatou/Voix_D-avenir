@@ -3,29 +3,28 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import { Toaster } from 'react-hot-toast';
-import HomePage from './components/Pages/HomePage';
-import AboutPage from './components/Pages/AboutPage';
-import LoginPage from './components/Pages/LoginPage';
-import RegisterPage from './components/Pages/RegisterPage';
-import ForgotPasswordPage from './components/Pages/ForgotPasswordPage';
-import ResetPasswordPage from './components/Pages/ResetPasswordPage';
-import MentoreeDashboard from './components/Dashboard/MentoreeDashboard';
-import MentoreDashboard from './components/Dashboard/MentoreDashboard';
-import AdminDashboard from './components/Dashboard/AdminDashboard';
-import ExpertsPage from './components/Pages/ExpertsPage';
-import ResourcesPage from './components/Pages/ResourcesPage';
-// import EventsPage from './components/Pages/EventsPage';
-// import OpportunitiesPage from './components/Pages/OpportunitiesPage';
-import FAQPage from './components/Pages/FAQPage';
-import ApplicationForm from './components/Pages/Candidature';
-import Rencontres from './components/Pages/Rencontres';
-import NotificationsPage from './components/Pages/NotificationsPage';
-import VoixAvenirNotificationsDemo from './components/Pages/VoixAvenirNotificationsDemo';
-import ContactPage from './components/Pages/ContactPage';
-import HelpCenterPage from './components/Pages/HelpCenterPage';
-import PrivacyPolicy from './components/Pages/PrivacyPolicy';
-import TermsOfService from './components/Pages/TermsOfService';
-import IntelligentChatbot from './components/Chatbot/IntelligentChatbot';
+// Lazy loading des pages pour optimiser les performances (Code Splitting)
+const HomePage = React.lazy(() => import('./components/Pages/HomePage'));
+const AboutPage = React.lazy(() => import('./components/Pages/AboutPage'));
+const LoginPage = React.lazy(() => import('./components/Pages/LoginPage'));
+const RegisterPage = React.lazy(() => import('./components/Pages/RegisterPage'));
+const ForgotPasswordPage = React.lazy(() => import('./components/Pages/ForgotPasswordPage'));
+const ResetPasswordPage = React.lazy(() => import('./components/Pages/ResetPasswordPage'));
+const MentoreeDashboard = React.lazy(() => import('./components/Dashboard/MentoreeDashboard'));
+const MentoreDashboard = React.lazy(() => import('./components/Dashboard/MentoreDashboard'));
+const AdminDashboard = React.lazy(() => import('./components/Dashboard/AdminDashboard'));
+const ExpertsPage = React.lazy(() => import('./components/Pages/ExpertsPage'));
+const ResourcesPage = React.lazy(() => import('./components/Pages/ResourcesPage'));
+const FAQPage = React.lazy(() => import('./components/Pages/FAQPage'));
+const ApplicationForm = React.lazy(() => import('./components/Pages/Candidature'));
+const Rencontres = React.lazy(() => import('./components/Pages/Rencontres'));
+const NotificationsPage = React.lazy(() => import('./components/Pages/NotificationsPage'));
+const VoixAvenirNotificationsDemo = React.lazy(() => import('./components/Pages/VoixAvenirNotificationsDemo'));
+const ContactPage = React.lazy(() => import('./components/Pages/ContactPage'));
+const HelpCenterPage = React.lazy(() => import('./components/Pages/HelpCenterPage'));
+const PrivacyPolicy = React.lazy(() => import('./components/Pages/PrivacyPolicy'));
+const TermsOfService = React.lazy(() => import('./components/Pages/TermsOfService'));
+const IntelligentChatbot = React.lazy(() => import('./components/Chatbot/IntelligentChatbot'));
 
 
 function AppContent() {
@@ -134,11 +133,20 @@ function AppContent() {
       )}
 
       <main className={showHeader ? "pt-0" : ""}>
-        {renderPage()}
+        <React.Suspense fallback={
+          <div className="flex h-[50vh] items-center justify-center">
+            <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+          </div>
+        }>
+          {renderPage()}
+        </React.Suspense>
       </main>
 
       {showFooter && <Footer onNavigate={handleNavigate} />}
-      <IntelligentChatbot />
+      
+      <React.Suspense fallback={null}>
+        <IntelligentChatbot />
+      </React.Suspense>
     </div>
   );
 }
