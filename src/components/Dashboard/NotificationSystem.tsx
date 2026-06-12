@@ -3,6 +3,7 @@ import { Bell, X } from 'lucide-react';
 import ProfessionalNotification, { NotificationType } from '../UI/ProfessionalNotification';
 import Api from '../../data/Api';
 import { toast } from 'react-hot-toast';
+import { useSocket } from '../../hooks/useSocket';
 
 interface Notification {
   id: string;
@@ -29,6 +30,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { socket } = useSocket();
 
   useEffect(() => {
     loadNotifications();
@@ -38,6 +40,29 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
 
     return () => clearInterval(interval);
   }, [userId]);
+
+  // Écouter les notifications Socket en temps réel
+  useEffect(() => {
+    const handleNewMentorshipRequest = (data: any) => {
+      console.log('Nouvelle demande de mentorat (Socket):', data);
+      toast('Nouvelle demande de mentorat !', { icon: '📝', duration: 5000 });
+      loadNotifications();
+    };
+
+    const handleMentorshipResponse = (data: any) => {
+      console.log('Réponse à votre demande de mentorat (Socket):', data);
+      toast('Mise à jour de votre demande de mentorat', { icon: '🔔', duration: 5000 });
+      loadNotifications();
+    };
+
+    socket.on('newMentorshipRequest', handleNewMentorshipRequest);
+    socket.on('mentorshipResponse', handleMentorshipResponse);
+
+    return () => {
+      socket.off('newMentorshipRequest', handleNewMentorshipRequest);
+      socket.off('mentorshipResponse', handleMentorshipResponse);
+    };
+  }, [socket]);
 
   const loadNotifications = async () => {
     try {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Search, User, Plus, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import Api, { BASE_URL } from '../../data/Api'; // Importation du service Api
-// import { useSocket } from '../../hooks/useSocket';
+import Api, { BASE_URL } from '../../data/Api';
+import { useSocket } from '../../hooks/useSocket';
 
 // Fonction utilitaire pour corriger les URLs des photos
 let photoVersion = Date.now();
@@ -91,18 +91,17 @@ const MessageriePage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
 
+  const { socket } = useSocket();
+
   useEffect(() => {
     console.log('CurrentUser dans MessageriePage:', currentUser);
     loadConversations();
     loadUserProfile();
-    loadAvailableUsers(); // Charger les utilisateurs disponibles au démarrage
+    loadAvailableUsers();
     
-    // Écouter l'événement pour ouvrir une conversation spécifique
     const handleOpenConversation = (event: CustomEvent) => {
       const { userId } = event.detail;
-      console.log('Événement openConversation reçu pour userId:', userId);
       if (userId && userId !== selectedConversation) {
-        console.log('Changement de conversation de', selectedConversation, 'vers', userId);
         setSelectedConversation(null);
         setMessages([]);
         setTimeout(() => {
@@ -110,7 +109,6 @@ const MessageriePage: React.FC = () => {
           loadMessages(userId);
         }, 100);
       } else if (userId === selectedConversation) {
-        console.log('Même conversation, rechargement des messages');
         loadMessages(userId);
       }
     };
@@ -120,13 +118,45 @@ const MessageriePage: React.FC = () => {
     return () => {
       window.removeEventListener('openConversation', handleOpenConversation as EventListener);
     };
-  }, []); // Supprimer les dépendances qui causent la boucle
+  }, []);
+
+  // Écoute des messages en temps réel
+  useEffect(() => {
+    const handleNewMessage = (data: any) => {
+      console.log("Nouveau message reçu via Socket:", data);
+      
+      // Mettre à jour la liste des conversations pour avoir le dernier message et le compteur
+      loadConversations();
+
+      // Si le message appartient à la conversation actuellement ouverte, on l'ajoute
+      if (selectedConversation) {
+        const senderId = typeof data.sender === 'object' ? data.sender._id || data.sender.id : data.sender;
+        const recipientId = typeof data.recipient === 'object' ? data.recipient._id || data.recipient.id : data.recipient;
+        
+        if (senderId === selectedConversation || recipientId === selectedConversation) {
+          setMessages(prev => {
+            // Vérifier que le message n'existe pas déjà (évite les doublons)
+            if (prev.some(m => m._id === data._id)) return prev;
+            return [...prev, data];
+          });
+        }
+      }
+    };
+
+    socket.on('newMessage', handleNewMessage);
+    socket.on('receiveMessage', handleNewMessage);
+
+    return () => {
+      socket.off('newMessage', handleNewMessage);
+      socket.off('receiveMessage', handleNewMessage);
+    };
+  }, [selectedConversation, socket]);
 
   useEffect(() => {
     if (selectedConversation) {
       loadMessages(selectedConversation);
     }
-  }, [selectedConversation]); // Supprimer les dépendances inutiles
+  }, [selectedConversation]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -171,7 +201,17 @@ const MessageriePage: React.FC = () => {
   const loadMessages = async (userId: string) => {
     try {
       const res = await Api.get(`/messages/${userId}`);
-      setMessages(res.data || []);
+      console.log("Messages reçus de l'API pour", userId, ":", res.data);
+      // Extraire le tableau de messages quel que soit le format renvoyé par l'API
+      let messagesData = [];
+      if (Array.isArray(res.data)) {
+        messagesData = res.data;
+      } else if (res.data && Array.isArray(res.data.data)) {
+        messagesData = res.data.data;
+      } else if (res.data && Array.isArray(res.data.messages)) {
+        messagesData = res.data.messages;
+      }
+      setMessages(messagesData);
     } catch (error) {
       console.error('Erreur chargement messages:', error);
       setMessages([]);
@@ -358,23 +398,30 @@ const MessageriePage: React.FC = () => {
 
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
               <div className="space-y-4">
-                {messages.map((message, index) => {
-                  const senderId = typeof message.sender === 'object' ? message.sender._id : message.sender;
-                  const isMyMessage = String(senderId) === String(currentUser?._id || currentUser?.id);
+                {messages.length === 0 ? (
+                  <div className="text-center text-gray-500 mt-10">
+                    <p>Aucun message. Commencez la discussion !</p>
+                  </div>
+                ) : (
+                  messages.map((message, index) => {
+                    const senderObj = message.sender || {};
+                    const senderId = typeof senderObj === 'object' ? (senderObj._id || senderObj.id) : senderObj;
+                    const isMyMessage = String(senderId) === String(currentUser?._id || currentUser?.id);
 
-                  return (
-                    <div key={index} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`px-4 py-2 rounded-2xl max-w-xs ${
-                        isMyMessage ? 'bg-purple-600 text-white' : 'bg-white border border-gray-200'
-                      }`}>
-                        <p className="text-sm">{message.content}</p>
-                        <p className={`text-[10px] mt-1 ${isMyMessage ? 'text-purple-200' : 'text-gray-400'}`}>
-                          {formatTime(message.timestamp)}
-                        </p>
+                    return (
+                      <div key={message._id || index} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`px-4 py-2 rounded-2xl max-w-xs ${
+                          isMyMessage ? 'bg-purple-600 text-white' : 'bg-white border border-gray-200 text-gray-800'
+                        }`}>
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          <p className={`text-[10px] mt-1 text-right ${isMyMessage ? 'text-purple-200' : 'text-gray-400'}`}>
+                            {formatTime(message.timestamp || message.createdAt || new Date().toISOString())}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
                 <div ref={messagesEndRef} />
               </div>
             </div>
