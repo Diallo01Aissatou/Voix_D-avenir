@@ -60,10 +60,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
   useEffect(() => {
     loadStats();
-    loadUsers(); // Charger au démarrage
-    loadRequests();
-    loadPartners();
+    // Ne charger que les données strictement nécessaires au démarrage (pour les badges rouges du menu par exemple)
     loadPendingMentors();
+    // Les autres données très lourdes (tous les utilisateurs, partenaires, sessions) 
+    // seront chargées uniquement quand l'administrateur cliquera sur leur onglet.
   }, []);
 
   useEffect(() => {
@@ -995,20 +995,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                         <button
                           onClick={async () => {
                             try {
-                              // Essayer le nouvel endpoint dédié
-                              try {
-                                await Api.put(`/users/admin/reject/${rejectingId}`, { reason: rejectReason });
-                              } catch {
-                                // Repli: utiliser l'endpoint de mise à jour existant
-                                await Api.put(`/users/admin/${rejectingId}`, { isApproved: false, verified: false });
-                              }
+                              await Api.put(`/users/admin/reject/${rejectingId}`, { reason: rejectReason });
                               setRejectingId(null);
                               setRejectReason('');
                               await loadPendingMentors();
                               await refreshStats();
-                              alert('Mentore rejetée.');
+                              alert('Mentore rejetée et supprimée avec succès.');
                             } catch (err: any) {
-                              alert(`Erreur: ${err?.response?.data?.message || err?.message || 'Erreur inconnue'}`);
+                              alert(`Erreur lors du rejet : ${err?.response?.data?.message || err?.message || 'Erreur inconnue'}`);
                             }
                           }}
                           className="flex-1 bg-red-500 text-white py-2 rounded-xl font-bold text-sm"
