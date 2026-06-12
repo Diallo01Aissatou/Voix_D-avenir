@@ -301,7 +301,7 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
               />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentorée</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Mentorée</h1>
               <p className="text-gray-600 font-medium">Bienvenue, <span className="text-purple-600">{currentUser?.name}</span></p>
             </div>
           </div>

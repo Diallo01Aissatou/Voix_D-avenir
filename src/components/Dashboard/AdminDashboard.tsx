@@ -810,7 +810,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             )}
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Administrateur</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Tableau de Bord - Admin</h1>
             <p className="text-gray-600">Bienvenue <span className="text-purple-600 font-bold">{currentUser?.name?.replace('Admin2', 'Admin')}</span></p>
           </div>
         </div>
@@ -861,7 +861,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         {/* Navigation */}
         <div className="bg-white rounded-xl shadow-lg mb-8">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+            <nav className="flex space-x-4 md:space-x-8 px-4 md:px-6 overflow-x-auto no-scrollbar whitespace-nowrap">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`py-4 border-b-2 font-medium text-sm transition-colors ${activeTab === 'overview'
