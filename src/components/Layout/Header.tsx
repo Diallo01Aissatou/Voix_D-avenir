@@ -32,12 +32,15 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen, currentPage, 
             className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity lg:flex-1"
             onClick={() => onNavigate('home')}
           >
-            <div className="flex items-center justify-center w-full lg:justify-start">
+            <div className="flex items-center justify-center lg:justify-start space-x-3 w-full lg:w-auto">
               <img
                 src={`${import.meta.env.BASE_URL}logo.png`}
                 alt="Voix D'avenir Logo"
                 className="h-10 sm:h-12 md:h-14 w-auto bg-transparent object-contain"
               />
+              <span className="text-xl md:text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+                Voix d'Avenir
+              </span>
             </div>
           </div>
 
