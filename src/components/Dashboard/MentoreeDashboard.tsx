@@ -309,41 +309,41 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
-            <div className="w-14 h-14 bg-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
-              <CheckCircle className="w-7 h-7" />
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+              <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div className="ml-4">
-              <p className="text-3xl font-bold">{stats.activeMentorships}</p>
-              <p className="text-sm text-gray-500 font-medium">Mentorats actifs</p>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
-            <div className="w-14 h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-white shadow-lg">
-              <Clock className="w-7 h-7" />
-            </div>
-            <div className="ml-4">
-              <p className="text-3xl font-bold">{stats.pendingRequests}</p>
-              <p className="text-sm text-gray-500 font-medium">Demandes en attente</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-2xl sm:text-3xl font-bold">{stats.activeMentorships}</p>
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">Mentorats actifs</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
-            <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
-              <Calendar className="w-7 h-7" />
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+              <Clock className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div className="ml-4">
-              <p className="text-3xl font-bold">{stats.completedSessions}</p>
-              <p className="text-sm text-gray-500 font-medium">Séances terminées</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-2xl sm:text-3xl font-bold">{stats.pendingRequests}</p>
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">Demandes en attente</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 shadow-lg flex items-center transition-transform hover:scale-105">
-            <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
-              <Star className="w-7 h-7" />
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-500 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+              <Calendar className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div className="ml-4">
-              <p className="text-3xl font-bold">{stats.totalHours}h</p>
-              <p className="text-sm text-gray-500 font-medium">Heures cumulées</p>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-2xl sm:text-3xl font-bold">{stats.completedSessions}</p>
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">Séances terminées</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg flex items-center transition-transform hover:scale-105">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+              <Star className="w-6 h-6 sm:w-7 sm:h-7" />
+            </div>
+            <div className="ml-3 sm:ml-4">
+              <p className="text-2xl sm:text-3xl font-bold">{stats.totalHours}h</p>
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">Heures cumulées</p>
             </div>
           </div>
         </div>
@@ -386,14 +386,14 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                       <Star className="w-5 h-5 mr-2 text-yellow-300" />
                       Recommandé pour vous
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {mentores.filter((m: User) => m.expertise?.some((e: string) => (userProfile?.interests || []).some((i: string) => e.toLowerCase().includes(i.toLowerCase())))).slice(0, 2).map((m: User) => (
                         <div key={m.id} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
                           <div className="flex items-center space-x-3 mb-2">
                             <ProfileImage 
                               src={getPhotoUrl(m.photo)} 
                               alt={m.name} 
-                              className="w-12 h-12 rounded-full border-2 border-white/50" 
+                              className="w-12 h-12 rounded-full border-2 border-white/50 flex-shrink-0" 
                             />
                             <div>
                                <p className="font-bold text-sm">{m.name}</p> 
@@ -407,8 +407,8 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="relative">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <div className="relative col-span-1 sm:col-span-2 lg:col-span-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type="text" placeholder="Rechercher par nom..." value={searchFilters.search} onChange={e => setSearchFilters({ ...searchFilters, search: e.target.value })} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none" />
                   </div>
@@ -422,19 +422,19 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {mentores.map(m => (
                     <div key={m.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
-                      <div className="flex items-start space-x-4">
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left space-y-4 sm:space-y-0 sm:space-x-4">
                         <ProfileImage 
                           src={getPhotoUrl(m.photo)} 
                           alt={m.name} 
                           className="w-20 h-20 rounded-2xl flex-shrink-0" 
                         />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
+                        <div className="flex-1 w-full flex flex-col items-center sm:items-start">
+                          <div className="flex flex-col sm:flex-row sm:justify-between items-center w-full gap-1">
                              <h3 className="text-lg font-bold group-hover:text-purple-600 transition-colors">{m.name}</h3>
-                             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest bg-gray-100 px-2 py-1 rounded">Mentore</span>
+                             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest bg-gray-100 px-2 py-1 rounded mt-1 sm:mt-0">Mentore</span>
                           </div>
                           <p className="text-purple-600 font-medium text-sm mb-1">{m.profession}</p>
                           <p className="text-xs text-gray-500 mb-4">{m.city}</p>
@@ -459,28 +459,28 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Mon Profil Personnel</h3>
                  {isEditingProfile ? (
                     <form onSubmit={handleUpdateProfile} className="bg-white rounded-2xl p-8 border border-purple-100 shadow-sm space-y-4">
-                       <div className="flex items-center space-x-6 mb-6 pb-6 border-b border-gray-100">
-                         <div className="relative group">
-                           <ProfileImage 
-                             src={photoPreview || getPhotoUrl(userProfile?.photo)} 
-                             alt="Aperçu" 
-                             className="w-24 h-24 rounded-2xl object-cover shadow-md border-4 border-purple-100"
-                           />
-                           <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-2xl opacity-100 md:opacity-0 md:group-hover:opacity-100 cursor-pointer transition-opacity">
-                             <div className="text-center">
-                               <Camera className="w-8 h-8 mx-auto" />
-                               <span className="text-[10px] font-bold">Modifier</span>
-                             </div>
-                             <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
-                           </label>
-                         </div>
-                         <div>
-                           <h4 className="font-bold text-gray-800">Photo de profil</h4>
-                           <p className="text-xs text-gray-500">Cliquez sur l'image pour la modifier</p>
-                         </div>
-                       </div>
+                        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6 pb-6 border-b border-gray-100 text-center sm:text-left">
+                          <div className="relative group">
+                            <ProfileImage 
+                              src={photoPreview || getPhotoUrl(userProfile?.photo)} 
+                              alt="Aperçu" 
+                              className="w-24 h-24 rounded-2xl object-cover shadow-md border-4 border-purple-100"
+                            />
+                            <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-2xl opacity-100 md:opacity-0 md:group-hover:opacity-100 cursor-pointer transition-opacity">
+                              <div className="text-center">
+                                <Camera className="w-8 h-8 mx-auto" />
+                                <span className="text-[10px] font-bold">Modifier</span>
+                              </div>
+                              <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
+                            </label>
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-800">Photo de profil</h4>
+                            <p className="text-xs text-gray-500">Cliquez sur l'image pour la modifier</p>
+                          </div>
+                        </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                            <label className="block text-sm font-bold text-gray-700 mb-1">Nom complet</label>
                            <input value={userProfile?.name || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, name: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Nom" />
@@ -497,68 +497,68 @@ const MentoreeDashboard: React.FC<{ onNavigate?: (page: string) => void }> = ({ 
                            <label className="block text-sm font-bold text-gray-700 mb-1">Niveau d'études / Métier</label>
                            <input value={userProfile?.level || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, level: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Étudiante en Droit" />
                         </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
-                        <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, interests: e.target.value.split(',').map(it => it.trim()) } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
-                      </div>
-                      <div>
-                         <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
-                         <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, bio: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
-                      </div>
-                      <div className="flex space-x-3 pt-4">
-                         <button 
-                           type="submit" 
-                           disabled={isUpdating}
-                           className={`flex-1 ${isUpdating ? 'bg-purple-400' : 'bg-purple-600 hover:bg-purple-700'} text-white py-3 rounded-xl font-bold shadow-lg transition-all`}
-                         >
-                           {isUpdating ? (
-                             <span className="flex items-center justify-center">
-                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                               Enregistrement...
-                             </span>
-                           ) : 'Enregistrer les modifications'}
-                         </button>
-                         <button type="button" onClick={() => { setIsEditingProfile(false); setPhotoFile(null); setPhotoPreview(null); }} className="flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
-                      </div>
-                   </form>
+                       </div>
+                       <div>
+                         <label className="block text-sm font-bold text-gray-700 mb-1">Mes Intérêts (séparés par des virgules)</label>
+                         <input value={userProfile?.interests?.join(', ') || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, interests: e.target.value.split(',').map(it => it.trim()) } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" placeholder="Ex: Marketing, IA, Finance" />
+                       </div>
+                       <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-1">Ma Bio</label>
+                          <textarea value={userProfile?.bio || ''} onChange={e => setUserProfile(prev => prev ? { ...prev, bio: e.target.value } : null)} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none transition-colors" rows={5} placeholder="Décrivez-vous..." />
+                       </div>
+                       <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                          <button 
+                            type="submit" 
+                            disabled={isUpdating}
+                            className={`w-full sm:flex-1 ${isUpdating ? 'bg-purple-400' : 'bg-purple-600 hover:bg-purple-700'} text-white py-3 rounded-xl font-bold shadow-lg transition-all`}
+                          >
+                            {isUpdating ? (
+                              <span className="flex items-center justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                Enregistrement...
+                              </span>
+                            ) : 'Enregistrer les modifications'}
+                          </button>
+                          <button type="button" onClick={() => { setIsEditingProfile(false); setPhotoFile(null); setPhotoPreview(null); }} className="w-full sm:flex-1 border-2 border-gray-200 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Annuler</button>
+                       </div>
+                    </form>
                  ) : (
-                   <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
-                     <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-8">
-                        <ProfileImage 
-                          src={getPhotoUrl(userProfile?.photo)} 
-                          alt={userProfile?.name || 'Profil'} 
-                          className="w-32 h-32 rounded-3xl shadow-xl ring-4 ring-purple-50" 
-                        />
-                        <div className="flex-1 text-center md:text-left">
-                           <h3 className="text-3xl font-black text-gray-800 mb-1">{userProfile?.name}</h3>
-                           <p className="text-purple-600 font-bold mb-2 uppercase tracking-widest text-[10px]">VOTRE COMPTE MENTORÉE</p>
-                           <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
-                             <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.age || '?'} ans</span>
-                             <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.city || 'Ma ville'}</span>
-                             <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.level || 'Niveau d\'études'}</span>
-                           </div>
-                           <p className="text-gray-500 mb-4 font-medium bg-gray-50 px-4 py-2 rounded-xl inline-block text-sm">{userProfile?.email}</p>
-                           
-                           {(userProfile?.interests?.length || 0) > 0 && (
-                             <div className="flex flex-wrap gap-1 mb-4 justify-center md:justify-start">
-                               {userProfile?.interests?.map((it, idx) => (
-                                 <span key={idx} className="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">#{it}</span>
-                               ))}
-                             </div>
-                           )}
+                    <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-lg">
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-8">
+                         <ProfileImage 
+                           src={getPhotoUrl(userProfile?.photo)} 
+                           alt={userProfile?.name || 'Profil'} 
+                           className="w-32 h-32 rounded-3xl shadow-xl ring-4 ring-purple-50 flex-shrink-0" 
+                         />
+                         <div className="flex-1 text-center sm:text-left w-full">
+                            <h3 className="text-2xl sm:text-3xl font-black text-gray-800 mb-1">{userProfile?.name}</h3>
+                            <p className="text-purple-600 font-bold mb-2 uppercase tracking-widest text-[10px]">VOTRE COMPTE MENTORÉE</p>
+                            <div className="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
+                              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.age || '?'} ans</span>
+                              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.city || 'Ma ville'}</span>
+                              <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-xs font-bold">{userProfile?.level || 'Niveau d\'études'}</span>
+                            </div>
+                            <p className="text-gray-500 mb-4 font-medium bg-gray-50 px-4 py-2 rounded-xl inline-block text-sm break-all">{userProfile?.email}</p>
+                            
+                            {(userProfile?.interests?.length || 0) > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-4 justify-center sm:justify-start">
+                                {userProfile?.interests?.map((it, idx) => (
+                                  <span key={idx} className="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">#{it}</span>
+                                ))}
+                              </div>
+                            )}
 
-                           <div className="p-4 bg-purple-50 rounded-2xl italic text-purple-800 text-sm mb-6 border-l-4 border-purple-400">
-                             "{userProfile?.bio || "Partagez votre histoire et vos objectifs avec la communauté."}"
-                           </div>
-                           
-                           <button onClick={() => setIsEditingProfile(true)} className="mt-6 flex items-center px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
-                             <Edit className="w-4 h-4 mr-2" />
-                             Modifier mon profil
-                           </button>
-                        </div>
-                     </div>
-                   </div>
+                            <div className="p-4 bg-purple-50 rounded-2xl italic text-purple-800 text-sm mb-6 border-l-4 border-purple-400">
+                              "{userProfile?.bio || "Partagez votre histoire et vos objectifs avec la communauté."}"
+                            </div>
+                            
+                            <button onClick={() => setIsEditingProfile(true)} className="mt-6 flex items-center justify-center sm:justify-start px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg mx-auto sm:mx-0 w-full sm:w-auto">
+                              <Edit className="w-4 h-4 mr-2" />
+                              Modifier mon profil
+                            </button>
+                         </div>
+                      </div>
+                    </div>
                  )}
                </div>
             )}

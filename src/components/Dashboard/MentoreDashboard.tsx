@@ -194,59 +194,59 @@ const MentoreDashboard: React.FC<MentoreDashboardProps> = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <div className="stat-card-enhanced bg-white rounded-2xl p-6 shadow-lg">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+          <div className="stat-card-enhanced bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
             <div className="flex items-center">
-              <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                <MessageSquare className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                <MessageSquare className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
-              <div className="ml-4">
-                <p className="text-3xl font-bold">{stats.totalRequests}</p>
-                <p className="text-sm text-gray-500">Total demandes</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-2xl sm:text-3xl font-bold">{stats.totalRequests}</p>
+                <p className="text-xs sm:text-sm text-gray-500">Total demandes</p>
               </div>
             </div>
           </div>
-          <div className="stat-card-enhanced bg-white rounded-2xl p-6 shadow-lg">
+          <div className="stat-card-enhanced bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
             <div className="flex items-center">
-              <div className="w-14 h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                <Clock className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                <Clock className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
-              <div className="ml-4">
-                <p className="text-3xl font-bold">{stats.pendingRequests}</p>
-                <p className="text-sm text-gray-500">En attente</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-2xl sm:text-3xl font-bold">{stats.pendingRequests}</p>
+                <p className="text-xs sm:text-sm text-gray-500">En attente</p>
               </div>
             </div>
           </div>
-          <div className="stat-card-enhanced bg-white rounded-2xl p-6 shadow-lg">
+          <div className="stat-card-enhanced bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
             <div className="flex items-center">
-              <div className="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                <CheckCircle className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-500 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
-              <div className="ml-4">
-                <p className="text-3xl font-bold">{stats.acceptedRequests}</p>
-                <p className="text-sm text-gray-500">Acceptées</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-2xl sm:text-3xl font-bold">{stats.acceptedRequests}</p>
+                <p className="text-xs sm:text-sm text-gray-500">Acceptées</p>
               </div>
             </div>
           </div>
-          <div className="stat-card-enhanced bg-white rounded-2xl p-6 shadow-lg">
+          <div className="stat-card-enhanced bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
             <div className="flex items-center">
-              <div className="w-14 h-14 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                <XCircle className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                <XCircle className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
-              <div className="ml-4">
-                <p className="text-3xl font-bold">{stats.rejectedRequests}</p>
-                <p className="text-sm text-gray-500">Refusées</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-2xl sm:text-3xl font-bold">{stats.rejectedRequests}</p>
+                <p className="text-xs sm:text-sm text-gray-500">Refusées</p>
               </div>
             </div>
           </div>
-          <div className="stat-card-enhanced bg-white rounded-2xl p-6 shadow-lg">
+          <div className="stat-card-enhanced bg-white rounded-2xl p-4 sm:p-6 shadow-lg col-span-2 sm:col-span-1">
             <div className="flex items-center">
-              <div className="w-14 h-14 bg-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg flex-shrink-0">
                 <Calendar className="w-7 h-7" />
               </div>
-              <div className="ml-4">
-                <p className="text-3xl font-bold">{stats.totalHours}h</p>
-                <p className="text-sm text-gray-500">Heures</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-2xl sm:text-3xl font-bold">{stats.totalHours}h</p>
+                <p className="text-xs sm:text-sm text-gray-500">Heures</p>
               </div>
             </div>
           </div>
@@ -309,15 +309,15 @@ const SessionsManagerMentore = ({ sessions, onRefresh, onOpenChat }: { sessions:
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4"><h3 className="font-bold text-xl">Vos Séances de Mentorat</h3><button onClick={onRefresh} className="text-purple-600 font-bold">Actualiser</button></div>
       {sessions.map(s => (
-        <div key={s._id} className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center hover:bg-white transition-colors">
+        <div key={s._id} className="bg-gray-50 p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-white transition-colors">
           <div className="flex items-center space-x-3">
-             <ProfileImage src={getPhotoUrl(s.mentoree?.photo)} alt={s.mentoree?.name || ''} className="w-12 h-12 rounded-full border-2 border-purple-100" />
+             <ProfileImage src={getPhotoUrl(s.mentoree?.photo)} alt={s.mentoree?.name || ''} className="w-12 h-12 rounded-full border-2 border-purple-100 flex-shrink-0" />
              <div><p className="font-bold">{s.mentoree?.name}</p><p className="text-sm text-purple-600">{s.topic}</p><p className="text-xs text-gray-500">{new Date(s.scheduledDate).toLocaleDateString()} à {s.scheduledTime}</p></div>
           </div>
-          <div className="flex space-x-2">
-            <button onClick={() => { setMeetingLink(s.meetingLink || ''); setShowLinkModal(s._id); }} className="px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-bold">Lien</button>
-            <button onClick={() => handleAction(s._id, 'complete')} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-xs font-bold">Terminer</button>
-            <button onClick={() => onOpenChat(s.mentoree?._id || s.mentoree?.id)} className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold">Chat</button>
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-start sm:justify-end">
+            <button onClick={() => { setMeetingLink(s.meetingLink || ''); setShowLinkModal(s._id); }} className="px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-bold flex-1 sm:flex-none text-center">Lien</button>
+            <button onClick={() => handleAction(s._id, 'complete')} className="px-3 py-1 bg-purple-600 text-white rounded-lg text-xs font-bold flex-1 sm:flex-none text-center">Terminer</button>
+            <button onClick={() => onOpenChat(s.mentoree?._id || s.mentoree?.id)} className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold flex-1 sm:flex-none text-center">Chat</button>
           </div>
         </div>
       ))}
@@ -391,7 +391,7 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
     <div className="max-w-2xl mx-auto space-y-6">
       <h3 className="text-xl font-bold">Modifier mon Profil de Mentore</h3>
       
-      <div className="flex items-center space-x-6 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+      <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 bg-gray-50 p-6 rounded-2xl border border-gray-100 text-center sm:text-left">
         <div className="relative group">
           <ProfileImage 
             src={photoPreview || getPhotoUrl(currentUser?.photo)} 
@@ -412,7 +412,7 @@ const ProfileManager = ({ currentUser, onUpdate }: { currentUser: any, onUpdate:
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-bold text-gray-700 mb-1">Ville</label>
           <input type="text" value={profileData.city} onChange={e => setProfileData({ ...profileData, city: e.target.value })} className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-purple-500 outline-none" placeholder="Ville" />

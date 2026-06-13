@@ -816,8 +816,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -959,7 +959,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                     <p className="text-sm mt-1">Toutes les demandes ont été traitées.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pendingMentors.map(mentor => (
                       <div key={mentor._id} className="bg-white border border-gray-100 rounded-2xl shadow-md overflow-hidden flex flex-col">
                         {/* Header */}
@@ -1085,7 +1085,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             {activeTab === 'overview' && (
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Vue d'ensemble de la plateforme</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-6 text-white">
                     <h4 className="text-lg font-semibold mb-4">Activité récente</h4>
                     <div className="space-y-2">
@@ -1260,7 +1260,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
                 <div className="bg-gray-50 rounded-xl p-6 mb-6">
                   <h4 className="text-lg font-semibold text-gray-800 mb-4">Ajouter un nouveau partenaire</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <input
                       type="text"
                       placeholder="Nom du partenaire"
@@ -1290,7 +1290,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                       placeholder="Description"
                       value={newPartner.description}
                       onChange={(e) => setNewPartner({ ...newPartner, description: e.target.value })}
-                      className="col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                      className="sm:col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     ></textarea>
                   </div>
                   <button
@@ -1302,7 +1302,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {partners.length === 0 ? (
                     <div className="col-span-2 text-center py-12 text-gray-500">
                       <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -1311,8 +1311,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   ) : (
                     partners.map((partner) => (
                       <div key={partner._id} className="bg-white rounded-xl p-6 shadow-lg">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                          <div className="flex items-center flex-1 min-w-0 w-full">
                             {partner.logo && (
                               <img
                                 src={(partner.logo.startsWith('http') || partner.logo.startsWith('data:')) ? partner.logo : `${BASE_URL}${partner.logo}`}
@@ -1321,7 +1321,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                 onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/64?text=Logo'; }}
                               />
                             )}
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                               <h4 className="font-bold text-gray-800 text-lg truncate">{partner.name}</h4>
                               {partner.website && (
                                 <a href={partner.website} target="_blank" rel="noopener noreferrer" className="text-purple-600 text-sm hover:underline block break-all">
@@ -1335,7 +1335,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           </div>
                           <button
                             onClick={() => deletePartner(partner._id)}
-                            className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                            className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm text-center sm:ml-4 flex-shrink-0"
                           >
                             Supprimer
                           </button>
@@ -1353,8 +1353,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
 
                 <div className="bg-gray-50 rounded-xl p-6 mb-6">
                   <h4 className="text-lg font-semibold text-gray-800 mb-4">Ajouter un nouveau témoignage</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="col-span-1 sm:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Sélectionner une mentorée</label>
                       <div className="relative">
                         <input
@@ -1415,7 +1415,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                       rows={3}
                       value={newTestimonial.message}
                       onChange={(e) => setNewTestimonial({ ...newTestimonial, message: e.target.value })}
-                      className="col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                      className="col-span-1 sm:col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     ></textarea>
                     <select
                       value={newTestimonial.rating}
@@ -1436,7 +1436,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {testimonials.length === 0 ? (
                     <div className="col-span-2 text-center py-12 text-gray-500">
                       <Star className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -1451,8 +1451,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           ))}
                         </div>
                         <p className="text-gray-600 italic mb-4">"{testimonial.message}"</p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                          <div className="flex items-center w-full">
                             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
                               {(testimonial.adminCreated?.avatar || testimonial.mentee?.photo) ? (
                                 <img
@@ -1460,8 +1460,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                                   alt={testimonial.adminCreated?.name || testimonial.mentee?.name}
                                   className="w-10 h-10 object-cover"
                                   onError={(e) => {
-                                    e.target.style.display = 'none';
-                                    e.target.nextSibling.style.display = 'flex';
+                                    e.currentTarget.style.display = 'none';
+                                    const nextSib = e.currentTarget.nextSibling as HTMLElement;
+                                    if (nextSib) nextSib.style.display = 'flex';
                                   }}
                                 />
                               ) : null}
@@ -1476,7 +1477,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                           </div>
                           <button
                             onClick={() => deleteTestimonial(testimonial._id)}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                            className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm text-center flex-shrink-0"
                           >
                             Supprimer
                           </button>
@@ -1624,14 +1625,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                   ) : (
                     experts.map((expert) => (
                       <div key={expert._id} className="bg-white rounded-xl p-6 shadow-lg">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
+                        <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+                          <div className="flex-1 w-full">
                             <div className="flex items-center mb-4">
                               {expert.user?.photo && (
                                 <img
                                   src={getPhotoUrl(expert.user.photo)!}
                                   alt={expert.user.name}
-                                  className="w-16 h-16 rounded-full object-cover mr-4"
+                                  className="w-16 h-16 rounded-full object-cover mr-4 flex-shrink-0"
                                 />
                               )}
                               <div>
@@ -1665,16 +1666,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                               </div>
                             )}
                           </div>
-                          <div className="ml-4 flex flex-col space-y-2">
+                          <div className="w-full lg:w-auto flex flex-row lg:flex-col gap-2 lg:space-y-2 lg:ml-4 flex-shrink-0">
                             <button
                               onClick={() => toggleFeatured(expert._id)}
-                              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm"
+                              className="flex-1 lg:flex-none px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm text-center"
                             >
-                              {expert.isFeatured ? 'Retirer vedette' : 'Définir vedette'}
+                              {expert.isFeatured ? 'Retirer' : 'Vedette'}
                             </button>
                             <button
                               onClick={() => deleteExpert(expert._id)}
-                              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                              className="flex-1 lg:flex-none px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm text-center"
                             >
                               Supprimer
                             </button>

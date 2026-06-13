@@ -124,10 +124,10 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
           <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Actualiser
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {sessions.map((session, index) => (
           <div key={`${session._id}-${index}`} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center space-x-3">
                 <ProfileImage src={getPhotoUrl(session.mentore?.photo)} alt={session.mentore?.name || ''} className="w-12 h-12 rounded-full border-2 border-purple-100 flex-shrink-0" />
                 <div>
@@ -135,7 +135,9 @@ const SessionsManagerMentoree: React.FC<SessionsManagerMentoreeProps> = ({
                   <p className="text-sm text-purple-600">{session.topic}</p>
                 </div>
               </div>
-              {getStatusBadge(session.status || 'scheduled', session._id)}
+              <div className="flex-shrink-0">
+                {getStatusBadge(session.status || 'scheduled', session._id)}
+              </div>
             </div>
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
