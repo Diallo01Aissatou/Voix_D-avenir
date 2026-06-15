@@ -51,7 +51,7 @@ const ExpertsPage: React.FC<ExpertsPageProps> = ({ onNavigate }) => {
         <img 
           src={src} 
           alt={alt} 
-          className={`${className} object-cover w-full h-full`} 
+          className={`${className} object-cover object-top w-full h-full`} 
           onLoad={() => setLoading(false)}
           onError={() => { setError(true); setLoading(false); }} 
         />
