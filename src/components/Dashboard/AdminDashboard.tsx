@@ -112,6 +112,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     if (activeTab === 'resources') loadResources();
     if (activeTab === 'events') loadEvents();
     if (activeTab === 'requests') loadRequests();
+    if (activeTab === 'partners') loadPartners();
   }, [activeTab]);
 
   // Recharger les stats après certaines actions
